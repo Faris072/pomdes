@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('status_id');
             $table->string('name');
             $table->date('start_date');
-            $table->data('end_date');
+            $table->date('end_date');
             $table->string('description');
             $table->timestamps();
             $table->softDeletes();

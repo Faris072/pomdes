@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Transaction;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,6 +14,18 @@ class User extends Authenticatable implements JWTSubject
 
     protected $guarded = ['id'];
     protected $hidden = ['password'];
+
+    public function role(){
+        return $this->belongsTo(Role::class,'role_id','id');
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class,'user_id','id');
+    }
+
+    public function fuels(){
+        return $this->hasMany(Fuel::class,'user_id', 'id');
+    }
 
     public function getJWTIdentifier()
     {
