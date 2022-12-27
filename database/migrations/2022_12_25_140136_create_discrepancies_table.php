@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('discrepancy', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaction_id');
-            $table->string('fuel_type');
-            $table->string('discrepancy_type');
-            $table->float('fuel_volume');
-            $table->bigInteger('fuel_price');
+            $table->date('report_date');
+            $table->string('report_title');
+            $table->string('report_description');
+            $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();
         });

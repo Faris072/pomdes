@@ -13,10 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('fuel_transaction', function (Blueprint $table) {
+        Schema::create('discrepancy_type', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('fuel_id');
-            $table->foreignId('transaction_id');
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fuel_transaction');
+        Schema::dropIfExists('discrepancy_type');
     }
 };

@@ -14,6 +14,6 @@ class DiscrepancyFiles extends Model
     protected $guarded = ['id'];
 
     public function discrepancy(){
-        return $this->belongsTo(Discrepancy::class, 'discrepancy_id','id');
+        return $this->belongsTo(FuelDiscrepancy::class, 'fuel_discrepancy_id','id');
     }
 }

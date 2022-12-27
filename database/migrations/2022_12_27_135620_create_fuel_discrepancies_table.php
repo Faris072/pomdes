@@ -13,9 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('fuel_discrepancies', function (Blueprint $table) {
+        Schema::create('fuel_discrepancy', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('discrepancy_id');
+            $table->foreignId('fuel_transaction_id');
+            $table->foreignId('discrepancy_type_id');
+            $table->float('discrepancy_volume');
+            $table->bigInteger('discrepancy_price');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -26,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fuel_discrepancies');
+        Schema::dropIfExists('fuel_discrepancy');
     }
 };

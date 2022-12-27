@@ -13,8 +13,8 @@ class Discrepancy extends Model
     protected $table = 'discrepancy';
     protected $guarded = ['id'];
 
-    public function discrepancy_files(){
-        return $this->hasMany(DiscrepancyFiles::class, 'discrepancy_id', 'id');
+    public function fuel_discrepancy(){
+        return $this->hasMany(FuelDiscrepancy::class, 'discrepancy_id', 'id');
     }
 
     public function transaction(){
