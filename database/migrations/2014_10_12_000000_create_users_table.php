@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('role_id');
             $table->foreignId('pusat_id');
             $table->string('username');
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
