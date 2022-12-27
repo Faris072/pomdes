@@ -13,7 +13,7 @@ class Controller extends BaseController
 
     public $code;
 
-    public function getResponse($code = $this->$code){
-        return response()->json([],$code);
-    }
+    // public function getResponse($code = $this->$code){
+    //     return response()->json([],$code);
+    // }
 }
