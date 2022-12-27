@@ -9,4 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'role';
+    protected $guarded = ['id'];
+
+    public function users(){
+        return $this->hasMany(User::class, 'role_id', 'id');
+    }
 }

@@ -9,4 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentToSupplierFiles extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'payment_to_supplier_files';
+    protected $guarded = ['id'];
+
+    public function payment_to_supplier(){
+        return $this->belongsTo(PaymentToSupplier::class,'payment_to_supplier_id','id');
+    }
 }

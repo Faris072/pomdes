@@ -9,4 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 class Status extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'status';
+    protected $guarded = ['id'];
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class, 'status_id','id');
+    }
 }

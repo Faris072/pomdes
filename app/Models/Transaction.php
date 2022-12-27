@@ -9,4 +9,43 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $table = 'transaction';
+    protected $guarded = ['id'];
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id','id');
+    }
+
+    public function status(){
+        return $this->belongsTo(Status::class, 'status_id','id');
+    }
+
+    public function invoice_pomdes(){
+        return $this->hasOne(InvoicePomdes::class, 'transaction_id','id');
+    }
+
+    public function invoice_pusat(){
+        return $this->hasOne(InvoicePusat::class,'transaction_id','id');
+    }
+
+    public function payment_to_pusat(){
+        return $this->hasOne(PaymentToPusat::class,'transaction_id','id');
+    }
+
+    public function payment_to_supplier(){
+        return $this->hasOne(PaymentToSupplier::class,'transaction_id','id');
+    }
+
+    public function fuel_transactions(){
+        return $this->hasMany(FuelTransaction::class,'transaction_id','id');
+    }
+
+    public function hindrance(){
+        return $this->hasOne(Hindrance::class,'transaction_id','id');
+    }
+
+    public function discrepancy(){
+        return $this->hasOne(Discrepancy::class, 'transaction_id','id');
+    }
 }
