@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Profile;
 
 class AuthController extends Controller
 {
@@ -66,11 +67,17 @@ class AuthController extends Controller
                 'password' => bcrypt($request->password)
             ]);
 
-            if($query){
-                return $this->getResponse($query,'Data user berhasil disimpan');
+            $profile = Profile::create(['user_id'=>$query->id]);
+
+            if(!$query){
+                return $this->getResponse([],'Terjadi kesalahan koneksi',500);
+            }
+            else if(!$profile){
+                User::destroy($query->id);
+                return $this->getResponse([],'Terjadi kesalahan koneksi',500);
             }
             else{
-                return $this->getResponse([],'Terjadi kesalahan koneksi',500);
+                return $this->getResponse($query,'Data user berhasil disimpan');
             }
         }
         catch(\Exception $e){
@@ -238,7 +245,7 @@ class AuthController extends Controller
         }
     }
 
-    public function destroy($id){
+    public function kill($id){
         try{
             if(auth()->user()->role_id != 1){
                 return $this->getResponse([],'Anda tidak memiliki akses.',403);
@@ -250,7 +257,7 @@ class AuthController extends Controller
                 return $this->getResponse([],'User tidak ditemukan',422);
             }
 
-            $delete = $user->destroy();
+            $delete = User::destroy($id);
 
             if(!$delete){
                 return $this->getResponse([],'User gagal dihancurkan',500);

@@ -27,7 +27,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('/','App\Http\Controllers\API\AuthController@get_users');
         Route::get('/{id}','App\Http\Controllers\API\AuthController@show_user');
         Route::put('/{id}','App\Http\Controllers\API\AuthController@update');
-        Route::delete('/{id}','App\Http\Controllers\API\AuthController@destroy');
+        Route::delete('/{id}','App\Http\Controllers\API\AuthController@kill');
         Route::delete('delete/{id}','App\Http\Controllers\API\AuthController@delete');
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
