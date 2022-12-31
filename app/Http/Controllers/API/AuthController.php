@@ -73,7 +73,7 @@ class AuthController extends Controller
                 return $this->getResponse([],'Terjadi kesalahan koneksi',500);
             }
             else if(!$profile){
-                User::destroy($query->id);
+                $query->forceDelete();
                 return $this->getResponse([],'Terjadi kesalahan koneksi',500);
             }
             else{
@@ -257,7 +257,7 @@ class AuthController extends Controller
                 return $this->getResponse([],'User tidak ditemukan',422);
             }
 
-            $delete = User::destroy($id);
+            $delete = $user->forceDelete($id);
 
             if(!$delete){
                 return $this->getResponse([],'User gagal dihancurkan',500);

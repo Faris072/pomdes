@@ -23,6 +23,7 @@ Route::group(['middleware' => 'auth:api'],function(){
     Route::post('logout', 'App\Http\Controllers\API\AuthController@logout');
 
     Route::group(['prefix' => 'users'], function(){
+
         Route::post('/','App\Http\Controllers\API\AuthController@register');
         Route::get('/','App\Http\Controllers\API\AuthController@get_users');
         Route::get('/{id}','App\Http\Controllers\API\AuthController@show_user');
@@ -32,5 +33,25 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
         Route::put('restore/{id}','App\Http\Controllers\API\AuthController@restore');
+
+    });
+
+    Route::group(['prefix' => 'profile'], function(){
+        Route::put('/','App\Http\Controllers\API\ProfileController@update');
+    });
+
+    Route::group(['prefix' => 'location'],function(){
+
+        Route::group(['prefix' => 'city'],function(){
+            Route::post('/','App\Http\Controllers\API\CityController@store');
+        });
+
+        Route::group(['prefix' => 'province'],function(){
+            Route::post('/','App\Http\Controllers\API\ProvinceController@store');
+            Route::get('/','App\Http\Controllers\API\ProvinceController@get');
+            Route::get('/{id}','App\Http\Controllers\API\ProvinceController@show');
+            Route::put('/{id}','App\Http\Controllers\API\ProvinceController@update');
+        });
+
     });
 });
