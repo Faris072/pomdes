@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('invoice_pusat_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_pusat_id');
+            $table->foreignId('invoice_pusat_id')->constrained('invoice_pusat')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');

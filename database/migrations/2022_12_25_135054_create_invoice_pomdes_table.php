@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('invoice_pomdes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id');
+            $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
             $table->bigInteger('nominal');
             $table->timestamps();
             $table->softDeletes();

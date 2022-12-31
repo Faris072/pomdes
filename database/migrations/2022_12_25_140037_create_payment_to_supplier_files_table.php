@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('payment_to_supplier_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_to_supplier_id');
+            $table->foreignId('payment_to_supplier_id')->constrained('payment_to_supplier')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');

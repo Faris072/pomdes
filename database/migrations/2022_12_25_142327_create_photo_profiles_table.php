@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('photo_profile', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_id');
+            $table->foreignId('profile_id')->constrained('profile')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');

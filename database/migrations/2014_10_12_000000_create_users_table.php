@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id');
-            $table->foreignId('pusat_id');
+            $table->foreignId('role_id')->constrained('role')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('pusat_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('username');
             $table->string('password');
             $table->rememberToken();

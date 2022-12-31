@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('invoice_pomdes_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_pomdes_id');
+            $table->foreignId('invoice_pomdes_id')->constrained('invoice_pomdes')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');

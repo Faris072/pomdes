@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('payment_to_supplier', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id');
+            $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();

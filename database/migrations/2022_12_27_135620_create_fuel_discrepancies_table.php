@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('fuel_discrepancy', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('discrepancy_id');
-            $table->foreignId('fuel_transaction_id');
-            $table->foreignId('discrepancy_type_id');
+            $table->foreignId('discrepancy_id')->constrained('discrepancy')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('fuel_transaction_id')->constrained('fuel_transaction')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('discrepancy_type_id')->constrained('discrepancy_type')->cascadeOnUpdate()->cascadeOnDelete();
             $table->float('discrepancy_volume');
             $table->bigInteger('discrepancy_price');
             $table->timestamps();

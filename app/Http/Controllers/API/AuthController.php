@@ -30,7 +30,11 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return $this->respondWithToken($token);
+        $data = [
+            'me' => auth()->user(),
+            'auth' => $this->respondWithToken($token)->original
+        ];
+        return $this->getResponse($data,'Login berhasil');
     }
 
     /**
@@ -62,7 +66,11 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        $data = [
+            'me' => auth()->user(),
+            'auth' => $this->respondWithToken(auth()->refresh())->original
+        ];
+        return $this->getResponse($data,'Refresh token berhasil');
     }
 
     /**

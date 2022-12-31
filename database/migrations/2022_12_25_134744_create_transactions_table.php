@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('transaction', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('status_id');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->date('start_date');
             $table->date('end_date');
