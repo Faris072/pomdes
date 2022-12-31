@@ -16,9 +16,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('role_id')->constrained('role')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('pusat_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('username');
+            $table->foreignId('pusat_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('username')->unique();
             $table->string('password');
+            $table->string('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

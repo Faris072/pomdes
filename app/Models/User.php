@@ -13,7 +13,15 @@ class User extends Authenticatable implements JWTSubject
     use Notifiable, SoftDeletes;
 
     protected $guarded = ['id'];
-    protected $hidden = ['password'];
+    protected $hidden = ['password','remember_token'];
+
+    public function pusat(){
+        return $this->belongsTo(User::class,'pusat_id','id');
+    }
+
+    public function pomdes(){
+        return $this->hasMany(User::class,'pusat_id','id');
+    }
 
     public function role(){
         return $this->belongsTo(Role::class,'role_id','id');

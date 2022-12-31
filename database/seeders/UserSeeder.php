@@ -16,10 +16,10 @@ class UserSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['pusat_id' => -1, 'role_id' => 1, 'username' => 'admin', 'password' => bcrypt(123456)],
-            ['pusat_id' => -1, 'role_id' => 2, 'username' => 'pusat', 'password' => bcrypt(123456)],
-            ['pusat_id' => -1, 'role_id' => 3, 'username' => 'pomdes', 'password' => bcrypt(123456)],
-            ['pusat_id' => -1, 'role_id' => 4, 'username' => 'supplier', 'password' => bcrypt(123456)],
+            ['pusat_id' => null, 'role_id' => 1, 'username' => 'admin', 'password' => bcrypt(123456)],
+            // ['pusat_id' => null, 'role_id' => 2, 'username' => 'pusat', 'password' => bcrypt(123456)],
+            // ['pusat_id' => null, 'role_id' => 3, 'username' => 'pomdes', 'password' => bcrypt(123456)],
+            // ['pusat_id' => null, 'role_id' => 4, 'username' => 'supplier', 'password' => bcrypt(123456)],
         ];
 
         foreach($data as $d){
