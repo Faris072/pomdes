@@ -123,6 +123,36 @@ class ProvinceController extends Controller
         }
     }
 
+    public function get_trash(){
+        try{
+            $province = Province::with(['cities'])->onlyTrashed()->get();
+
+            if(!$province){
+                return $this->getResponse([],'Provinsi tidak ditemukan',404);
+            }
+
+            return $this->getResponse($province,'Provinsi trash berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function show_trash($id){
+        try{
+            $province = Province::with(['cities'])->onlyTrashed()->find($id);
+
+            if(!$province){
+                return $this->getResponse([],'Provinsi tidak ditemukan',404);
+            }
+
+            return $this->getResponse($province,'Provinsi trash berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
     public function restore($id){
         try{
             $province = Province::onlyTrashed()->find($id);

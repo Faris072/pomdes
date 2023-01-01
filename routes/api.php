@@ -42,24 +42,28 @@ Route::group(['middleware' => 'auth:api'],function(){
 
     Route::group(['prefix' => 'location'],function(){
 
-        Route::group(['prefix' => 'city'],function(){
-            Route::post('/','App\Http\Controllers\API\CityController@store');
-            Route::get('/','App\Http\Controllers\API\CityController@get');
-            Route::get('/{id}','App\Http\Controllers\API\CityController@show');
-            Route::put('/{id}','App\Http\Controllers\API\CityController@update');
-            Route::delete('delete/{id}','App\Http\Controllers\API\CityController@delete');
-            Route::put('restore/{id}','App\Http\Controllers\API\CityController@restore');
-            Route::delete('{id}','App\Http\Controllers\API\CityController@destroy');
-        });
-
         Route::group(['prefix' => 'province'],function(){
+            Route::get('/get-trash','App\Http\Controllers\API\ProvinceController@get_trash');
+            Route::get('show-trash/{id}','App\Http\Controllers\API\ProvinceController@show_trash');
+            Route::put('restore/{id}','App\Http\Controllers\API\ProvinceController@restore');
+            Route::delete('delete/{id}','App\Http\Controllers\API\ProvinceController@delete');
             Route::post('/','App\Http\Controllers\API\ProvinceController@store');
             Route::get('/','App\Http\Controllers\API\ProvinceController@get');
             Route::get('/{id}','App\Http\Controllers\API\ProvinceController@show');
             Route::put('/{id}','App\Http\Controllers\API\ProvinceController@update');
             Route::delete('/{id}','App\Http\Controllers\API\ProvinceController@destroy');
-            Route::put('restore/{id}','App\Http\Controllers\API\ProvinceController@restore');
-            Route::delete('delete/{id}','App\Http\Controllers\API\ProvinceController@delete');
+        });
+
+        Route::group(['prefix' => 'city'],function(){
+            Route::get('/get-trash','App\Http\Controllers\API\CityController@get_trash');
+            Route::get('show-trash/{id}','App\Http\Controllers\API\CityController@show_trash');
+            Route::delete('delete/{id}','App\Http\Controllers\API\CityController@delete');
+            Route::put('restore/{id}','App\Http\Controllers\API\CityController@restore');
+            Route::post('/','App\Http\Controllers\API\CityController@store');
+            Route::get('/','App\Http\Controllers\API\CityController@get');
+            Route::get('/{id}','App\Http\Controllers\API\CityController@show');
+            Route::put('/{id}','App\Http\Controllers\API\CityController@update');
+            Route::delete('{id}','App\Http\Controllers\API\CityController@destroy');
         });
 
     });

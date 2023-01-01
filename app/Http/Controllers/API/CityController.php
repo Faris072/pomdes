@@ -134,6 +134,36 @@ class CityController extends Controller
         }
     }
 
+    public function get_trash(){
+        try{
+            $City = City::with(['province'])->onlyTrashed()->get();
+
+            if(!$City){
+                return $this->getResponse([],'City tidak ditemukan',404);
+            }
+
+            return $this->getResponse($City,'City trash berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function show_trash($id){
+        try{
+            $City = City::with(['province'])->onlyTrashed()->find($id);
+
+            if(!$City){
+                return $this->getResponse([],'City tidak ditemukan',404);
+            }
+
+            return $this->getResponse($City,'City trash berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
     public function restore($id){
         try{
             $city = City::onlyTrashed()->find($id);
