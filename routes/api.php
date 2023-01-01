@@ -51,6 +51,8 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('/','App\Http\Controllers\API\ProvinceController@get');
             Route::get('/{id}','App\Http\Controllers\API\ProvinceController@show');
             Route::put('/{id}','App\Http\Controllers\API\ProvinceController@update');
+            Route::delete('delete/{id}','App\Http\Controllers\API\ProvinceController@delete');
+            Route::delete('/{id}','App\Http\Controllers\API\ProvinceController@destroy');
         });
 
     });

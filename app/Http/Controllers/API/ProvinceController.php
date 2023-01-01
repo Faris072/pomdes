@@ -102,8 +102,51 @@ class ProvinceController extends Controller
         }
     }
 
-    public function delete(){
-        try{}
+    public function delete($id){
+        try{
+            $province = Province::find($id);
+
+            if(!$province){
+                return $this->getResponse([],'Provinsi tidak ditemukan',422);
+            }
+
+            $delete = $province->delete();
+
+            if(!$delete){
+                return $this->getResponse([],'Provinsi gagal dihapus.',500);
+            }
+
+            return $this->getResponse($province,'Provinsi berhasil dihapus',200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function destroy($id){
+        try{
+            $province = Province::find($id);
+
+            if(!$province){
+                $provinceTrash = Province::onlyTrashed()->find($id);
+                if(!$provinceTrash){
+                    return $this->getResponse([],'Provinsi tidak ditemukan',422);
+                }
+                $provinceTrashDelete = $provinceTrash->forceDelete();
+                if(!$provinceTrashDelete){
+                    return $this->getResponse([],'Provinsi gagal dihapus',500);
+                }
+                return $this->getResponse($provinceTrash,'Provinsi berhasil dihapus',200);
+            }
+
+            $provinceDelete = $province->forceDelete();
+
+            if(!$provinceDelete){
+                return $this->getResponse([],'Provinsi gagal dihapus',500);
+            }
+
+            return $this->getResponse($province,'Provinsi berhasil dihapus',200);
+        }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
         }
