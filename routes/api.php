@@ -26,7 +26,7 @@ Route::group(['middleware' => 'auth:api'],function(){
 
         Route::group(['prefix' => 'profile'], function(){
             Route::put('/','App\Http\Controllers\API\ProfileController@update');
-            Route::put('/','App\Http\Controllers\API\ProfileController@update');
+            Route::post('/photo','App\Http\Controllers\API\ProfileController@photo');
         });
 
         Route::delete('delete/{id}','App\Http\Controllers\API\AuthController@delete');
