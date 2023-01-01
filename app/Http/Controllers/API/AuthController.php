@@ -254,16 +254,24 @@ class AuthController extends Controller
             $user = User::find($id);
 
             if(!$user){
-                return $this->getResponse([],'User tidak ditemukan',422);
+                $userTrash = User::onlyTrashed()->find($id);
+                if(!$userTrash){
+                    return $this->getResponse([],'User tidak ditemukan',422);
+                }
+                $userTrashDelete = $userTrash->forceDelete();
+                if(!$userTrashDelete){
+                    return $this->getResponse([],'User gagal dihapus',500);
+                }
+                return $this->getResponse([],'User berhasil di destroy',200);
             }
 
-            $delete = $user->forceDelete($id);
+            $delete = $user->forceDelete();
 
             if(!$delete){
-                return $this->getResponse([],'User gagal dihancurkan',500);
+                return $this->getResponse([],'User gagal di destroy',500);
             }
 
-            return $this->getResponse($user,'User berhasil dihancurkan',200);
+            return $this->getResponse($user,'User berhasil di destroy',200);
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

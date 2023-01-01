@@ -123,6 +123,27 @@ class ProvinceController extends Controller
         }
     }
 
+    public function restore($id){
+        try{
+            $province = Province::onlyTrashed()->find($id);
+
+            if(!$province){
+                return $this->getResponse([],'Province tidak ditemukan',404);
+            }
+
+            $restore = $province->restore();
+
+            if(!$restore){
+                return $this->getResponse([],'Province gagal dikembalikan',500);
+            }
+
+            return $this->getResponse($province, 'Province berhasil dikembalikan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
     public function destroy($id){
         try{
             $province = Province::find($id);

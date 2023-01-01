@@ -44,6 +44,12 @@ Route::group(['middleware' => 'auth:api'],function(){
 
         Route::group(['prefix' => 'city'],function(){
             Route::post('/','App\Http\Controllers\API\CityController@store');
+            Route::get('/','App\Http\Controllers\API\CityController@get');
+            Route::get('/{id}','App\Http\Controllers\API\CityController@show');
+            Route::put('/{id}','App\Http\Controllers\API\CityController@update');
+            Route::delete('delete/{id}','App\Http\Controllers\API\CityController@delete');
+            Route::put('restore/{id}','App\Http\Controllers\API\CityController@restore');
+            Route::delete('{id}','App\Http\Controllers\API\CityController@destroy');
         });
 
         Route::group(['prefix' => 'province'],function(){
@@ -51,8 +57,9 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('/','App\Http\Controllers\API\ProvinceController@get');
             Route::get('/{id}','App\Http\Controllers\API\ProvinceController@show');
             Route::put('/{id}','App\Http\Controllers\API\ProvinceController@update');
-            Route::delete('delete/{id}','App\Http\Controllers\API\ProvinceController@delete');
             Route::delete('/{id}','App\Http\Controllers\API\ProvinceController@destroy');
+            Route::put('restore/{id}','App\Http\Controllers\API\ProvinceController@restore');
+            Route::delete('delete/{id}','App\Http\Controllers\API\ProvinceController@delete');
         });
 
     });
