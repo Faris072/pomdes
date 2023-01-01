@@ -87,7 +87,7 @@ class AuthController extends Controller
 
     public function get_users(){
         try{
-            $user = User::with(['pusat', 'pomdes', 'role'])->get();
+            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile'])->get();
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
             }
@@ -101,7 +101,7 @@ class AuthController extends Controller
 
     public function show_user($id){
         try{
-            $user = User::with(['pusat', 'pomdes', 'role'])->find($id);
+            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile'])->find($id);
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
             }
@@ -284,7 +284,7 @@ class AuthController extends Controller
                 return $this->getResponse([],'Anda tidak memiliki akses.',403);
             }
 
-            $users = User::onlyTrashed()->get();
+            $users = User::with(['profile', 'pomdes', 'role', 'pusat', 'profile.photo_profile'])->onlyTrashed()->get();
 
             if(!$users){
                 return $this->getResponse([],'User tidak ditemukan',422);
@@ -303,7 +303,7 @@ class AuthController extends Controller
                 return $this->getResponse([],'Anda tidak memiliki akses.',403);
             }
 
-            $user = User::onlyTrashed()->find($id);
+            $user = User::with(['profile', 'pomdes', 'role', 'pusat', 'profile.photo_profile'])->onlyTrashed()->find($id);
 
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
