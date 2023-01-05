@@ -13,7 +13,7 @@ class Discrepancy extends Model
     protected $table = 'discrepancy';
     protected $guarded = ['id'];
 
-    public function fuel_discrepancy(){
+    public function fuel_discrepancies(){
         return $this->hasMany(FuelDiscrepancy::class, 'discrepancy_id', 'id');
     }
 

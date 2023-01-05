@@ -13,7 +13,7 @@ class Fuel extends Model
     protected $table = 'fuel';
     protected $guarded = ['id'];
 
-    public function user(){
+    public function supplier(){
         return $this->belongsTo(User::class,'user_id','id');
     }
 

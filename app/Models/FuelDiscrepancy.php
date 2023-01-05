@@ -24,4 +24,8 @@ class FuelDiscrepancy extends Model
     public function discrepancy_files(){
         return $this->hasOne(DiscrepancyFiles::class,'fuel_discrepancy_id','id');
     }
+
+    public function fuel_transaction(){
+        return $this->belongsTo(FuelTransaction::class,'fuel_transaction_id','id');
+    }
 }
