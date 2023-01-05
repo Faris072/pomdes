@@ -277,4 +277,60 @@ class TransactionController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function destroy($id){
+        try{
+            if(empty($id)){
+                return $this->getResponse([],'Transaksi wajib dipilih',422);
+            }
+
+            $transactions = Transaction::onlyTrashed()->find($id);
+
+            if(!$transactions){
+                return $this->getResponse([],'Transaksi gagal dimuat.',500);
+            }
+
+            $destroy = $transactions->forceDelete();
+
+            if(!$destroy){
+                return $this->getResponse([],'Data gagal dihapus', 500);
+            }
+
+            return $this->getResponse($transactions,'Data berhasil dihapus.',200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function approve_submission($id){
+        try{
+            if(empty($id)){
+                return $this->getResponse([],'Transaksi wajib dipilih',422);
+            }
+
+            $transaction = Transaction::find($id);
+
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            if($transaction->status_id == 2){
+                return $this->getResponse([],'Transaksi sudah disetujui',403);
+            }
+
+            $update = $transaction->update([
+                'status_id' => 2
+            ]);
+
+            if(!$update){
+                return $this->getResponse([],'Pengajuan transaksi gagal disetujui',500);
+            }
+
+            return $this->getResponse(Transaction::find($id),'Pengajuan transaksi berhasil disetujui',200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }

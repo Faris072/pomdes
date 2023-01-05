@@ -17,7 +17,9 @@ class StatusSeeder extends Seeder
     {
         $data = [
             ['name'=>'Pengajuan Transaksi'],
-            ['name'=>'Tagihan Transaksi'],
+            ['name'=>'Transaksi Disetujui'],
+            ['name'=>'Tagihan Transaksi Pomdes'],
+            ['name'=>'Tagihan Pomdes Telah Dibayar'],
         ];
 
         foreach($data as $d){

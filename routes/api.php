@@ -70,12 +70,17 @@ Route::group(['middleware' => 'auth:api'],function(){
     });
 
     Route::group(['prefix' => 'transaction'], function(){
+        Route::group(['prefix' => 'invoice-pomdes'],function(){
+            Route::post('/','App\Http\Controllers\API\InvoicePomdesController@store');
+        });
+        Route::put('approve-submission/{id}','App\Http\Controllers\API\TransactionController@approve_submission');
         Route::get('trash','App\Http\Controllers\API\TransactionController@get_trash');
         Route::get('trash/{id}','App\Http\Controllers\API\TransactionController@show_trash');
+        Route::delete('delete/{id}','App\Http\Controllers\API\TransactionController@delete');
         Route::post('/','App\Http\Controllers\API\TransactionController@store');
         Route::get('/','App\Http\Controllers\API\TransactionController@get');
         Route::get('/{id}','App\Http\Controllers\API\TransactionController@show');
         Route::put('/{id}','App\Http\Controllers\API\TransactionController@update');
-        Route::delete('/{id}','App\Http\Controllers\API\TransactionController@delete');
+        Route::delete('/{id}','App\Http\Controllers\API\TransactionController@destroy');
     });
 });
