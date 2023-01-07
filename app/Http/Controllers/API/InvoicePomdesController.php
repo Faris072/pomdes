@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\InvoicePomdes;
+use App\Models\InvoicePomdesFiles;
 use App\Models\InvoicePusat;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class InvoicePomdesController extends Controller
 {
@@ -223,6 +225,73 @@ class InvoicePomdesController extends Controller
             }
 
             return $this->getResponse($invoice,'Data berhasil dihancurkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function upload_files(Request $request, $id){
+        try{
+            $invoice = InvoicePomdes::find($id);
+
+            if(!$invoice){
+                return $this->getResponse([],'Data tagihan pomdes tidak ditemukan');
+            }
+
+            $exist = InvoicePomdesFiles::firstWhere('invoice_pomdes_id',$id);
+
+            if($exist){
+                $old = InvoicePomdesFiles::where('invoice_pomdes_id',$id)->get();
+                $destroy = InvoicePomdesFiles::where('invoice_pomdes_id',$id)->delete();
+
+                if(!$destroy){
+                    return $this->getResponse([],'Data gagal diperbarui',500);
+                }
+
+                foreach($old as $o){
+                    $storage = Storage::disk('public')->delete('invoice_pomdes/'.$o->name);
+
+                    if(!$storage){
+                        return $this->getResponse([],'Data gagal diperbarui',500);
+                    }
+                }
+            }
+
+            foreach($request->all()['file'] as $r){
+                $data = (object) [
+                    'invoice_pomdes_id' => $id,
+                    'original' => $r,
+                    'name' => $r->getClientOriginalName(),
+                    'extension' => $r->getClientOriginalExtension(),
+                    'is_image' => substr($r->getMimeType(),0,5) == 'image' ? true : false,
+                    'size' => $r->getSize()
+                ];
+
+                $replace = $r->storeAs('invoice_pomdes',$data->name);
+
+                if(!$replace){
+                    return $this->getResponse([],'File gagal diupload',500);
+                }
+
+                $upload = InvoicePomdesFiles::create((array) $data);
+
+                if(!$upload){
+                    return $this->getResponse([],'Data gagal disimpan',500);
+                }
+            }
+
+            $getTrash = InvoicePomdesFiles::onlyTrashed()->get();
+            if(count($getTrash)){
+                foreach($getTrash as $t){
+                    $delete = $t->forceDelete();
+                    if(!$delete){
+                        return $this->getResponse([],'Data gagal diperbarui',500);
+                    }
+                }
+            }
+
+            return $this->getResponse([],'Data berhasil diupload');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
