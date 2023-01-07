@@ -278,6 +278,26 @@ class TransactionController extends Controller
         }
     }
 
+    public function restore_trash($id){
+        try{
+            $transaction = Transaction::onlyTrashed()->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            $restore =  $transaction->restore();
+
+            if(!$restore){
+                return $this->getResponse([],'Data transaksi gagal dikembalikan',500);
+            }
+
+            return $this->getResponse($transaction,'Data transaksi berhasil dikembalikan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
     public function destroy($id){
         try{
             if(empty($id)){

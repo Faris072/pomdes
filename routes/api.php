@@ -71,8 +71,17 @@ Route::group(['middleware' => 'auth:api'],function(){
 
     Route::group(['prefix' => 'transaction'], function(){
         Route::group(['prefix' => 'invoice-pomdes'],function(){
+            Route::put('restore-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@restore_trash');
+            Route::get('show-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@show_trash');
+            Route::get('get-trash','App\Http\Controllers\API\InvoicePomdesController@get_trash');
+            Route::delete('delete/{id}','App\Http\Controllers\API\InvoicePomdesController@delete');
             Route::post('/','App\Http\Controllers\API\InvoicePomdesController@store');
+            Route::put('/{id}','App\Http\Controllers\API\InvoicePomdesController@update');
+            Route::get('/','App\Http\Controllers\API\InvoicePomdesController@get');
+            Route::get('/{id}','App\Http\Controllers\API\InvoicePomdesController@show');
+            Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
         });
+        Route::put('trash/{id}','App\Http\Controllers\API\TransactionController@restore_trash');
         Route::put('approve-submission/{id}','App\Http\Controllers\API\TransactionController@approve_submission');
         Route::get('trash','App\Http\Controllers\API\TransactionController@get_trash');
         Route::get('trash/{id}','App\Http\Controllers\API\TransactionController@show_trash');
