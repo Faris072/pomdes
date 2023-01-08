@@ -86,6 +86,9 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('/{id}','App\Http\Controllers\API\InvoicePomdesController@show');
             Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
         });
+        Route::group(['prefix'=>'invoice-pusat'],function(){
+            Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
+        });
         Route::put('trash/{id}','App\Http\Controllers\API\TransactionController@restore_trash');
         Route::put('approve-submission/{id}','App\Http\Controllers\API\TransactionController@approve_submission');
         Route::get('trash','App\Http\Controllers\API\TransactionController@get_trash');

@@ -210,6 +210,20 @@ class InvoicePomdesController extends Controller
                 if(!$invoiceTrash){
                     return $this->getResponse([],'Data tagihan tidak ditemukan',404);
                 }
+
+                $delete = $invoiceTrash->forceDelete();
+
+                if(!$delete){
+                    return $this->getResponse([],'Data gagal dihancurkan',500);
+                }
+
+                $status = Transaction::find($invoice->transaction_id)->update(['status_id' => 2]);
+
+                if(!$status){
+                    return $this->getResponse([],'Data tagihan gagal dihancurkan',500);
+                }
+
+                return $this->getResponse($invoiceTrash,'Data berhasil dihancurkan');
             }
 
             $status = Transaction::find($invoice->transaction_id)->update(['status_id' => 2]);
