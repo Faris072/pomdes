@@ -74,6 +74,8 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::group(['prefix' => 'file'],function(){
                 Route::post('/{id}','App\Http\Controllers\API\InvoicePomdesController@upload_files');
             });
+            Route::post('update-file/{id}','App\Http\Controllers\API\InvoicePomdesController@update_upload');
+            Route::post('store-file','App\Http\Controllers\API\InvoicePomdesController@store_upload');
             Route::put('restore-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@restore_trash');
             Route::get('show-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@show_trash');
             Route::get('get-trash','App\Http\Controllers\API\InvoicePomdesController@get_trash');

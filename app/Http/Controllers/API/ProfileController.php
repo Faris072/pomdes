@@ -27,6 +27,8 @@ class ProfileController extends Controller
                 'size' => $request->file->getSize(),
             ];
 
+            $data->name = date('now').rand('10000','99999').'.'.$data->extension;
+
             if(!$data->is_image){
                 return $this->getResponse([],'File harus berupa .jpg/.jpeg/.png',422);
             }
