@@ -7,3 +7,22 @@
 <link rel="stylesheet" href="{{asset('assets/plugins/custom/datatables/datatables.bundle.css')}}">
 
 {{-- CUSTOM --}}
+<style>
+    *{
+        font-family: Poppins,Helvetica,sans-serif;
+    }
+    .btn-orange{
+        background-color:orange !important;
+        color:white;
+    }
+    .btn-orange:hover{
+        background-color:rgb(227, 150, 5) !important;
+        color:white;
+    }
+    .text-orange{
+        color:orange !important;
+    }
+    .bg-orange{
+        background-color:orange !important;
+    }
+</style>
