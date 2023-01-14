@@ -1,4 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
+import store from '@/vuex';
+import axios from '@/global-plugins/api.js';
 
 import Login from '@/view/Login.vue';
 import Application from '@/components/Application.vue';
@@ -41,5 +43,14 @@ let router = createRouter({
     }
 });
 
+router.beforeEach((to, from, next) => {
+    console.log(store.state.auth)
+    if(to.meta.auth){
+        next()
+    }
+    else{
+        next()
+    }
+});
 
 export default router;
