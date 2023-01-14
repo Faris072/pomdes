@@ -64,14 +64,17 @@
         },
         methods: {
             login(){
-                console.log(this.$axios())
                 let data = {
                     username: this.username,
                     password: this.password
                 };
                 this.$axios().post('login',data)
                     .then(res => {
+                        let data = res?.data?.data;
                         console.log(data);
+                        console.log(this.$store.state.auth);
+                        this.$store.commit('setAuth',data);
+                        console.log(this.$store.state.auth);
                     })
                     .catch(err => {
                         console.log(err);

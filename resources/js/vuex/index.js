@@ -11,6 +11,14 @@ export default createStore({
         }
     },
     mutations: {
+        setAuth(state,data){
+            state.auth.authenticated = true;
+            state.auth.username = data?.me?.username;
 
+        },
+        setNotAuth(state){
+            state.auth.authenticated = false;
+            state.auth.username = '';
+        },
     }
 });

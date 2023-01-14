@@ -12,7 +12,7 @@ export default (isFormData = false) => {
         "Content-Type": "multipart/form-data",
     };
 
-    const instance =  axios.create({
+    let instance =  axios.create({
         baseURL: urlApi,
         headers: isFormData == false ? header : headerFormData,
     });
