@@ -12,13 +12,12 @@ export default createStore({
     },
     mutations: {
         setAuth(state,data){
+            state.auth = data?.me;
             state.auth.authenticated = true;
-            state.auth.username = data?.me?.username;
-
         },
-        setNotAuth(state){
+        setNoAuth(state){
+            state.auth = {};
             state.auth.authenticated = false;
-            state.auth.username = '';
         },
     }
 });

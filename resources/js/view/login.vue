@@ -71,13 +71,12 @@
                 this.$axios().post('login',data)
                     .then(res => {
                         let data = res?.data?.data;
-                        console.log(data);
-                        console.log(this.$store.state.auth);
+                        localStorage.setItem('pomdes_token',data?.auth?.access_token);
                         this.$store.commit('setAuth',data);
-                        console.log(this.$store.state.auth);
+                        this.$router.push({name: 'dashboard'});
                     })
                     .catch(err => {
-                        console.log(err);
+                        this.$axiosHandleError(err);
                     })
                     .then(() => {
 

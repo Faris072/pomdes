@@ -68,9 +68,9 @@
                                             <!--end::Avatar-->
                                             <!--begin::Username-->
                                             <div class="d-flex flex-column">
-                                                <div class="fw-bolder d-flex align-items-center fs-5">Max Smith
-                                                <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2">Pro</span></div>
-                                                <a href="#" class="fw-bold text-muted text-hover-primary fs-7">max@kt.com</a>
+                                                <div class="fw-bolder d-flex align-items-center fs-5"> {{ this.$store?.state?.auth?.profile?.name }}
+                                                <span class="badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2">{{ this?.$store?.state?.auth?.role?.name }}</span></div>
+                                                <a href="#" class="fw-bold text-muted text-hover-primary fs-7">{{ this.$store?.state?.auth?.username }}</a>
                                             </div>
                                             <!--end::Username-->
                                         </div>
@@ -81,7 +81,7 @@
                                     <!--end::Menu separator-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-5">
-                                        <a href="../../demo1/dist/account/overview.html" class="menu-link px-5">My Profile</a>
+                                        <a href="javascript:;" @click="showModalProfile()" class="menu-link px-5">Profile</a>
                                     </div>
                                     <!--end::Menu item-->
                                     <!--begin::Menu item-->
@@ -155,7 +155,7 @@
                                     <!--end::Menu item-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-5">
-                                        <a href="../../demo1/dist/authentication/flows/basic/sign-in.html" class="menu-link px-5">Sign Out</a>
+                                        <a href="javascript:;" @click="logout()" class="menu-link px-5">Logout</a>
                                     </div>
                                     <!--end::Menu item-->
                                     <!--begin::Menu separator-->
@@ -202,5 +202,102 @@
         </div>
         </div>
         <!--end::Header-->
+
+        <div class="modal fade" tabindex="-1" id="modal-navbar-profile">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Profile</h3>
+                                <span class="text-muted">Ubah profile akun PDOMS</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group my-4">
+                            <label for="nama"><h5>Nama</h5></label>
+                            <input type="text" v-model="profile.data.name" class="form-control" id="nama" placeholder="Masukkan nama" >
+                        </div>
+                        <div class="form-group my-4">
+                            <label for="phone"><h5>Province</h5></label>
+                            <select2 id="select-province" :options="selectList.selectProvince" placeholder="masukkan asdf"></select2>
+                        </div>
+                        <div class="form-group my-4">
+                            <label for="phone"><h5>Nomor Telpon</h5></label>
+                            <input type="text" v-model="profile.data.phone" class="form-control" id="phone" placeholder="Masukkan nomor telpon" >
+                        </div>
+                        <div class="form-group my-4">
+                            <label for="email"><h5>Email</h5></label>
+                            <input type="text" v-model="profile.data.email" class="form-control" id="email" placeholder="Masukkan email" >
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-primary" @click="updateProfile()">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
+
+<script>
+    export default {
+        data(){
+            return {
+                selectList: {
+                    selectProvince: [
+                        {id: 1, text: 'asdf'},
+                        {id: 1, text: 'asdf'},
+                        {id: 1, text: 'asdf'},
+                    ],
+                    selectCity: []
+                },
+                profile: {
+                    data: {
+                        name: '',
+                        city_id: '',
+                        phone: '',
+                        email: '',
+                    },
+                    photo: {
+
+                    }
+                }
+            }
+        },
+        mounted(){
+
+        },
+        methods: {
+            logout(){
+                this.$axios().post('logout')
+                    .then(res => {
+                        localStorage.setItem('pomdes_token','');
+                        this.$store.commit('setNoAuth');
+                        this.$router.push({name: 'login'});
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+
+                    });
+            },
+            updateProfile(){
+                let data = this.profile?.data;
+                console.log(data);
+            },
+            showModalProfile(){
+                $('#modal-navbar-profile').modal('show');
+            }
+        }
+    }
+</script>

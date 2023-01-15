@@ -189,11 +189,11 @@ class AuthController extends Controller
         $credentials = request(['username', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Login gagal. Username / Password tidak ditemukan'], 401);
         }
 
         $data = [
-            'me' => auth()->user(),
+            'me' => User::with(['profile','profile.photo_profile', 'role'])->find(auth()->user()->id),
             'auth' => $this->respondWithToken($token)->original
         ];
         return $this->getResponse($data,'Login berhasil');
@@ -201,7 +201,10 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth()->user());
+        $data = [
+            'me' => User::with(['profile','profile.photo_profile', 'role'])->find(auth()->user()->id),
+        ];
+        return $this->getResponse($data,'Login berhasil');
     }
 
     public function logout()

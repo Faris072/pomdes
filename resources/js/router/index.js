@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import store from '@/vuex';
-import axios from '@/global-plugins/api.js';
+import {axios, axiosHandleError} from '@/global-plugins';
 
 import Login from '@/view/Login.vue';
 import Application from '@/components/Application.vue';
@@ -57,12 +57,24 @@ let router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    console.log(store.state.auth)
     if(to.meta.auth){
-        next()
+        if(store.state.auth.authenticated){
+            next();
+        }
+        else{
+            axios().post('me')
+                .then(res => {
+                    store.commit('setAuth', res?.data?.data);
+                    next();
+                })
+                .catch(err => {
+                    axiosHandleError(err);
+                })
+                .then(()=>{});
+        }
     }
     else{
-        next()
+        next();
     }
 });
 

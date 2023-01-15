@@ -211,7 +211,6 @@
         },
         methods: {
             pageActive(menu){
-                console.log(this.$route.name);
                 let active = this.$route.name == menu ? 'active' : '';
                 return active;
             }

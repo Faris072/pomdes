@@ -5,7 +5,7 @@
 			<div class="page d-flex flex-row flex-column-fluid">
                 <app-sidebar></app-sidebar>
 				<!--begin::Wrapper-->
-				<div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
+				<div class="wrapper d-flex flex-column flex-row-fluid" style="padding-top:70px !important;" id="kt_wrapper">
                     <app-navbar></app-navbar>
                     <!--begin::Content-->
                     <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
@@ -21,6 +21,13 @@
 </template>
 
 <script>
+    export default {
+        mounted(){
+            setTimeout(function(){
+                reinitializeAllPlugin();
+            },100);
+        }
+    };
 </script>
 
 <style scoped>
