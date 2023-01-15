@@ -7,6 +7,8 @@ import Application from '@/components/Application.vue';
 
 import Dashboard from '@/view/dashboard/Index.vue';
 
+import MasterUsers from '@/view/master/users/Index.vue';
+
 let routes = [
     {
         path: '/login',
@@ -26,9 +28,14 @@ let routes = [
         children: [
             {
                 path: '',
-                name: 'Dashboard',
+                name: 'dashboard',
                 component: Dashboard,
-            }
+            },
+            {
+                path: 'master/users',
+                name: 'm-users',
+                component: MasterUsers,
+            },
         ]
     },
 ];
