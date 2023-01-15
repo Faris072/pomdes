@@ -4,6 +4,7 @@ import axios from '@/global-plugins/api.js';
 
 import Login from '@/view/Login.vue';
 import Application from '@/components/Application.vue';
+import NotFound from '@/components/Not-found.vue';
 
 import Dashboard from '@/view/dashboard/Index.vue';
 
@@ -37,6 +38,11 @@ let routes = [
                 component: MasterUsers,
             },
         ]
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        component: NotFound,
+        name: 'not-found',
     },
 ];
 
