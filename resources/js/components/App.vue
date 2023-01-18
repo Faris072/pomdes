@@ -22,20 +22,6 @@
             }
         },
         mounted(){
-            $(document).ready(function(){
-                setTimeout(function(){
-                    let scriptTag = document.createElement('script');
-                    let scriptTag1 = document.createElement('script');
-                    let scriptTag2 = document.createElement('script');
-                    let scriptTag3 = document.createElement('script');
-                    let scriptTag4 = document.createElement('script');
-                    scriptTag.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-                    scriptTag1.src = assetUrl+`/assets/js/scripts.bundle.js`;
-                    scriptTag2.src = assetUrl+`/assets/plugins/global/plugins.bundle.js`;
-                    scriptTag3.src = assetUrl+`/assets/plugins/custom/datatables/datatables.bundle.js`;
-                    scriptTag4.src = assetUrl+`/assets/plugins/custom/ckeditor/ckeditor-classic.bundle.js`;
-                },1000);
-            });
         }
     }
 </script>

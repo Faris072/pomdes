@@ -25,7 +25,7 @@
         mounted(){
             setTimeout(function(){
                 reinitializeAllPlugin();
-            },100);
+            },1000);
         }
     };
 </script>

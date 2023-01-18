@@ -225,7 +225,7 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 id="select-province" :options="selectList.selectProvince" placeholder="masukkan asdf"></select2>
+                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince" @change-options="changeProvince()" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -255,14 +255,17 @@
                 selectList: {
                     selectProvince: [
                         {id: 1, text: 'asdf'},
-                        {id: 1, text: 'asdf'},
-                        {id: 1, text: 'asdf'},
+                        {id: 2, text: `<span style="color:blue;">asdf</span>`},
+                        {id: 3, text: 'asdf'},
                     ],
                     selectCity: []
                 },
+                a: '',
+                b: '',
                 profile: {
                     data: {
                         name: '',
+                        province_id: '',
                         city_id: '',
                         phone: '',
                         email: '',
@@ -274,7 +277,10 @@
             }
         },
         mounted(){
-
+            let that = this;
+            // setInterval(function(){
+            //     console.log(that.profile.data.province_id)
+            // },1000)
         },
         methods: {
             logout(){
@@ -297,6 +303,9 @@
             },
             showModalProfile(){
                 $('#modal-navbar-profile').modal('show');
+            },
+            changeProvince(){
+                console.log('parent',this.profile.data.province_id);
             }
         }
     }
