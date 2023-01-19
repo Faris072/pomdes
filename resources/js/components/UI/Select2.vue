@@ -25,7 +25,6 @@
 </template>
 
 <script>
-    import VueLodash from 'vue-lodash';
     import Lodash from 'lodash';
     export default {
         props: {
@@ -76,11 +75,19 @@
                 this.$emit('change-options', value);
                 this.value = value.html ? value?.html : value?.text;
             },
-            search(){
-                let that = this;
-                let lodash = this.lodash;
-                this.triggerSearch = false;
-            }
+            search: Lodash.debounce(function($event){
+                console.log(this.searchValue)
+            }, 1000),
+            // search(){
+            //     let that = this;
+            //     // if(!this.triggerSearch){
+            //     //     this.triggerSearch = true;
+            //     //     setTimeout(function(){
+            //     //         that.triggerSearch = false;
+            //     //         console.log(that.searchValue);
+            //     //     }, 1000);
+            //     // }
+            // },
         },
         computed: {
             optionsLimit(){
