@@ -25,6 +25,8 @@
 </template>
 
 <script>
+    import VueLodash from 'vue-lodash';
+    import Lodash from 'lodash';
     export default {
         props: {
             modelValue: {
@@ -76,13 +78,8 @@
             },
             search(){
                 let that = this;
+                let lodash = this.lodash;
                 this.triggerSearch = false;
-                setTimeout(function(){
-                    that.triggerSearch = true;
-                    if(that.triggerSearch){
-                        console.log(that.searchValue);
-                    }
-                },1000);
             }
         },
         computed: {
