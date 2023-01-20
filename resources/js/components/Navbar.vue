@@ -225,7 +225,7 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince" @change-options="changeProvince()" />
+                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince" @change-options="changeProvince()" @get-options="getProvince" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -314,7 +314,10 @@
                 $('#modal-navbar-profile').modal('show');
             },
             changeProvince(){
-                console.log('parent',this.profile.data.province_id);
+
+            },
+            getProvince(search, limit){
+                console.log('parent',search, limit);
             }
         }
     }

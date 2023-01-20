@@ -76,7 +76,7 @@
                 this.value = value.html ? value?.html : value?.text;
             },
             search: Lodash.debounce(function($event){
-                console.log(this.searchValue)
+                this.$emit('get-options',this.searchValue, this.limit);
             }, 1000),
             // search(){
             //     let that = this;
