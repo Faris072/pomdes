@@ -1,25 +1,58 @@
 <template>
     <div>
         <div class="dropdown">
-            <input type="text" :value="value" class="form-select" @click="$emit('get-options')" data-bs-toggle="dropdown" readonly>
-            <ul class="dropdown-menu" style="width:100%;">
-                <li class="p-4">
-                    <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
-                </li>
-                <template v-if="loading">
-                    <li>
-                        <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ loadingLabel }}</a>
+            <div class="select-single" v-if="!multiple">
+                <input id="testing" type="search" :value="value" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" readonly>
+                <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
+                <ul class="dropdown-menu" style="width:100%;">
+                    <li class="p-4">
+                        <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
                     </li>
-                </template>
-                <template v-else>
-                    <li v-for="(context, index) in optionsLimit" v-if="context?.html">
-                        <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
+                    <template v-if="loading">
+                        <li>
+                            <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ loadingLabel }}</a>
+                        </li>
+                    </template>
+                    <template v-else v-for="(context, index) in optionsLimit">
+                        <li :class="`${context?.id == modelValue?.id ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-if="context?.html">
+                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
+                            <i v-if="context?.id == modelValue?.id" class="fa-solid fa-check text-primary px-5"></i>
+                        </li>
+                        <li :class="`${context?.id == modelValue?.id ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-else>
+                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-text="context?.text"></a>
+                            <i v-if="context?.id == modelValue?.id" class="fa-solid fa-check text-primary px-5"></i>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <div class="select-multiple" data-bs-toggle="dropdown" v-else>
+                <div class="input-select form-select">
+                    <div class="placeholder-multiple">
+                        <span class="text-muted">{{ placeholder }}</span>
+                    </div>
+                    <div class="value-multiple">
+
+                    </div>
+                </div>
+                <ul class="dropdown-menu" style="width:100%;">
+                    <li class="p-4">
+                        <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
                     </li>
-                    <li v-for="(context, index) in optionsLimit" v-else>
-                        <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-text="context?.text"></a>
-                    </li>
-                </template>
-            </ul>
+                    <template v-if="loading">
+                        <li>
+                            <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ loadingLabel }}</a>
+                        </li>
+                    </template>
+                    <template v-else v-for="(context, index) in optionsLimit">
+                        <li v-if="context?.html">
+                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
+                        </li>
+                        <li v-else>
+                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-text="context?.text"></a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -50,6 +83,18 @@
             limit: {
                 type: Number,
                 default: 7
+            },
+            multiple: {
+                type: Boolean,
+                default: false
+            },
+            placeholder: {
+                type: String,
+                default: ''
+            },
+            showClear: {
+                type: Boolean,
+                default: true
             }
         },
         data(){
@@ -78,16 +123,18 @@
             search: Lodash.debounce(function($event){
                 this.$emit('get-options',this.searchValue, this.limit);
             }, 1000),
-            // search(){
-            //     let that = this;
-            //     // if(!this.triggerSearch){
-            //     //     this.triggerSearch = true;
-            //     //     setTimeout(function(){
-            //     //         that.triggerSearch = false;
-            //     //         console.log(that.searchValue);
-            //     //     }, 1000);
-            //     // }
-            // },
+            clear(){
+                if(this.multiple){
+                    this.$emit('update:modelValue', []);
+                    this.value = [];
+                    this.$emit('change-options', []);
+                }
+                else{
+                    this.$emit('update:modelValue', '');
+                    this.value = '';
+                    this.$emit('change-options', '');
+                }
+            }
         },
         computed: {
             optionsLimit(){
@@ -106,5 +153,27 @@
     .dropdown-item-selectku-dewe:hover{
         color:#2c98db;
         background-color:#68c2fa43;
+    }
+    .select-multiple .input-select{
+        width:100%;
+        min-height:40px;
+        border-radius:5px;
+        border:1px solid #E4E6EF;
+        display:flex;
+        align-items: center;
+        padding:10px;
+    }
+    .btn-clear{
+        margin-top:-33px;
+        position:absolute;
+        background-color:transparent;
+        border:none;
+        right:35px;
+        z-index:99;
+        font-weight: bold;
+    }
+    .select-active{
+        color:#2c98db !important;
+        background-color:#68c2fa43 !important;
     }
 </style>

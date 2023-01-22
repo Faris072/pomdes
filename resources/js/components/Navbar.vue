@@ -225,7 +225,7 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince" @change-options="changeProvince()" @get-options="getProvince" />
+                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -253,21 +253,14 @@
         data(){
             return {
                 selectList: {
-                    selectProvince: [
-                        {id: 1, text: 'asdf1'},
-                        {id: 2, html: `<span style="color:blue;">asdf</span>`},
-                        {id: 3, text: 'asdf3'},
-                        {id: 4, text: 'asdf4'},
-                        {id: 5, text: 'asdf5'},
-                        {id: 6, text: 'asdf6'},
-                        {id: 7, text: 'asdf7'},
-                        {id: 8, text: 'asdf8'},
-                        {id: 9, text: 'asdf9'},
-                        {id: 10, text: 'asdf10'},
-                        {id: 11, text: 'asdf11'},
-                        {id: 12, text: 'asdf12'},
-                    ],
-                    selectCity: []
+                    selectProvince: {
+                        loading: false,
+                        list: []
+                    },
+                    selectCity: {
+                        loading: false,
+                        list: []
+                    },
                 },
                 a: '',
                 b: '',
@@ -314,10 +307,25 @@
                 $('#modal-navbar-profile').modal('show');
             },
             changeProvince(){
-
+                console.log(this.profile.data.province_id)
             },
             getProvince(search, limit){
-                console.log('parent',search, limit);
+                let that = this;
+                this.selectList.selectProvince.loading = true;
+                this.$axios().get('location/province')
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.selectList.selectProvince.list = [];
+                        $.each(data, function(i, val){
+                            that.selectList.selectProvince.list.push({id: val?.id, text: val?.name});
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.selectList.selectProvince.loading = false;
+                    })
             }
         }
     }
