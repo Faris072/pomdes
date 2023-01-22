@@ -202,4 +202,27 @@ class ProvinceController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function select(Request $request){
+        try{
+            $province = Province::with([]);
+            if(isset($request->search)){
+                $province = $province->where('LOWER(name)','LIKE','%'.strtolower($request->search).'%');
+            }
+            if(isset($request->limit)){
+                $province = $province->limit($request->limit);
+            }
+
+            $province = $province->get();
+
+            if(!$province){
+                return $this->getResponse([],'Data gagal ditampilkan',500);
+            }
+
+            return $this->getResponse($province, 'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }

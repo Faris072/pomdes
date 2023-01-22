@@ -211,4 +211,34 @@ class CityController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function select(Request $request){
+        try{
+            // $city = City::all();
+            $city = City::with([]);
+
+            if(isset($request->province_id)){
+                $city = $city->where('province_id',$request->province_id);
+            }
+
+            if(isset($request->search)){
+                $city = $city->where('LOWER(name)','LIKE','%'.strtolower($request->search).'%');
+            }
+
+            if(isset($request->limit)){
+                $city = $city->take($request->limit);
+            }
+
+            $city = $city->get();
+
+            if(!$city){
+                return $this->getResponse([],'Data gagal ditampilkan',500);
+            }
+
+            return $this->getResponse($city, 'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }

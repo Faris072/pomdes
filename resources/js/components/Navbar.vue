@@ -225,7 +225,11 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="true" />
+                            <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                        </div>
+                        <div class="form-group my-4">
+                            <label for="phone"><h5>City</h5></label>
+                            <select2 v-model="profile.data.city" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -267,7 +271,7 @@
                 profile: {
                     data: {
                         name: '',
-                        province_id: [],
+                        province: '',
                         city_id: '',
                         phone: '',
                         email: '',
@@ -307,12 +311,12 @@
                 $('#modal-navbar-profile').modal('show');
             },
             changeProvince(){
-                console.log(this.profile.data.province_id)
+                console.log(this.profile.data.province)
             },
             getProvince(search, limit){
                 let that = this;
                 this.selectList.selectProvince.loading = true;
-                this.$axios().get(`location/province?search=${search}&limit=${limit}`)
+                this.$axios().get(`location/province/select-list?search=${search}&limit=${limit}`)
                     .then(res => {
                         let data = res?.data?.data;
                         this.selectList.selectProvince.list = [];

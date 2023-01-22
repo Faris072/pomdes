@@ -44,6 +44,7 @@ Route::group(['middleware' => 'auth:api'],function(){
     Route::group(['prefix' => 'location'],function(){
 
         Route::group(['prefix' => 'province'],function(){
+            Route::get('/select-list','App\Http\Controllers\API\ProvinceController@select');
             Route::get('/get-trash','App\Http\Controllers\API\ProvinceController@get_trash');
             Route::get('show-trash/{id}','App\Http\Controllers\API\ProvinceController@show_trash');
             Route::put('restore/{id}','App\Http\Controllers\API\ProvinceController@restore');
@@ -56,6 +57,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         });
 
         Route::group(['prefix' => 'city'],function(){
+            Route::get('/select-list','App\Http\Controllers\API\CityController@select');
             Route::get('/get-trash','App\Http\Controllers\API\CityController@get_trash');
             Route::get('show-trash/{id}','App\Http\Controllers\API\CityController@show_trash');
             Route::delete('delete/{id}','App\Http\Controllers\API\CityController@delete');
