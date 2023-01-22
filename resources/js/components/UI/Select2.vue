@@ -3,7 +3,7 @@
         <div class="dropdown">
             <div class="select-single" v-if="!multiple">
                 <input id="testing" type="search" :value="value" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" readonly>
-                <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
                 <ul class="dropdown-menu" style="width:100%;">
                     <li class="p-4">
                         <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
@@ -26,13 +26,18 @@
                 </ul>
             </div>
             <div class="select-multiple" data-bs-toggle="dropdown" v-else>
-                <div class="input-select form-select">
-                    <div class="placeholder-multiple">
+                <div class="input-select form-select" @click="$emit('get-options', searchValue, limit)">
+                    <div class="placeholder-multiple" v-if="!modelValue?.length">
                         <span class="text-muted">{{ placeholder }}</span>
                     </div>
-                    <div class="value-multiple">
-
+                    <div class="value-multiple" v-else>
+                        <template v-for="(context, index) in modelValue">
+                            <span class="badge badge-secondary m-1"><i class="fa-solid fa-xmark mx-1 text-dark" @click="popMultiple(context?.id)"></i>{{ context?.text }}</span>
+                        </template>
                     </div>
+                </div>
+                <div class="wrap-btn-clear-multiple d-flex">
+                    <button class="my-auto" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <ul class="dropdown-menu" style="width:100%;">
                     <li class="p-4">
@@ -44,11 +49,13 @@
                         </li>
                     </template>
                     <template v-else v-for="(context, index) in optionsLimit">
-                        <li v-if="context?.html">
-                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
+                        <li :class="`${modelValue.findIndex(val => val?.id == context?.id) != -1 ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-if="context?.html">
+                            <a @click="setValueMultiple(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
+                            <i v-if="modelValue.findIndex(val => val?.id == context?.id) != -1" class="fa-solid fa-check text-primary px-5"></i>
                         </li>
-                        <li v-else>
-                            <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-text="context?.text"></a>
+                        <li :class="`${modelValue.findIndex(val => val?.id == context?.id) != -1 ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-else>
+                            <a @click="setValueMultiple(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-text="context?.text"></a>
+                            <i v-if="modelValue.findIndex(val => val?.id == context?.id) != -1" class="fa-solid fa-check text-primary px-5"></i>
                         </li>
                     </template>
                 </ul>
@@ -61,9 +68,7 @@
     import Lodash from 'lodash';
     export default {
         props: {
-            modelValue: {
-                type: String,
-            },
+            modelValue: {},
             options: {
                 type: Array,
                 default: []
@@ -120,6 +125,13 @@
                 this.$emit('change-options', value);
                 this.value = value.html ? value?.html : value?.text;
             },
+            setValueMultiple(value){
+                let vModel = [];
+                vModel = this.modelValue;
+                vModel.push({id: value?.id, text: value?.text});
+                this.$emit('update:modelValue', vModel);//modelValue merepresentasikan v-model di parent dan di set ke value
+                this.$emit('change-options', value);
+            },
             search: Lodash.debounce(function($event){
                 this.$emit('get-options',this.searchValue, this.limit);
             }, 1000),
@@ -134,6 +146,12 @@
                     this.value = '';
                     this.$emit('change-options', '');
                 }
+            },
+            popMultiple(id){
+                let vModel = this.modelValue;
+                let index = vModel.findIndex((val) => val?.id == id);
+                vModel.splice(index,1);
+                this.$emit('change-options');
             }
         },
         computed: {
@@ -172,8 +190,20 @@
         z-index:99;
         font-weight: bold;
     }
+    .wrap-btn-clear-multiple{
+        top:0;
+        bottom:0;
+        right:35px;
+        position:absolute;
+    }
+    .wrap-btn-clear-multiple button{
+        background-color:transparent;
+        border:none;
+        font-weight: bold;
+    }
     .select-active{
         color:#2c98db !important;
         background-color:#68c2fa43 !important;
+        pointer-events:none;
     }
 </style>

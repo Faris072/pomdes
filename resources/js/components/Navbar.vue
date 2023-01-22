@@ -225,7 +225,7 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                            <select2 v-model="profile.data.province_id" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="true" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -267,7 +267,7 @@
                 profile: {
                     data: {
                         name: '',
-                        province_id: '',
+                        province_id: [],
                         city_id: '',
                         phone: '',
                         email: '',
@@ -312,7 +312,7 @@
             getProvince(search, limit){
                 let that = this;
                 this.selectList.selectProvince.loading = true;
-                this.$axios().get('location/province')
+                this.$axios().get(`location/province?search=${search}&limit=${limit}`)
                     .then(res => {
                         let data = res?.data?.data;
                         this.selectList.selectProvince.list = [];
