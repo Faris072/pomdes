@@ -125,6 +125,8 @@ class ProfileController extends Controller
     public function show(){
         try{
             $get = Profile::with(['user','city','city.province','photo_profile'])->firstWhere('user_id',auth()->user()->id);
+            $get->photo_profile->link = url('/storage/profile/'.$get->photo_profile->name);
+
             if(!$get){
                 return $this->getResponse([],'Data tidak ditemukan',404);
             }

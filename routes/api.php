@@ -103,4 +103,8 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::put('/{id}','App\Http\Controllers\API\TransactionController@update');
         Route::delete('/{id}','App\Http\Controllers\API\TransactionController@destroy');
     });
+
+    Route::group(['prefix' => 'role'], function(){
+        Route::get('/','App\Http\Controllers\API\RoleController@get');
+    });
 });

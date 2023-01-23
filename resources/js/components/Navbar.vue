@@ -219,29 +219,50 @@
                     </div>
 
                     <div class="modal-body">
-                        <div class="d-flex" v-if="profile.loading">
-                            <app-loader class="m-auto"></app-loader>
+                        <div class="wrap-photo-profile">
+                            <center>
+                                <img :src="profile?.photo?.link" style="width:150px; height:150px; object-fit: cover; border-radius:100%; border:1px solid black;">
+                            </center>
+                            <br>
+                            <div class="form-photo-profile">
+                                <label for="dropzone_photo_profile"><h5><b>Photo Profile</b></h5></label>
+                                <div class="dropzone" id="dropzone_photo_profile">
+                                    <div class="dz-message needsclick">
+                                        <i class="bi bi-file-earmark-arrow-up text-primary fs-3x"></i>
+                                        <div class="ms-4">
+                                            <h3 class="fs-5 fw-bolder text-gray-900 mb-1">Drop atau klik disini untuk mengubah foto profil.</h3>
+                                            <span class="fs-7 fw-bold text-gray-400">Upload foto profil dengan format .jpg/.jpeg/.png</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div v-else>
-                            <div class="form-group my-4">
-                                <label for="nama"><h5>Nama</h5></label>
-                                <input type="text" v-model="profile.data.name" class="form-control" id="nama" placeholder="Masukkan nama" >
+                        <br>
+                        <div class="wrap-form-profile">
+                            <div class="d-flex" v-if="profile.loading">
+                                <app-loader class="m-auto"></app-loader>
                             </div>
-                            <div class="form-group my-4">
-                                <label for="phone"><h5>Province</h5></label>
-                                <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="resetCity()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
-                            </div>
-                            <div class="form-group my-4">
-                                <label for="phone"><h5>City</h5></label>
-                                <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="false" :disabled="!profile.data.province.id" />
-                            </div>
-                            <div class="form-group my-4">
-                                <label for="phone"><h5>Nomor Telpon</h5></label>
-                                <input type="text" v-model="profile.data.phone" class="form-control" id="phone" placeholder="Masukkan nomor telpon" >
-                            </div>
-                            <div class="form-group my-4">
-                                <label for="email"><h5>Email</h5></label>
-                                <input type="text" v-model="profile.data.email" class="form-control" id="email" placeholder="Masukkan email" >
+                            <div v-else>
+                                <div class="form-group my-4">
+                                    <label for="nama"><h5>Nama</h5></label>
+                                    <input type="text" v-model="profile.data.name" class="form-control" id="nama" placeholder="Masukkan nama" >
+                                </div>
+                                <div class="form-group my-4">
+                                    <label for="phone"><h5>Province</h5></label>
+                                    <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="resetCity()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                                </div>
+                                <div class="form-group my-4">
+                                    <label for="phone"><h5>City</h5></label>
+                                    <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="false" :disabled="!profile.data.province.id" />
+                                </div>
+                                <div class="form-group my-4">
+                                    <label for="phone"><h5>Nomor Telpon</h5></label>
+                                    <input type="text" v-model="profile.data.phone" class="form-control" id="phone" placeholder="Masukkan nomor telpon" >
+                                </div>
+                                <div class="form-group my-4">
+                                    <label for="email"><h5>Email</h5></label>
+                                    <input type="text" v-model="profile.data.email" class="form-control" id="email" placeholder="Masukkan email" >
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -283,7 +304,8 @@
                         email: '',
                     },
                     photo: {
-
+                        link: '',
+                        data: ''
                     }
                 }
             }
@@ -293,6 +315,42 @@
             this.getProfile();
         },
         methods: {
+            initDropzone() {
+                const that = this;
+                this.profile.photo.data = new Dropzone("#dropzone_photo_profile", {
+                    url: urlApi+"users/profile/photo",
+                    dictCancelUpload: "Cancel",
+                    maxFilesize: 20,
+                    parallelUploads: 1,
+                    uploadMultiple: false,
+                    maxFiles: 1,
+                    addRemoveLinks: true,
+                    acceptedFiles: ".jpg,.jpeg,.png",
+                    autoProcessQueue: true,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        Authorization: "Bearer " + localStorage.getItem("pomdes_token"),
+                    },
+                    init: function () {
+                        this.on("error", function (file) {
+                        if (!file.accepted) {
+                            this.removeFile(file);
+                            that.$swal("Silahkan periksa file Anda lagi");
+                        } else if (file.status == "error") {
+                            this.removeFile(file);
+                            that.$swal("Terjadi kesalahan koneksi");
+                        }
+                        });
+                            this.on("resetFiles", function (file) {
+                            this.removeAllFiles();
+                        });
+                    },
+                });
+                this.profile.photo.data.on('success',function(){
+                    that.profile.photo.data.destroy();
+                    that.getProfile();
+                });
+            },
             logout(){
                 this.$axios().post('logout')
                     .then(res => {
@@ -357,8 +415,11 @@
                         this.profile.data.email = data?.email;
                         this.profile.data.city = {id: data?.city?.id, text: data?.city?.name};
                         this.profile.data.province = {id: data?.city?.province?.id, text: data?.city?.province?.name};
+                        this.profile.photo.link = data?.photo_profile?.link;
+                        this.initDropzone();
                     })
                     .catch(err => {
+                        console.log(err)
                         this.$axiosHandleError(err);
                     })
                     .then(() => {
