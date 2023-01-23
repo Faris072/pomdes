@@ -222,7 +222,7 @@ class CityController extends Controller
             }
 
             if(isset($request->search)){
-                $city = $city->where('LOWER(name)','LIKE','%'.strtolower($request->search).'%');
+                $city = $city->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
             }
 
             if(isset($request->limit)){

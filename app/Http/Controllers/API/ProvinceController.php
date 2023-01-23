@@ -207,7 +207,7 @@ class ProvinceController extends Controller
         try{
             $province = Province::with([]);
             if(isset($request->search)){
-                $province = $province->where('LOWER(name)','LIKE','%'.strtolower($request->search).'%');
+                $province = $province->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
             }
             if(isset($request->limit)){
                 $province = $province->limit($request->limit);

@@ -225,11 +225,11 @@
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                            <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>City</h5></label>
-                            <select2 v-model="profile.data.city" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="changeProvince()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                            <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="true" :disabled="!profile.data.province.id" />
                         </div>
                         <div class="form-group my-4">
                             <label for="phone"><h5>Nomor Telpon</h5></label>
@@ -272,7 +272,7 @@
                     data: {
                         name: '',
                         province: '',
-                        city_id: '',
+                        city: '',
                         phone: '',
                         email: '',
                     },
@@ -310,9 +310,6 @@
             showModalProfile(){
                 $('#modal-navbar-profile').modal('show');
             },
-            changeProvince(){
-                console.log(this.profile.data.province)
-            },
             getProvince(search, limit){
                 let that = this;
                 this.selectList.selectProvince.loading = true;
@@ -329,6 +326,24 @@
                     })
                     .then(() => {
                         this.selectList.selectProvince.loading = false;
+                    })
+            },
+            getCity(search, limit){
+                let that = this;
+                this.selectList.selectCity.loading = true;
+                this.$axios().get(`location/city/select-list?search=${search}&limit=${limit}&province_id=${this.profile?.data?.province?.id || ''}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.selectList.selectCity.list = [];
+                        $.each(data, function(i, val){
+                            that.selectList.selectCity.list.push({id: val?.id, text: val?.name});
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.selectList.selectCity.loading = false;
                     })
             }
         }

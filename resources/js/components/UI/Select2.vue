@@ -2,8 +2,8 @@
     <div>
         <div class="dropdown">
             <div class="select-single" v-if="!multiple">
-                <input id="testing" type="search" :value="value" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" readonly>
-                    <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
+                <input type="text" :value="value" :placeholder="placeholder" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" :disabled="disabled" readonly>
+                <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
                 <ul class="dropdown-menu" style="width:100%;">
                     <li class="p-4">
                         <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
@@ -13,7 +13,12 @@
                             <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ loadingLabel }}</a>
                         </li>
                     </template>
-                    <template v-else v-for="(context, index) in optionsLimit">
+                    <template v-if="!options?.length&&!loading">
+                        <li>
+                            <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ emptyLabel }}</a>
+                        </li>
+                    </template>
+                    <template v-if="options?.length && !loading" v-for="(context, index) in optionsLimit">
                         <li :class="`${context?.id == modelValue?.id ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-if="context?.html">
                             <a @click="setValue(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
                             <i v-if="context?.id == modelValue?.id" class="fa-solid fa-check text-primary px-5"></i>
@@ -25,8 +30,8 @@
                     </template>
                 </ul>
             </div>
-            <div class="select-multiple" data-bs-toggle="dropdown" v-else>
-                <div class="input-select form-select" @click="$emit('get-options', searchValue, limit)">
+            <div :class="`select-multiple ${disabled ? 'disabled' : ''}`" data-bs-toggle="dropdown" v-else>
+                <div :class="`input-select form-select`" :disabled="disabled" @click="$emit('get-options', searchValue, limit)">
                     <div class="placeholder-multiple" v-if="!modelValue?.length">
                         <span class="text-muted">{{ placeholder }}</span>
                     </div>
@@ -48,7 +53,12 @@
                             <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ loadingLabel }}</a>
                         </li>
                     </template>
-                    <template v-else v-for="(context, index) in optionsLimit">
+                    <template v-if="!loading && !options?.length">
+                        <li>
+                            <a class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;">{{ emptyLabel }}</a>
+                        </li>
+                    </template>
+                    <template v-if="!loading && options.length" v-for="(context, index) in optionsLimit">
                         <li :class="`${modelValue.findIndex(val => val?.id == context?.id) != -1 ? 'select-active' : ''} d-flex align-items-center justify-content-between`" v-if="context?.html">
                             <a @click="setValueMultiple(context)" class="dropdown-item dropdown-item-selectku-dewe" href="javascript:;" v-html="context?.html"></a>
                             <i v-if="modelValue.findIndex(val => val?.id == context?.id) != -1" class="fa-solid fa-check text-primary px-5"></i>
@@ -100,6 +110,14 @@
             showClear: {
                 type: Boolean,
                 default: true
+            },
+            disabled: {
+                type: Boolean,
+                default: false
+            },
+            emptyLabel: {
+                type: String,
+                default: 'Tidak ada data'
             }
         },
         data(){
@@ -205,5 +223,9 @@
         color:#2c98db !important;
         background-color:#68c2fa43 !important;
         pointer-events:none;
+    }
+    .disabled, .disabled div{
+        pointer-events:none;
+        background-color:#EFF2F5 !important;
     }
 </style>
