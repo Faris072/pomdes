@@ -61,12 +61,12 @@ export default {
                     break;
                 case 403:
                     status.title = 'Forbidden';
-                    status.message = err?.response?.statusText;
+                    status.message = data?.status?.message;
                     status.icon = 'warning';
                     break;
                 case 404:
                     status.title = 'URL Not Found';
-                    status.message = err?.response?.statusText;
+                    status.message = data?.status?.message;
                     status.icon = 'warning';
                     break;
                 case 422:
@@ -78,7 +78,7 @@ export default {
                     break;
                 default:
                     status.title = 'Terjadi kesalahan koneksi';
-                    status.icon = 'danger';
+                    status.icon = 'error';
             }
             Swal.fire({
                 title: status?.title,
@@ -95,6 +95,13 @@ export default {
         global.$axios = () => {
             return api();
         };
+
+        global.$pageLoadingShow = () => {
+            store.state.pageLoading = true;
+        }
+        global.$pageLoadingHide = () => {
+            store.state.pageLoading = false;
+        }
     }
 }
 
@@ -157,12 +164,12 @@ export function axiosHandleError(err){
             break;
         case 403:
             status.title = 'Forbidden';
-            status.message = err?.response?.statusText;
+            status.message = data?.status?.message;
             status.icon = 'warning';
             break;
         case 404:
             status.title = 'URL Not Found';
-            status.message = err?.response?.statusText;
+            status.message = data?.status?.message;
             status.icon = 'warning';
             break;
         case 422:
@@ -174,7 +181,7 @@ export function axiosHandleError(err){
             break;
         default:
             status.title = 'Terjadi kesalahan koneksi';
-            status.icon = 'danger';
+            status.icon = 'error';
     }
     Swal.fire({
         title: status?.title,

@@ -2,7 +2,7 @@
     <div>
         <div class="dropdown">
             <div class="select-single" v-if="!multiple">
-                <input type="text" :value="value" :placeholder="placeholder" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" :disabled="disabled" readonly>
+                <input type="text" :value="modelValue?.html ? modelValue?.html : modelValue?.text" :placeholder="placeholder" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" :disabled="disabled" readonly>
                 <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
                 <ul class="dropdown-menu" style="width:100%;">
                     <li class="p-4">

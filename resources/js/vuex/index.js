@@ -7,7 +7,8 @@ export default createStore({
                 authenticated: false,
                 username: '',
                 name: '',
-            }
+            },
+            pageLoading: false
         }
     },
     mutations: {
@@ -19,5 +20,11 @@ export default createStore({
             state.auth = {};
             state.auth.authenticated = false;
         },
+        pageLoadingShow(state){
+            state.pageLoading = true;
+        },
+        pageLoadingShow(state){
+            state.pageLoading = false;
+        }
     }
 });

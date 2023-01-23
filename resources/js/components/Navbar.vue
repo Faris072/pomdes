@@ -219,25 +219,30 @@
                     </div>
 
                     <div class="modal-body">
-                        <div class="form-group my-4">
-                            <label for="nama"><h5>Nama</h5></label>
-                            <input type="text" v-model="profile.data.name" class="form-control" id="nama" placeholder="Masukkan nama" >
+                        <div class="d-flex" v-if="profile.loading">
+                            <app-loader class="m-auto"></app-loader>
                         </div>
-                        <div class="form-group my-4">
-                            <label for="phone"><h5>Province</h5></label>
-                            <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
-                        </div>
-                        <div class="form-group my-4">
-                            <label for="phone"><h5>City</h5></label>
-                            <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="true" :disabled="!profile.data.province.id" />
-                        </div>
-                        <div class="form-group my-4">
-                            <label for="phone"><h5>Nomor Telpon</h5></label>
-                            <input type="text" v-model="profile.data.phone" class="form-control" id="phone" placeholder="Masukkan nomor telpon" >
-                        </div>
-                        <div class="form-group my-4">
-                            <label for="email"><h5>Email</h5></label>
-                            <input type="text" v-model="profile.data.email" class="form-control" id="email" placeholder="Masukkan email" >
+                        <div v-else>
+                            <div class="form-group my-4">
+                                <label for="nama"><h5>Nama</h5></label>
+                                <input type="text" v-model="profile.data.name" class="form-control" id="nama" placeholder="Masukkan nama" >
+                            </div>
+                            <div class="form-group my-4">
+                                <label for="phone"><h5>Province</h5></label>
+                                <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="resetCity()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                            </div>
+                            <div class="form-group my-4">
+                                <label for="phone"><h5>City</h5></label>
+                                <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="false" :disabled="!profile.data.province.id" />
+                            </div>
+                            <div class="form-group my-4">
+                                <label for="phone"><h5>Nomor Telpon</h5></label>
+                                <input type="text" v-model="profile.data.phone" class="form-control" id="phone" placeholder="Masukkan nomor telpon" >
+                            </div>
+                            <div class="form-group my-4">
+                                <label for="email"><h5>Email</h5></label>
+                                <input type="text" v-model="profile.data.email" class="form-control" id="email" placeholder="Masukkan email" >
+                            </div>
                         </div>
                     </div>
 
@@ -269,6 +274,7 @@
                 a: '',
                 b: '',
                 profile: {
+                    loading: false,
                     data: {
                         name: '',
                         province: '',
@@ -284,9 +290,7 @@
         },
         mounted(){
             let that = this;
-            // setInterval(function(){
-            //     console.log(that.profile.data.province_id)
-            // },1000)
+            this.getProfile();
         },
         methods: {
             logout(){
@@ -302,10 +306,6 @@
                     .then(()=>{
 
                     });
-            },
-            updateProfile(){
-                let data = this.profile?.data;
-                console.log(data);
             },
             showModalProfile(){
                 $('#modal-navbar-profile').modal('show');
@@ -345,6 +345,45 @@
                     .then(() => {
                         this.selectList.selectCity.loading = false;
                     })
+            },
+            getProfile(){
+                this.profile.loading = true;
+                let that = this;
+                this.$axios().get(`users/profile`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.profile.data.name = data?.name;
+                        this.profile.data.phone = data?.phone;
+                        this.profile.data.email = data?.email;
+                        this.profile.data.city = {id: data?.city?.id, text: data?.city?.name};
+                        this.profile.data.province = {id: data?.city?.province?.id, text: data?.city?.province?.name};
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.profile.loading = false;
+                    });
+            },
+            updateProfile(){
+                let that = this;
+                let data = this.profile?.data;
+                data.city_id = data?.city?.id;
+                this.$pageLoadingShow();
+                this.$axios().put(`users/profile`,data)
+                    .then(res => {
+                        Swal.fire('Berhasil', 'Data profil berhasil diubah', 'success');
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.$pageLoadingHide();
+                        this.getProfile();
+                    });
+            },
+            resetCity(){
+                this.profile.data.city = '';
             }
         }
     }

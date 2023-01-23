@@ -26,6 +26,7 @@ Route::group(['middleware' => 'auth:api'],function(){
 
         Route::group(['prefix' => 'profile'], function(){
             Route::put('/','App\Http\Controllers\API\ProfileController@update');
+            Route::get('/','App\Http\Controllers\API\ProfileController@show');
             Route::post('/photo','App\Http\Controllers\API\ProfileController@photo');
         });
 

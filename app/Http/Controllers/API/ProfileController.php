@@ -121,4 +121,18 @@ class ProfileController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function show(){
+        try{
+            $get = Profile::with(['user','city','city.province','photo_profile'])->firstWhere('user_id',auth()->user()->id);
+            if(!$get){
+                return $this->getResponse([],'Data tidak ditemukan',404);
+            }
+
+            return $this->getResponse($get,'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }
