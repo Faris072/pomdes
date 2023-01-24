@@ -220,8 +220,8 @@
 
                     <div class="modal-body">
                         <div class="wrap-photo-profile">
-                            <center>
-                                <img :src="profile?.photo?.link" style="width:150px; height:150px; object-fit: cover; border-radius:100%; border:1px solid black;">
+                            <center id="wrap-show-photo-profile">
+
                             </center>
                             <br>
                             <div class="form-photo-profile">
@@ -282,6 +282,7 @@
     export default {
         data(){
             return {
+                token: localStorage.getItem('pomdes_token'),
                 selectList: {
                     selectProvince: {
                         loading: false,
@@ -335,10 +336,10 @@
                         this.on("error", function (file) {
                         if (!file.accepted) {
                             this.removeFile(file);
-                            that.$swal("Silahkan periksa file Anda lagi");
+                            Swal.fire("Silahkan periksa file Anda lagi");
                         } else if (file.status == "error") {
                             this.removeFile(file);
-                            that.$swal("Terjadi kesalahan koneksi");
+                            Swal.fire("Terjadi kesalahan koneksi");
                         }
                         });
                             this.on("resetFiles", function (file) {
@@ -416,6 +417,7 @@
                         this.profile.data.city = {id: data?.city?.id, text: data?.city?.name};
                         this.profile.data.province = {id: data?.city?.province?.id, text: data?.city?.province?.name};
                         this.profile.photo.link = data?.photo_profile?.link;
+                        $(`#wrap-show-photo-profile`).html(`<img src="${this.profile?.photo?.link+'?token='+this.token}" style="width:150px; height:150px; object-fit: cover; border-radius:100%; border:1px solid black;">`)
                         this.initDropzone();
                     })
                     .catch(err => {

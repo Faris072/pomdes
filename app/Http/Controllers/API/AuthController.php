@@ -352,4 +352,34 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 6000
         ]);
     }
+
+    public function select_pusat(Request $request){
+        try{
+            $query = User::with([])->where('role_id', 2);
+
+            if(isset($request->search)){
+                $query = $query->whereRaw("LOWER(username) LIKE '%".strtolower($request->search)."%'")
+                    ->orWhereHas('profile',function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('profile.city', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('profile.city.province', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    });
+            }
+
+            $query = $query->get();
+
+            if(!$query){
+                return $this->getResponse([],'Data gagal ditemukan',500);
+            }
+
+            return $this->getResponse($query,'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }

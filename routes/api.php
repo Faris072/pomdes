@@ -25,14 +25,16 @@ Route::group(['middleware' => 'auth:api'],function(){
     Route::group(['prefix' => 'users'], function(){
 
         Route::group(['prefix' => 'profile'], function(){
+            Route::get('/render-photo/{id}','App\Http\Controllers\API\ProfileController@render_gambar')->name('render-gambar-profile');
+            Route::post('/photo','App\Http\Controllers\API\ProfileController@photo');
             Route::put('/','App\Http\Controllers\API\ProfileController@update');
             Route::get('/','App\Http\Controllers\API\ProfileController@show');
-            Route::post('/photo','App\Http\Controllers\API\ProfileController@photo');
         });
 
         Route::delete('delete/{id}','App\Http\Controllers\API\AuthController@delete');
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
+        Route::get('select-pusat','App\Http\Controllers\API\AuthController@select_pusat');
         Route::put('restore/{id}','App\Http\Controllers\API\AuthController@restore');
         Route::post('/','App\Http\Controllers\API\AuthController@register');
         Route::get('/','App\Http\Controllers\API\AuthController@get_users');
@@ -106,5 +108,6 @@ Route::group(['middleware' => 'auth:api'],function(){
 
     Route::group(['prefix' => 'role'], function(){
         Route::get('/','App\Http\Controllers\API\RoleController@get');
+        Route::get('/select-list','App\Http\Controllers\API\RoleController@select');
     });
 });

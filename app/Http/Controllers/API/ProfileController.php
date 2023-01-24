@@ -47,7 +47,7 @@ class ProfileController extends Controller
                 return $this->getResponse(User::with(['profile','profile.photo_profile'])->find(auth()->user()->id),'Foto berhasil disimpan');
             }
 
-            $delete = Storage::disk('public')->delete('profile/'.$photoProfile->name);
+            $delete = Storage::delete('profile/'.$photoProfile->name);
 
             if(!$delete){
                 return $this->getResponse([],'Foto gagal diperbarui.',500);
@@ -125,7 +125,10 @@ class ProfileController extends Controller
     public function show(){
         try{
             $get = Profile::with(['user','city','city.province','photo_profile'])->firstWhere('user_id',auth()->user()->id);
-            $get->photo_profile->link = url('/storage/profile/'.$get->photo_profile->name);
+            if($get->photo_profile){
+                // $get->photo_profile->link = url('/storage/profile/'.$get->photo_profile->name);
+                $get->photo_profile->link = route('render-gambar-profile',$get->photo_profile->id);
+            }
 
             if(!$get){
                 return $this->getResponse([],'Data tidak ditemukan',404);
@@ -136,5 +139,10 @@ class ProfileController extends Controller
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
         }
+    }
+
+    public function render_gambar($id){
+        $query = PhotoProfile::find($id)->name;
+        return response()->file(Storage::path('profile/'.$query));
     }
 }
