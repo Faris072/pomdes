@@ -355,7 +355,7 @@ class AuthController extends Controller
 
     public function select_pusat(Request $request){
         try{
-            $query = User::with([])->where('role_id', 2);
+            $query = User::with(['profile'])->where('role_id', 2);
 
             if(isset($request->search)){
                 $query = $query->whereRaw("LOWER(username) LIKE '%".strtolower($request->search)."%'")

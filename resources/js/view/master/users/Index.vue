@@ -9,7 +9,7 @@
                                 <button class="btn btn-warning" @click="showModal()">Tambah Data</button>
                             </div>
                             <div class="card-body pt-5">
-
+                                <app-data-table></app-data-table>
                             </div>
                         </div>
                     </div>
@@ -35,11 +35,11 @@
                     <div class="modal-body">
                         <div class="wrap-form">
                             <label for="role"><h5>Role</h5></label>
-                            <select2 id="role" v-model="form.data.role" :options="selectList.role.list" :loading="selectList.role.loading" @get-options="getRole" placeholder="Pilih Role" :multiple="false" />
+                            <app-select2 id="role" v-model="form.data.role" :options="selectList.role.list" :loading="selectList.role.loading" @get-options="getRole" placeholder="Pilih Role" :multiple="false" />
                             <br>
                             <template v-if="form?.data?.role?.id == 3">
                                 <label for="pusat"><h5>Pusat</h5></label>
-                                <select2 id="pusat" v-model="form.data.pusat" :options="selectList.pusat.list" :loading="selectList.pusat.loading" @get-options="getPusat" placeholder="Pilih Pusat" :multiple="false" />
+                                <app-select2 id="pusat" v-model="form.data.pusat" :options="selectList.pusat.list" :loading="selectList.pusat.loading" @get-options="getPusat" placeholder="Pilih Pusat" :multiple="false" />
                                 <br>
                             </template>
                             <label for="username"><h5>Username</h5></label>
@@ -53,7 +53,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-primary" @click="updateProfile()">Simpan Perubahan</button>
+                        <button type="button" class="btn btn-primary" @click="simpan()">Simpan</button>
                     </div>
                 </div>
             </div>
@@ -91,6 +91,7 @@
         },
         methods: {
             showModal(){
+                this.resetModal();
                 $('#modal-form').modal('show');
             },
             getRole(){
@@ -110,6 +111,57 @@
                     .then(() => {
                         this.selectList.role.loading = false;
                     });
+            },
+            getPusat(search, limit){
+                let that = this;
+                this.selectList.pusat.loading = true;
+                this.$axios().get(`users/select-pusat?search=${search}&limit=${limit}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.selectList.pusat.list = [];
+                        $.each(data, function(i,val){
+                            that.selectList.pusat.list.push({
+                                id: val?.id,
+                                text: val?.profile?.name
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+                        this.selectList.pusat.loading = false;
+                    })
+            },
+            simpan(){
+                let that = this;
+                let data = {
+                    role_id: this.form?.data?.role?.id,
+                    pusat_id: this.form?.data?.pusat?.id,
+                    username: this?.form?.data?.username,
+                    password: this?.form?.data?.password
+                };
+
+                this.$pageLoadingShow();
+                this.$axios().post(`users`,data)
+                    .then(res => {
+                        $('.modal').modal('hide');
+                        Swal.fire('Berhasil', 'User berhasil ditambahkan', 'success');
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+                        this.$pageLoadingHide();
+                    })
+            },
+            resetModal(){
+                this.form.data = {
+                    role: '',
+                    pusat: '',
+                    username: '',
+                    password: ''
+                };
             }
         }
     }

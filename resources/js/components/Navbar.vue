@@ -249,11 +249,11 @@
                                 </div>
                                 <div class="form-group my-4">
                                     <label for="phone"><h5>Province</h5></label>
-                                    <select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="resetCity()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
+                                    <app-select2 v-model="profile.data.province" :options="selectList.selectProvince.list" :loading="selectList.selectProvince.loading" @change-options="resetCity()" @get-options="getProvince" placeholder="Pilih Provinsi" :multiple="false" />
                                 </div>
                                 <div class="form-group my-4">
                                     <label for="phone"><h5>City</h5></label>
-                                    <select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="false" :disabled="!profile.data.province.id" />
+                                    <app-select2 v-model="profile.data.city" :options="selectList.selectCity.list" :loading="selectList.selectCity.loading" @get-options="getCity" placeholder="Pilih Kota" :multiple="false" :disabled="!profile.data.province.id" />
                                 </div>
                                 <div class="form-group my-4">
                                     <label for="phone"><h5>Nomor Telpon</h5></label>

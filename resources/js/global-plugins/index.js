@@ -70,9 +70,9 @@ export default {
                     status.icon = 'warning';
                     break;
                 case 422:
-                    status.title = 'Unauthorized';
-                    $.each(data?.status, function(i,val){
-                        status.message = val.message;
+                    status.title = 'Pastikan data sudah benar!';
+                    $.each(data?.status?.message, function(i,val){
+                        status.message = val;
                     });
                     status.icon = 'warning';
                     break;
@@ -173,9 +173,9 @@ export function axiosHandleError(err){
             status.icon = 'warning';
             break;
         case 422:
-            status.title = 'Unauthorized';
-            $.each(data?.status, function(i,val){
-                status.message = val.message;
+            status.title = 'Pastikan data sudah benar!';
+            $.each(data?.status?.message, function(i,val){
+                status.message = val;
             });
             status.icon = 'warning';
             break;
