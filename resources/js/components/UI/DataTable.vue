@@ -26,46 +26,7 @@
                     </tr>
                 </template>
                 <template v-else>
-                    <tr>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                    </tr>
-                    <tr>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                    </tr>
-                    <tr>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                    </tr>
-                    <tr>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                    </tr>
-                    <tr>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                        <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                    </tr>
+                    <slot name="body"></slot>
                 </template>
             </tbody>
         </table>
@@ -99,68 +60,17 @@
     import Lodash from 'lodash';
     export default {
         props: {
-
+            tableConfig: {
+                type: Object,
+            }
         },
         data(){
             return {
-                tableConfig: {
-                    data: {
-                        header: [
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: false,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'Nama',
-                                sortBy: 'name',
-                                sort: true,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: true,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: false,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: false,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: true,
-                                class: '',
-                                style: ''
-                            },
-                        ],
-                        body: []
-                    },
-                    config: {
-                        orderBy: 'asc',
-                        sortBy: 'id',
-                        loading: true
-                    }
-                }
+
             }
         },
         mounted(){
-
+            console.log(this.tableConfig)
         },
         methods: {
             clickSort(val, i){

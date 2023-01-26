@@ -9,7 +9,18 @@
                                 <button class="btn btn-warning" @click="showModal()">Tambah Data</button>
                             </div>
                             <div class="card-body pt-5">
-                                <app-data-table></app-data-table>
+                                <app-data-table :table-config="tableConfig">
+                                    <template v-slot:body>
+                                        <tr>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                        </tr>
+                                    </template>
+                                </app-data-table>
                             </div>
                         </div>
                     </div>
@@ -82,6 +93,60 @@
                         pusat: '',
                         username: '',
                         password: ''
+                    }
+                },
+                tableConfig: {
+                    data: {
+                        header: [
+                            {
+                                text: 'No',
+                                sortBy: 'id',
+                                sort: false,
+                                class: '',
+                                style: ''
+                            },
+                            {
+                                text: 'Nama',
+                                sortBy: 'name',
+                                sort: true,
+                                class: '',
+                                style: ''
+                            },
+                            {
+                                text: 'No',
+                                sortBy: 'id',
+                                sort: true,
+                                class: '',
+                                style: ''
+                            },
+                            {
+                                text: 'No',
+                                sortBy: 'id',
+                                sort: false,
+                                class: '',
+                                style: ''
+                            },
+                            {
+                                text: 'No',
+                                sortBy: 'id',
+                                sort: false,
+                                class: '',
+                                style: ''
+                            },
+                            {
+                                text: 'No',
+                                sortBy: 'id',
+                                sort: true,
+                                class: '',
+                                style: ''
+                            },
+                        ],
+                        body: []
+                    },
+                    config: {
+                        orderBy: 'asc',
+                        sortBy: 'id',
+                        loading: false
                     }
                 }
             }
