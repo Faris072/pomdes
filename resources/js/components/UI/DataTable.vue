@@ -6,7 +6,7 @@
                 <tr>
                     <th v-for="(val, i) in tableConfig?.data?.header">
                         <div class="d-flex justify-content-between" @click="val?.sort ? clickSort(val, i) : ''" :style="val?.sort ? 'cursor:pointer;' : ''">
-                            <h5 class="text-gray-700">{{ val?.text }}</h5>
+                            <h5 :class="`text-gray-700 ${val?.class}`" :style="val?.style">{{ val?.text }}</h5>
                             <template v-if="val?.sort && val?.activeSort">
                                 <span v-if="tableConfig?.config?.orderBy == 'asc'"><i class="bi bi-sort-alpha-down fa-lg"></i></span>
                                 <span v-if="tableConfig?.config?.orderBy == 'desc'"><i class="bi bi-sort-alpha-up fa-lg"></i></span>
@@ -32,7 +32,7 @@
         </table>
         <div class="control-bottom d-flex justify-content-between w-100">
             <div class="wrap-limit">
-                <select class="form-select-solid form-select form-select-sm">
+                <select class="form-select-solid form-select form-select-sm" v-model="tableConfig.config.limit">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -41,15 +41,27 @@
             </div>
             <div class="wrap-pagination">
                 <ul class="pagination">
-                    <li class="page-item previous disabled"><a href="javascript:;" class="page-link"><i class="previous"></i></a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">1</a></li>
-                    <li class="page-item active"><a href="javascript:;" class="page-link">2</a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">3</a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">4</a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">5</a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">...</a></li>
-                    <li class="page-item "><a href="javascript:;" class="page-link">10</a></li>
-                    <li class="page-item next"><a href="javascript:;"  class="page-link"><i class="next"></i></a></li>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = 1" class="page-link"><i class="bi bi-chevron-double-left"></i></a></li>
+                    <li :class="`page-item previous ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;"  @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage-1" class="page-link"><i class="previous"></i></a></li>
+                    <template v-for="(context,index) in tableConfig?.config?.totalPage">
+                        <template v-if="tableConfig?.config?.currentPage < 3">
+                            <template v-if="index+1 <= 5">
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                            </template>
+                        </template>
+                        <template v-if="tableConfig?.config?.currentPage >= 3 && tableConfig?.config?.currentPage <= tableConfig?.config?.totalPage-3">
+                            <template v-if="index+1 < tableConfig?.config?.currentPage+3 && index+1 > tableConfig?.config?.currentPage-3">
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                            </template>
+                        </template>
+                        <template v-if="tableConfig?.config?.currentPage >= tableConfig?.config?.totalPage-2">
+                            <template v-if="index+1 > tableConfig?.config?.totalPage-5">
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                            </template>
+                        </template>
+                    </template>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage+1" class="page-link"><i class="next"></i></a></li>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.totalPage" class="page-link"><i class="bi bi-chevron-double-right"></i></a></li>
                 </ul>
             </div>
         </div>
@@ -70,7 +82,14 @@
             }
         },
         mounted(){
-            console.log(this.tableConfig)
+
+        },
+        watch: {
+            "tableConfig.config.limit": {
+                handler(val){
+                    alert(val);
+                }
+            }
         },
         methods: {
             clickSort(val, i){

@@ -146,7 +146,10 @@
                     config: {
                         orderBy: 'asc',
                         sortBy: 'id',
-                        loading: false
+                        loading: false,
+                        limit: 10,
+                        currentPage: 1,
+                        totalPage: 20
                     }
                 }
             }
