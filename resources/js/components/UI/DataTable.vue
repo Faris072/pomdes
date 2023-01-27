@@ -46,17 +46,17 @@
                     <template v-for="(context,index) in tableConfig?.config?.totalPage">
                         <template v-if="tableConfig?.config?.currentPage < 3">
                             <template v-if="index+1 <= 5">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
                         <template v-if="tableConfig?.config?.currentPage >= 3 && tableConfig?.config?.currentPage <= tableConfig?.config?.totalPage-3">
                             <template v-if="index+1 < tableConfig?.config?.currentPage+3 && index+1 > tableConfig?.config?.currentPage-3">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
                         <template v-if="tableConfig?.config?.currentPage >= tableConfig?.config?.totalPage-2">
                             <template v-if="index+1 > tableConfig?.config?.totalPage-5">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
                     </template>
