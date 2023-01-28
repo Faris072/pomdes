@@ -1,7 +1,7 @@
 <template>
     <div style="overflow-x:auto;">
         <input type="search" class="form-control form-control-solid" v-model="tableConfig.config.search" style="width:25%;" placeholder="Search">
-        <table class="table my-4" style="table-layout: fixed;">
+        <table class="table my-4 data-table-faris" style="table-layout: fixed;">
             <thead>
                 <tr>
                     <th v-for="(val, i) in tableConfig?.data?.header" :class="val?.class?.column" :style="val?.style?.column">
@@ -111,11 +111,18 @@
 </script>
 
 <style scoped>
-    table tr td,table tr th{
+    table tr td, table tr th{
         border-bottom:1px dashed lightgray !important;
         padding:20px;
     }
     thead{
         border-bottom:2px solid lightgray;
+    }
+</style>
+
+<style>
+    table.data-table-faris tr td, table.data-table-faris tr th{
+        border-bottom:1px dashed lightgray !important;
+        padding:20px !important;
     }
 </style>

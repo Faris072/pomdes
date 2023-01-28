@@ -112,7 +112,17 @@
                             {
                                 text: 'Nama',
                                 sort_by: 'username',
-                                sort: false,
+                                sort: true,
+                                class: '',
+                                style: {
+                                    column: '',
+                                    text: ''
+                                }
+                            },
+                            {
+                                text: 'Role',
+                                sort_by: 'username',
+                                sort: true,
                                 class: '',
                                 style: {
                                     column: '',
