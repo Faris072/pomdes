@@ -9,15 +9,11 @@
                                 <button class="btn btn-warning" @click="showModal()">Tambah Data</button>
                             </div>
                             <div class="card-body pt-5">
-                                <app-data-table :table-config="tableConfig">
+                                <app-data-table :table-config="tableConfig" @get-data="getDataTable">
                                     <template v-slot:body>
-                                        <tr>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
-                                            <td>asdfafdasdfd asefav sfaf aef wea fa wf af d s f s def a fea s a a a a a</td>
+                                        <tr v-for="(context, index) in tableConfig?.data?.body">
+                                            <td class="text-center">{{ index+1 + ((tableConfig?.config?.currentPage-1) * tableConfig?.config?.limit) }}</td>
+                                            <td>{{ context?.username }}</td>
                                         </tr>
                                     </template>
                                 </app-data-table>
@@ -100,62 +96,46 @@
                         header: [
                             {
                                 text: 'No',
-                                sortBy: 'id',
-                                sort: false,
-                                class: '',
-                                style: ''
+                                sort_by: 'id',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: 'text-center'
+                                },
+                                style: {
+                                    column: 'width:10%;',
+                                    wrap: '',
+                                    text: '',
+                                }
                             },
                             {
                                 text: 'Nama',
-                                sortBy: 'name',
-                                sort: true,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: true,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
+                                sort_by: 'username',
                                 sort: false,
                                 class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: false,
-                                class: '',
-                                style: ''
-                            },
-                            {
-                                text: 'No',
-                                sortBy: 'id',
-                                sort: true,
-                                class: '',
-                                style: ''
+                                style: {
+                                    column: '',
+                                    text: ''
+                                }
                             },
                         ],
                         body: []
                     },
                     config: {
-                        orderBy: 'asc',
-                        sortBy: 'id',
+                        order_by: 'asc',
+                        sort_by: 'id',
                         loading: false,
-                        limit: 10,
+                        limit: 2,
                         currentPage: 1,
-                        totalPage: 20
+                        totalPage: 2,
+                        search: ''
                     }
                 }
             }
         },
         mounted(){
-
+            this.getDataTable();
         },
         methods: {
             showModal(){
@@ -200,6 +180,31 @@
                     .then(()=>{
                         this.selectList.pusat.loading = false;
                     })
+            },
+            getDataTable(){
+                this.tableConfig.config.loading = true;
+
+                let data = this.tableConfig?.config;
+                data.page = data?.currentPage;
+
+                this.$axios().get(`users`, {params: data})
+                    .then(res => {
+                        let data = res?.data?.data;
+
+                        console.log(data)
+
+                        this.tableConfig.config.totalPage = data?.last_page;
+                        this.tableConfig.config.currentPage = data?.current_page;
+
+                        this.tableConfig.data.body = [];
+                        this.tableConfig.data.body = data?.data;
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+                        this.tableConfig.config.loading = false;
+                    });
             },
             simpan(){
                 let that = this;

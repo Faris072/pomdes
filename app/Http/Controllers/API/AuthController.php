@@ -85,9 +85,21 @@ class AuthController extends Controller
         }
     }
 
-    public function get_users(){
+    public function get_users(Request $request){
         try{
-            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile'])->get();
+            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile']);
+
+            if(isset($request->order_by)){
+                $user = $user->orderBy($request->sort_by, $request->order_by);
+            }
+
+            if(isset($request->limit)){
+                $user = $user->paginate($request->limit);
+            }
+            else{
+                $user = $user->get();
+            }
+
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
             }

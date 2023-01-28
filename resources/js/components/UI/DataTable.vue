@@ -1,15 +1,17 @@
 <template>
     <div style="overflow-x:auto;">
-        <input type="search" class="form-control form-control-solid" style="width:25%;" placeholder="Search">
-        <table class="table my-4">
+        <input type="search" class="form-control form-control-solid" v-model="tableConfig.config.search" style="width:25%;" placeholder="Search">
+        <table class="table my-4" style="table-layout: fixed;">
             <thead>
                 <tr>
-                    <th v-for="(val, i) in tableConfig?.data?.header">
-                        <div class="d-flex justify-content-between" @click="val?.sort ? clickSort(val, i) : ''" :style="val?.sort ? 'cursor:pointer;' : ''">
-                            <h5 :class="`text-gray-700 ${val?.class}`" :style="val?.style">{{ val?.text }}</h5>
+                    <th v-for="(val, i) in tableConfig?.data?.header" :class="val?.class?.column" :style="val?.style?.column">
+                        <div class="d-flex justify-content-between" @click="val?.sort ? clickSort(val, i) : ''" :style="`${val?.sort ? 'cursor:pointer;' : ''}`">
+                            <div :class="`wrap-th ${val?.class?.wrap}`" :style="`width:100%; ${val?.style?.wrap}`">
+                                <h5 :class="`text-gray-700 ${val?.class?.text}`" :style="val?.style?.text">{{ val?.text }}</h5>
+                            </div>
                             <template v-if="val?.sort && val?.activeSort">
-                                <span v-if="tableConfig?.config?.orderBy == 'asc'"><i class="bi bi-sort-alpha-down fa-lg"></i></span>
-                                <span v-if="tableConfig?.config?.orderBy == 'desc'"><i class="bi bi-sort-alpha-up fa-lg"></i></span>
+                                <span v-if="tableConfig?.config?.order_by == 'asc'"><i class="bi bi-sort-alpha-down fa-lg"></i></span>
+                                <span v-if="tableConfig?.config?.order_by == 'desc'"><i class="bi bi-sort-alpha-up fa-lg"></i></span>
                             </template>
                         </div>
                     </th>
@@ -32,7 +34,7 @@
         </table>
         <div class="control-bottom d-flex justify-content-between w-100">
             <div class="wrap-limit">
-                <select class="form-select-solid form-select form-select-sm" v-model="tableConfig.config.limit">
+                <select class="form-select-solid form-select form-select-sm" v-model="tableConfig.config.limit" @change="$emit('get-data')">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -41,27 +43,27 @@
             </div>
             <div class="wrap-pagination">
                 <ul class="pagination">
-                    <li :class="`page-item next ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = 1" class="page-link"><i class="bi bi-chevron-double-left"></i></a></li>
-                    <li :class="`page-item previous ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;"  @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage-1" class="page-link"><i class="previous"></i></a></li>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = 1; $emit('get-data');" class="page-link"><i class="bi bi-chevron-double-left"></i></a></li>
+                    <li :class="`page-item previous ${tableConfig?.config?.currentPage == 1 ? 'disabled' : ''}`"><a href="javascript:;"  @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage-1; $emit('get-data');" class="page-link"><i class="previous"></i></a></li>
                     <template v-for="(context,index) in tableConfig?.config?.totalPage">
                         <template v-if="tableConfig?.config?.currentPage < 3">
                             <template v-if="index+1 <= 5">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1; $emit('get-data');" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
                         <template v-if="tableConfig?.config?.currentPage >= 3 && tableConfig?.config?.currentPage <= tableConfig?.config?.totalPage-3">
                             <template v-if="index+1 < tableConfig?.config?.currentPage+3 && index+1 > tableConfig?.config?.currentPage-3">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1; $emit('get-data');" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
-                        <template v-if="tableConfig?.config?.currentPage >= tableConfig?.config?.totalPage-2">
+                        <template v-if="tableConfig?.config?.currentPage >= tableConfig?.config?.totalPage-2 && tableConfig?.config?.currentPage >= 3">
                             <template v-if="index+1 > tableConfig?.config?.totalPage-5">
-                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1" class="page-link">{{ index+1 }}</a></li>
+                                <li :class="`page-item ${index+1 == tableConfig?.config?.currentPage ? 'active' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = index+1; $emit('get-data');" class="page-link">{{ index+1 }}</a></li>
                             </template>
                         </template>
                     </template>
-                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage+1" class="page-link"><i class="next"></i></a></li>
-                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.totalPage" class="page-link"><i class="bi bi-chevron-double-right"></i></a></li>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.currentPage+1; $emit('get-data');" class="page-link"><i class="next"></i></a></li>
+                    <li :class="`page-item next ${tableConfig?.config?.currentPage == tableConfig?.config?.totalPage ? 'disabled' : ''}`"><a href="javascript:;" @click="tableConfig.config.currentPage = tableConfig?.config?.totalPage; $emit('get-data');" class="page-link"><i class="bi bi-chevron-double-right"></i></a></li>
                 </ul>
             </div>
         </div>
@@ -85,11 +87,7 @@
 
         },
         watch: {
-            "tableConfig.config.limit": {
-                handler(val){
-                    alert(val);
-                }
-            }
+
         },
         methods: {
             clickSort(val, i){
@@ -97,14 +95,16 @@
                     value.activeSort = false;
                 });
                 this.tableConfig.data.header[i].activeSort = true;
-                if(this.tableConfig.config.orderBy == 'asc'){
-                    this.tableConfig.config.orderBy = 'desc';
-                    this.tableConfig.config.sortBy = val?.sortBy;
+                if(this.tableConfig.config.order_by == 'asc'){
+                    this.tableConfig.config.order_by = 'desc';
+                    this.tableConfig.config.sort_by = val?.sort_by;
                 }
-                else if(this.tableConfig.config.orderBy == 'desc'){
-                    this.tableConfig.config.orderBy = 'asc';
-                    this.tableConfig.config.sortBy = val?.sortBy
+                else if(this.tableConfig.config.order_by == 'desc'){
+                    this.tableConfig.config.order_by = 'asc';
+                    this.tableConfig.config.sort_by = val?.sort_by
                 }
+
+                this.$emit('get-data');
             }
         }
     }
