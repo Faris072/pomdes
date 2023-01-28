@@ -87,7 +87,7 @@ class AuthController extends Controller
 
     public function get_users(Request $request){
         try{
-            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile']);
+            $user = User::with(['pusat', 'pusat.profile', 'pomdes', 'role', 'profile', 'profile.photo_profile']);
 
             if(isset($request->order_by)){
                 $user = $user->orderBy($request->sort_by, $request->order_by);

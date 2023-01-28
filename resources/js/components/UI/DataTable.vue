@@ -1,7 +1,7 @@
 <template>
     <div style="overflow-x:auto;">
         <input type="search" class="form-control form-control-solid" v-model="tableConfig.config.search" style="width:25%;" placeholder="Search">
-        <table class="table my-4 data-table-faris" style="table-layout: fixed;">
+        <table class="table table-hover my-4 data-table-faris" style="table-layout: fixed;">
             <thead>
                 <tr>
                     <th v-for="(val, i) in tableConfig?.data?.header" :class="val?.class?.column" :style="val?.style?.column">
@@ -34,7 +34,7 @@
         </table>
         <div class="control-bottom d-flex justify-content-between w-100">
             <div class="wrap-limit">
-                <select class="form-select-solid form-select form-select-sm" v-model="tableConfig.config.limit" @change="$emit('get-data')">
+                <select class="form-select-solid form-select form-select-sm" v-model="tableConfig.config.limit" @change=" tableConfig.config.currentPage = 1; $emit('get-data');">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -111,18 +111,18 @@
 </script>
 
 <style scoped>
-    table tr td, table tr th{
-        border-bottom:1px dashed lightgray !important;
-        padding:20px;
-    }
     thead{
         border-bottom:2px solid lightgray;
     }
 </style>
 
 <style>
-    table.data-table-faris tr td, table.data-table-faris tr th{
+    table.data-table-faris tr{
         border-bottom:1px dashed lightgray !important;
+        padding:20px !important;
+    }
+    table.data-table-faris tr td, table.data-table-faris tr th{
+        border:none;
         padding:20px !important;
     }
 </style>

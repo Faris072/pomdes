@@ -12,8 +12,42 @@
                                 <app-data-table :table-config="tableConfig" @get-data="getDataTable">
                                     <template v-slot:body>
                                         <tr v-for="(context, index) in tableConfig?.data?.body">
-                                            <td class="text-center">{{ index+1 + ((tableConfig?.config?.currentPage-1) * tableConfig?.config?.limit) }}</td>
-                                            <td>{{ context?.username }}</td>
+                                            <td valign="middle">
+                                                {{ index+1 + ((tableConfig?.config?.currentPage-1) * tableConfig?.config?.limit) }}
+                                            </td>
+                                            <td valign="middle">
+                                                <div class="wrap-profile">
+                                                    {{ context?.profile?.name || '-' }}
+                                                    <br>
+                                                    {{ context?.username }}
+                                                </div>
+                                            </td>
+                                            <td valign="middle">{{ context?.role?.name }}</td>
+                                            <td valign="middle">
+                                                <div class="wrap-empty-pusat" v-if="!context?.pusat_id">
+                                                    <span class="badge badge-light-danger">Bukan Pomdes</span>
+                                                </div>
+                                                <div class="wrap-pusat" v-else>
+                                                    {{ context?.pusat?.profile?.name }}
+                                                    <br>
+                                                    {{ context?.pusat?.username }}
+                                                </div>
+                                            </td>
+                                            <td valign="middle">
+                                                <div class="m-auto form-check form-switch form-check-custom form-check-solid">
+                                                    <input class="m-auto form-check-input h-30px w-50px" type="checkbox" />
+                                                </div>
+                                            </td>
+                                            <td valign="middle">
+                                                <div class="dropdown m-auto">
+                                                    <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">Action</a>
+                                                        <a class="dropdown-item" href="#">Another action</a>
+                                                        <a class="dropdown-item" href="#">Something else here</a>
+                                                    </div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </template>
                                 </app-data-table>
@@ -111,9 +145,13 @@
                             },
                             {
                                 text: 'Nama',
-                                sort_by: 'username',
+                                sort_by: 'name',
                                 sort: true,
-                                class: '',
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
                                 style: {
                                     column: '',
                                     text: ''
@@ -121,9 +159,55 @@
                             },
                             {
                                 text: 'Role',
-                                sort_by: 'username',
+                                sort_by: 'name',
                                 sort: true,
-                                class: '',
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    text: ''
+                                }
+                            },
+                            {
+                                text: 'Pusat',
+                                sort_by: 'name',
+                                sort: false,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    text: ''
+                                }
+                            },
+                            {
+                                text: 'Status',
+                                sort_by: 'is_active',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: 'text-center'
+                                },
+                                style: {
+                                    column: '',
+                                    text: ''
+                                }
+                            },
+                            {
+                                text: 'Aksi',
+                                sort_by: 'is_active',
+                                sort: false,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: 'text-center'
+                                },
                                 style: {
                                     column: '',
                                     text: ''
@@ -230,6 +314,7 @@
                     .then(res => {
                         $('.modal').modal('hide');
                         Swal.fire('Berhasil', 'User berhasil ditambahkan', 'success');
+                        this.getDataTable();
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
