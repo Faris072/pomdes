@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth:api'],function(){
 
         Route::delete('delete/{id}','App\Http\Controllers\API\AuthController@delete');
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
+        Route::put('/switch-status/{id}','App\Http\Controllers\API\AuthController@switch_status');
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
         Route::get('select-pusat','App\Http\Controllers\API\AuthController@select_pusat');
         Route::put('restore/{id}','App\Http\Controllers\API\AuthController@restore');

@@ -86,8 +86,8 @@ export default {
                 icon: status?.icon
             }).then(()=>{
                 if(err?.response?.status == 401){
-                    this.state.me.authenticated = false;
-                    this.$router.push({path: '/login'});
+                    store.state.auth.authenticated = false;
+                    router.push({path: '/login'});
                 }
             });
         };

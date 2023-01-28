@@ -44,6 +44,7 @@ class AuthController extends Controller
                 return $this->getResponse([],$validatedData->getMessageBag(),422);
             }
 
+
             if($request->role_id == 3){
                 $pusat = User::find($request->pusat_id);
                 if(empty($request->pusat_id)){
@@ -87,7 +88,13 @@ class AuthController extends Controller
 
     public function get_users(Request $request){
         try{
-            $user = User::with(['pusat', 'pusat.profile', 'pomdes', 'role', 'profile', 'profile.photo_profile']);
+            $user = User::with([
+                'pusat.profile',
+                'pomdes',
+                'role',
+                'profile',
+                'profile.photo_profile'
+            ]);
 
             if(isset($request->order_by)){
                 $user = $user->orderBy($request->sort_by, $request->order_by);
@@ -389,6 +396,34 @@ class AuthController extends Controller
             }
 
             return $this->getResponse($query,'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function switch_status($id){
+        try{
+            $user = User::find($id);
+
+            if(!$user){
+                return $this->getResponse([],'User tidak ditemukan',404);
+            }
+
+            if($user->is_active == 1){
+                $status = 0;
+            }
+            else{
+                $status = 1;
+            }
+
+            $update = $user->update(['is_active' => $status]);
+
+            if(!$update){
+                return $this->getResponse([],'Data gagal diupdate', 500);
+            }
+
+            return $this->getResponse(User::find($id), 'Status berhasil diubah.');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

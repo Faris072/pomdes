@@ -1,6 +1,6 @@
 <template>
     <div style="overflow-x:auto;">
-        <input type="search" class="form-control form-control-solid" v-model="tableConfig.config.search" style="width:25%;" placeholder="Search">
+        <input type="search" class="form-control form-control-solid" v-model="searchValue" @input="search()" style="width:25%;" placeholder="Search" autocomplete="off">
         <table class="table table-hover my-4 data-table-faris" style="table-layout: fixed;">
             <thead>
                 <tr>
@@ -80,7 +80,7 @@
         },
         data(){
             return {
-
+                searchValue: ''
             }
         },
         mounted(){
@@ -105,7 +105,11 @@
                 }
 
                 this.$emit('get-data');
-            }
+            },
+            search: Lodash.debounce(function($event){
+                this.tableConfig.config.search = this.searchValue;
+                this.$emit('get-data');
+            }, 1000),
         }
     }
 </script>
