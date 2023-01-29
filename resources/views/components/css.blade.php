@@ -6,10 +6,14 @@
 {{-- METRONIC-CUSTOM-PLUGIN --}}
 <link rel="stylesheet" href="{{asset('assets/plugins/custom/datatables/datatables.bundle.css')}}">
 
+{{-- font google --}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 {{-- CUSTOM --}}
 <style>
     *{
-        font-family: Poppins,Helvetica,sans-serif;
+        font-family: 'Poppins', sans-serif;
     }
     .btn-orange{
         background-color:orange !important;

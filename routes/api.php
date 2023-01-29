@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
         Route::get('select-pusat','App\Http\Controllers\API\AuthController@select_pusat');
         Route::put('restore/{id}','App\Http\Controllers\API\AuthController@restore');
+        Route::put('reset-password/{id}','App\Http\Controllers\API\AuthController@reset_password');
         Route::post('/','App\Http\Controllers\API\AuthController@register');
         Route::get('/','App\Http\Controllers\API\AuthController@get_users');
         Route::get('/{id}','App\Http\Controllers\API\AuthController@show_user');

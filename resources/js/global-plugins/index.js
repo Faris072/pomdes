@@ -1,6 +1,7 @@
 import router from '@/router';
 import api from '@/global-plugins/api.js';
 import store from '@/vuex';
+import moment from 'moment';
 
 export default {
     install(app, options){
@@ -101,6 +102,10 @@ export default {
         }
         global.$pageLoadingHide = () => {
             store.state.pageLoading = false;
+        }
+
+        global.$moment = (date) => {
+            return moment(date);
         }
     }
 }

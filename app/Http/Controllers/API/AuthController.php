@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\PhotoProfile;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -120,10 +122,12 @@ class AuthController extends Controller
 
     public function show_user($id){
         try{
-            $user = User::with(['pusat', 'pomdes', 'role', 'profile', 'profile.photo_profile'])->find($id);
+            $user = User::with(['pusat.profile.city.province', 'pomdes.profile.city.province', 'role', 'profile.city.province', 'profile.photo_profile'])->find($id);
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
             }
+
+            $user->profile && $user->profile->photo_profile ? $user->profile->photo_profile->link = route('render-gambar-profile', $user->profile->photo_profile->id) : '';
 
             return $this->getResponse($user,'User berhasil ditampilkan');
         }
@@ -429,4 +433,32 @@ class AuthController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function reset_password($id){
+        try{
+            $default_password = env('DEFAULT_PASSWORD','123456');
+
+            if(auth()->user()->role_id != 1){
+                return $this->getResponse([],'Akses ditolak!',403);
+            }
+
+            $user = User::find($id);
+
+            if(!$user){
+                return $this->getResponse([],'User tidak ditemukan',404);
+            }
+
+            $reset = $user->update(['password' => bcrypt($default_password)]);
+
+            if(!$reset){
+                return $this->getResponse([],'Password gagal direset',500);
+            }
+
+            return $this->getResponse([],'Password user berhasil diperbarui');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
 }

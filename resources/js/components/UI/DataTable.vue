@@ -1,6 +1,6 @@
 <template>
     <div style="overflow-x:auto;">
-        <input type="search" class="form-control form-control-solid" v-model="searchValue" @input="search()" style="width:25%;" placeholder="Search" autocomplete="off">
+        <input type="search" class="form-control form-control-solid" v-model="searchValue" @input="search()" style="width:250px;" placeholder="Search" autocomplete="off">
         <table class="table table-hover my-4 data-table-faris" style="table-layout: fixed;">
             <thead>
                 <tr>
@@ -128,5 +128,10 @@
     table.data-table-faris tr td, table.data-table-faris tr th{
         border:none;
         padding:20px !important;
+    }
+    @media screen and (max-width: 700px){
+        table.table{
+            width:1000px;
+        }
     }
 </style>
