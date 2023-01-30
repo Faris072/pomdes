@@ -9,6 +9,8 @@ import NotFound from '@/components/Not-found.vue';
 import Dashboard from '@/view/dashboard/Index.vue';
 
 import MasterUsers from '@/view/master/users/Index.vue';
+import MasterProvince from '@/view/master/location/province/Index.vue';
+import MasterCity from '@/view/master/location/city/Index.vue';
 
 let routes = [
     {
@@ -36,6 +38,16 @@ let routes = [
                 path: 'master/users',
                 name: 'm-users',
                 component: MasterUsers,
+            },
+            {
+                path: 'master/province',
+                name: 'm-province',
+                component: MasterProvince,
+            },
+            {
+                path: 'master/city',
+                name: 'm-city',
+                component: MasterCity,
             },
         ]
     },

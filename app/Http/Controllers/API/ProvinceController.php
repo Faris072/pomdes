@@ -39,9 +39,21 @@ class ProvinceController extends Controller
         }
     }
 
-    public function get(){
+    public function get(Request $request){
         try{
-            $query = Province::with(['cities'])->get();
+            $query = Province::with(['cities']);
+
+            if(isset($request->sort_by)){
+                $query = $query->orderBy($request->sort_by, $request->order_by);
+            }
+
+            if(isset($request->limit)){
+                $query = $query->paginate($request->limit);
+            }
+            else{
+                $query = $query->get();
+            }
+
             if(!$query){
                 return $this->getResponse([],'Data provinsi tidak ditemukan.',422);
             }

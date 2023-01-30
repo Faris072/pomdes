@@ -30,7 +30,7 @@
                                                     <span class="badge badge-light-danger">Bukan Pomdes</span>
                                                 </div>
                                                 <div class="wrap-pusat" v-else>
-                                                    {{ context?.pusat?.profile?.name }}
+                                                    <b>{{ context?.pusat?.profile?.name }}</b>
                                                     <br>
                                                     {{ context?.pusat?.username }}
                                                 </div>
@@ -47,8 +47,7 @@
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="getDetail(context?.id)">Detail</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="edit(context?.id)">Edit</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="resetPassword(context?.id)">Reset Password</a>
-                                                        <a class="dropdown-item" href="#" style="padding:10px;">Hapus Sementara</a>
-                                                        <a class="dropdown-item" href="#" style="padding:10px;">Hapus Permanen</a>
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)">Hapus</a>
                                                     </div>
                                                 </div>
                                             </td>
@@ -767,6 +766,33 @@ import { toDisplayString } from 'vue';
                         this.detail.loading = false;
                     });
             },
+            hapus(id){
+                let that = this;
+                Swal.fire({
+                    title: `Hapus user yang dipilih?`,
+                    html: `User akan dihapus dan data pada user tersebut akan terhapus.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#DB3700'
+                }).then(result => {
+                    if(result.isConfirmed){
+                        this.$pageLoadingShow();
+                        this.$axios().delete(`users/delete/${id}`)
+                            .then(res => {
+                                Swal.fire('Berhasil', 'User berhasil dihapus','success');
+                                this.getDataTable();
+                            })
+                            .catch(err =>{
+                                this.$axiosHandleError(err);
+                            })
+                            .then(()=>{
+                                this.$pageLoadingHide();
+                            });
+                    }
+                });
+            }
         }
     }
 </script>
