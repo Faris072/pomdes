@@ -21,7 +21,7 @@
                                                 <b>{{ context?.name }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ context?.province?.name }}</b>
+                                                <b>{{ context?.province?.user?.profile?.name }}</b>
                                             </td>
                                             <td valign="middle">
                                                 <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
@@ -49,8 +49,8 @@
                     <div class="modal-header">
                         <div class="m-auto" style="width:100%;">
                             <center>
-                                <h3 class="modal-title">{{ form.flag == 'tambah' ? 'Tambah' : 'Edit' }} Kota</h3>
-                                <span class="text-muted">Isi form berikut untuk {{ form.flag == 'tambah' ? 'menambah' : 'mengubah' }} kota PDOMS</span>
+                                <h3 class="modal-title">{{ form.flag == 'tambah' ? 'Tambah' : 'Edit' }} Bahan Bakar</h3>
+                                <span class="text-muted">Isi form berikut untuk {{ form.flag == 'tambah' ? 'menambah' : 'mengubah' }} bahan bakar pada aplikasi PDOMS</span>
                             </center>
                         </div>
                         <!--begin::Close-->
@@ -59,10 +59,10 @@
                     </div>
 
                     <div class="modal-body">
-                        <label for="province"><h5>Provinsi</h5></label>
-                        <app-select2 id="province" v-model="form.data.province" :options="selectList.province.list" :loading="selectList.province.loading" @get-options="getProvince" placeholder="Pilih provinsi" :multiple="false" />
+                        <label for="supplier"><h5>Supplier</h5></label>
+                        <app-select2 id="province" v-model="form.data.user" :options="selectList.user.list" :loading="selectList.user.loading" @get-options="getUser" placeholder="Pilih supplier" :multiple="false" />
                         <br>
-                        <label for="city"><h5>Nama Kota</h5></label>
+                        <label for="city"><h5>Bahan Bakar</h5></label>
                         <input type="text" class="form-control" v-model="form.data.name" placeholder="Isi nama kota">
                     </div>
 
@@ -83,7 +83,7 @@
             return {
                 token: localStorage.getItem('pomdes_token'),
                 selectList: {
-                    province: {
+                    user: {
                         loading: false,
                         list: []
                     }
@@ -93,8 +93,8 @@
                     isEdit: false,
                     idEdit: '',
                     data: {
-                        province: '',
-                        province_id: '',
+                        user: '',
+                        user_id: '',
                         name: '',
                     }
                 },
@@ -117,7 +117,7 @@
                                 }
                             },
                             {
-                                text: 'Nama Kota',
+                                text: 'Nama Bahan Bakar',
                                 sort_by: 'name',
                                 sort: true,
                                 class: {
@@ -132,8 +132,8 @@
                                 }
                             },
                             {
-                                text: 'Nama Provinsi',
-                                sort_by: 'province_id',
+                                text: 'Nama Supplier',
+                                sort_by: 'user_id',
                                 sort: true,
                                 class: {
                                     column: '',
@@ -205,8 +205,8 @@
                     isEdit: false,
                     idEdit: '',
                     data: {
-                        province: '',
-                        province_id: '',
+                        user: '',
+                        user_id: '',
                         name: '',
                     }
                 }
@@ -214,11 +214,11 @@
             simpan(){
                 let that = this;
                 this.$pageLoadingShow();
-                this.form.data.province_id = this.form?.data?.province?.id;
-                this.$axios().post(`location/city`, this.form.data)
+                this.form.data.user_id = this.form?.data?.user?.id;
+                this.$axios().post(`location/fuel`, this.form.data)
                     .then(res => {
                         $('.modal').modal('hide');
-                        Swal.fire('Berhasil','Data kota berhasil disimpan.','success');
+                        Swal.fire('Berhasil','Data bahan bakar berhasil disimpan.','success');
                         this.getDataTable();
                     })
                     .catch(err => {
@@ -226,12 +226,12 @@
                     })
                     .then(() => {
                         this.$pageLoadingHide();
-                    })
+                    });
             },
             getDataTable(){
                 let that = this;
                 this.tableConfig.config.loading = true;
-                this.$axios().get(`location/city`, {params: this.tableConfig?.config})
+                this.$axios().get(`location/fuel`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;
                         this.tableConfig.data.body = res?.data?.data?.data;
@@ -252,16 +252,16 @@
                 this.form.idEdit = id;
                 $('#modal-form').modal('show');
                 this.form.data.name = data?.name;
-                this.form.data.province = {id: data?.province?.id, text: data?.province?.name}
+                this.form.data.user = {id: data?.user?.id, text: data?.user?.profile?.username}
             },
             update(){
                 let that = this;
                 this.$pageLoadingShow();
-                this.form.data.province_id = this.form?.data?.province?.id;
-                this.$axios().put(`location/city/${this.form.idEdit}`, this.form.data)
+                this.form.data.user_id = this.form?.data?.user?.id;
+                this.$axios().put(`location/fuel/${this.form.idEdit}`, this.form.data)
                     .then(res => {
                         $('.modal').modal('hide');
-                        Swal.fire('Berhasil', 'Data kota berhasil diubah.', 'success');
+                        Swal.fire('Berhasil', 'Data bahan bakar berhasil diubah.', 'success');
                         this.getDataTable();
                     })
                     .catch(err => {
@@ -273,8 +273,8 @@
             },
             hapus(id){
                 Swal.fire({
-                    title: `Hapus kota yang dipilih?`,
-                    html: `Kota akan dihapus dan data pada kota tersebut akan terhapus.`,
+                    title: `Hapus bahan bakar yang dipilih?`,
+                    html: `Bahan bakar akan dihapus dan data pada bahan bakar tersebut akan terhapus.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Hapus',
@@ -283,9 +283,9 @@
                 }).then(result => {
                     if(result.isConfirmed){
                         this.$pageLoadingShow();
-                        this.$axios().delete(`location/city/delete/${id}`)
+                        this.$axios().delete(`location/fuel/delete/${id}`)
                             .then(res => {
-                                Swal.fire('Berhasil', 'Kota berhasil dihapus','success');
+                                Swal.fire('Berhasil', 'Bahan bakar berhasil dihapus','success');
                                 this.getDataTable();
                             })
                             .catch(err =>{
@@ -297,7 +297,7 @@
                     }
                 });
             },
-            getProvince(search, limit){
+            getUser(search, limit){
                 let that = this;
                 this.selectList.province.loading = true;
 
@@ -306,19 +306,19 @@
                     limit
                 };
 
-                this.$axios().get(`location/province/select-list`, {params: data})
+                this.$axios().get(`location/users/select-list`, {params: data})
                     .then(res => {
                         let data = res?.data?.data;
-                        this.selectList.province.list = [];
+                        this.selectList.user.list = [];
                         $.each(data, function(i,val){
-                            that.selectList.province.list.push({id: val?.id, text: val?.name});
+                            that.selectList.user.list.push({id: val?.id, text: val?.profile?.username});
                         });
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
                     })
                     .then(() => {
-                        this.selectList.province.loading = false;
+                        this.selectList.user.loading = false;
                     })
             }
         }

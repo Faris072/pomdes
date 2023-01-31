@@ -198,6 +198,7 @@
             },
             getDataTable(){
                 let that = this;
+                this.tableConfig.config.loading = true;
                 this.$axios().get(`location/province`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;

@@ -35,4 +35,24 @@ class Controller extends BaseController
             ]
         ],$code);
     }
+
+    public function getDataTable($query, $request){//tanpa search
+        try{
+            if(isset($request->sort_by)){
+                $query = $query->orderBy($request->sort_by, $request->order_by);
+            }
+
+            if(isset($request->limit)){
+                $query = $query->paginate($request->limit);
+            }
+            else{
+                $query = $query->get();
+            }
+
+            return $query;
+        }
+        catch(\Exception $e){
+            $this->getResponse([],$e->getMessage(),500);
+        }
+    }
 }

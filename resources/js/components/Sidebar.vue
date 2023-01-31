@@ -100,6 +100,14 @@
                             </div>
                         </div>
                         <div class="menu-item">
+                            <a :class="`menu-link ${pageActive('m-fuel')}`" href="javascript:;" @click="this.$router.push({name: 'm-fuel'})">
+                                <span class="menu-icon">
+                                    <i class="bi bi-fuel-pump-fill fa-lg"></i>
+                                </span>
+                                <span class="menu-title">Bahan Bakar</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
                             <div class="menu-content pt-8 pb-2">
                                 <span class="menu-section text-muted text-uppercase fs-8 ls-1">Transaction</span>
                             </div>

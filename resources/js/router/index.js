@@ -11,6 +11,7 @@ import Dashboard from '@/view/dashboard/Index.vue';
 import MasterUsers from '@/view/master/users/Index.vue';
 import MasterProvince from '@/view/master/location/province/Index.vue';
 import MasterCity from '@/view/master/location/city/Index.vue';
+import MasterFuel from '@/view/master/fuel/Index.vue';
 
 let routes = [
     {
@@ -48,6 +49,11 @@ let routes = [
                 path: 'master/city',
                 name: 'm-city',
                 component: MasterCity,
+            },
+            {
+                path: 'master/fuel',
+                name: 'm-fuel',
+                component: MasterFuel,
             },
         ]
     },

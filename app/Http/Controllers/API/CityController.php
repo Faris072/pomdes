@@ -43,12 +43,21 @@ class CityController extends Controller
         }
     }
 
-    public function get(){
+    public function get(Request $request){
         try{
-            $city = City::with(['province'])->get();
+            $city = City::with(['province']);
+
+            if(isset($request->search)){
+                $city = $city->whereRaw("LOWER(name) like '%".$request->search."%'")
+                    ->orWhereHas('province', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) like '%".$request->search."%'");
+                    });
+            }
+
+            $city = $this->getDataTable($city, $request);
 
             if(!$city){
-                return $this->getResponse([],'City gagal dimuat',404);
+                return $this->getResponse([],'City gagal dimuat',500);
             }
 
             return $this->getResponse($city,'City berhasil ditampilkan');

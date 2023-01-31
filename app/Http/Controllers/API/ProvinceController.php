@@ -43,16 +43,11 @@ class ProvinceController extends Controller
         try{
             $query = Province::with(['cities']);
 
-            if(isset($request->sort_by)){
-                $query = $query->orderBy($request->sort_by, $request->order_by);
+            if(isset($request->search)){
+                $query = $query->whereRaw("LOWER(name) like '%".$request->search."%'");
             }
 
-            if(isset($request->limit)){
-                $query = $query->paginate($request->limit);
-            }
-            else{
-                $query = $query->get();
-            }
+            $query = $this->getDataTable($query,$request);
 
             if(!$query){
                 return $this->getResponse([],'Data provinsi tidak ditemukan.',422);
