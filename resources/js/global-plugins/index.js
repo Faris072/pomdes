@@ -72,9 +72,17 @@ export default {
                     break;
                 case 422:
                     status.title = 'Pastikan data sudah benar!';
-                    $.each(data?.status?.message, function(i,val){
-                        status.message = val;
-                    });
+                    if(typeof data?.status?.message == 'object'){
+                        status.message = ``;
+                        $.each(data?.status?.message, function(index,value){
+                            $.each(value, function(i,val){
+                                status.message += `${val}<br>`;
+                            });
+                        });
+                    }
+                    else{
+                        status.message = data?.status?.message;
+                    }
                     status.icon = 'warning';
                     break;
                 default:
@@ -179,9 +187,17 @@ export function axiosHandleError(err){
             break;
         case 422:
             status.title = 'Pastikan data sudah benar!';
-            $.each(data?.status?.message, function(i,val){
-                status.message = val;
-            });
+            if(typeof data?.status?.message == 'object'){
+                status.message = ``;
+                $.each(data?.status?.message, function(index,value){
+                    $.each(value, function(i,val){
+                        status.message += `${val}<br>`;
+                    });
+                });
+            }
+            else{
+                status.message = data?.status?.message;
+            }
             status.icon = 'warning';
             break;
         default:

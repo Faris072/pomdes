@@ -50,7 +50,7 @@ class ProvinceController extends Controller
             $query = $this->getDataTable($query,$request);
 
             if(!$query){
-                return $this->getResponse([],'Data provinsi tidak ditemukan.',422);
+                return $this->getResponse([],'Data provinsi tidak ditemukan.',404);
             }
 
             return $this->getResponse($query, 'Data provinsi berhasil ditampilkan.');

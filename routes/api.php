@@ -112,4 +112,15 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('/','App\Http\Controllers\API\RoleController@get');
         Route::get('/select-list','App\Http\Controllers\API\RoleController@select');
     });
+
+    Route::group(['prefix' => 'fuel'], function(){
+        Route::get('select-supplier','App\Http\Controllers\API\FuelController@select_supplier');
+        Route::delete('/delete/{id}','App\Http\Controllers\API\FuelController@delete');
+        Route::get('/','App\Http\Controllers\API\FuelController@get');
+        Route::post('/','App\Http\Controllers\API\FuelController@create');
+        Route::put('/{id}','App\Http\Controllers\API\FuelController@update');
+    });
+
+
+
 });

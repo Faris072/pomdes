@@ -49,6 +49,7 @@ class Controller extends BaseController
                 $query = $query->get();
             }
 
+
             return $query;
         }
         catch(\Exception $e){

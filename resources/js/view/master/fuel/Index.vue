@@ -21,7 +21,7 @@
                                                 <b>{{ context?.name }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ context?.province?.user?.profile?.name }}</b>
+                                                <b>{{ context?.supplier?.username}}</b>
                                             </td>
                                             <td valign="middle">
                                                 <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
@@ -60,7 +60,7 @@
 
                     <div class="modal-body">
                         <label for="supplier"><h5>Supplier</h5></label>
-                        <app-select2 id="province" v-model="form.data.user" :options="selectList.user.list" :loading="selectList.user.loading" @get-options="getUser" placeholder="Pilih supplier" :multiple="false" />
+                        <app-select2 id="supplier" v-model="form.data.user" :options="selectList.user.list" :loading="selectList.user.loading" @get-options="getUser" placeholder="Pilih supplier" :multiple="false" />
                         <br>
                         <label for="city"><h5>Bahan Bakar</h5></label>
                         <input type="text" class="form-control" v-model="form.data.name" placeholder="Isi nama kota">
@@ -215,7 +215,7 @@
                 let that = this;
                 this.$pageLoadingShow();
                 this.form.data.user_id = this.form?.data?.user?.id;
-                this.$axios().post(`location/fuel`, this.form.data)
+                this.$axios().post(`fuel`, this.form.data)
                     .then(res => {
                         $('.modal').modal('hide');
                         Swal.fire('Berhasil','Data bahan bakar berhasil disimpan.','success');
@@ -231,7 +231,7 @@
             getDataTable(){
                 let that = this;
                 this.tableConfig.config.loading = true;
-                this.$axios().get(`location/fuel`, {params: this.tableConfig?.config})
+                this.$axios().get(`fuel`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;
                         this.tableConfig.data.body = res?.data?.data?.data;
@@ -252,13 +252,13 @@
                 this.form.idEdit = id;
                 $('#modal-form').modal('show');
                 this.form.data.name = data?.name;
-                this.form.data.user = {id: data?.user?.id, text: data?.user?.profile?.username}
+                this.form.data.user = {id: data?.supplier?.id, text: data?.supplier?.username}
             },
             update(){
                 let that = this;
                 this.$pageLoadingShow();
                 this.form.data.user_id = this.form?.data?.user?.id;
-                this.$axios().put(`location/fuel/${this.form.idEdit}`, this.form.data)
+                this.$axios().put(`fuel/${this.form.idEdit}`, this.form.data)
                     .then(res => {
                         $('.modal').modal('hide');
                         Swal.fire('Berhasil', 'Data bahan bakar berhasil diubah.', 'success');
@@ -283,7 +283,7 @@
                 }).then(result => {
                     if(result.isConfirmed){
                         this.$pageLoadingShow();
-                        this.$axios().delete(`location/fuel/delete/${id}`)
+                        this.$axios().delete(`fuel/delete/${id}`)
                             .then(res => {
                                 Swal.fire('Berhasil', 'Bahan bakar berhasil dihapus','success');
                                 this.getDataTable();
@@ -299,19 +299,19 @@
             },
             getUser(search, limit){
                 let that = this;
-                this.selectList.province.loading = true;
+                this.selectList.user.loading = true;
 
                 let data = {
                     search,
                     limit
                 };
 
-                this.$axios().get(`location/users/select-list`, {params: data})
+                this.$axios().get(`fuel/select-supplier`, {params: data})
                     .then(res => {
                         let data = res?.data?.data;
                         this.selectList.user.list = [];
                         $.each(data, function(i,val){
-                            that.selectList.user.list.push({id: val?.id, text: val?.profile?.username});
+                            that.selectList.user.list.push({id: val?.id, text: val?.username});
                         });
                     })
                     .catch(err => {
