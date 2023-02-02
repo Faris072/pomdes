@@ -8,10 +8,15 @@ import NotFound from '@/components/Not-found.vue';
 
 import Dashboard from '@/view/dashboard/Index.vue';
 
+// master
 import MasterUsers from '@/view/master/users/Index.vue';
 import MasterProvince from '@/view/master/location/province/Index.vue';
 import MasterCity from '@/view/master/location/city/Index.vue';
 import MasterFuel from '@/view/master/fuel/Index.vue';
+
+// transaction
+import PengajuanTransaksi from '@/view/transaction/pengajuan/Index.vue';
+import TambahPengajuanTransaksi from '@/view/transaction/pengajuan/Tambah.vue';
 
 let routes = [
     {
@@ -54,6 +59,16 @@ let routes = [
                 path: 'master/fuel',
                 name: 'm-fuel',
                 component: MasterFuel,
+            },
+            {
+                path: 'transaksi/pengajuan',
+                name: 't-pengajuan',
+                component: PengajuanTransaksi,
+            },
+            {
+                path: 'transaksi/pengajuan/tambah',
+                name: 't-pengajuan-tambah',
+                component: TambahPengajuanTransaksi,
             },
         ]
     },
