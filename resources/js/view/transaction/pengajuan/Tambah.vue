@@ -3,13 +3,42 @@
         <div id="main-content">
             <div class="post d-flex flex-column-fluid" id="kt_post">
                 <div id="kt_content_container" class="container-xxl">
-                    <div class="card card-flush mt-5 mb-5 mb-xl-10" id="kt_profile_details_view">
-                        <div class="card card-xl-stretch mb-5 mb-xl-8">
-                            <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
-                                <button class="btn btn-secondary" @click="$router.push({name: 't-pengajuan'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
+                    <div class="d-flex justify-content-end">
+                        <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
+                            <button class="btn btn-secondary" @click="$router.push({name: 't-pengajuan'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card mb-5 mb-xl-8">
+                        <div class="card-body pt-5 container">
+                            <h2>Form Pengajuan Pembelian BBM</h2>
+                            <div class="wrap-form">
+                                <div class="form my-5">
+                                    <label for="name"><h5>Nama Transaksi</h5></label>
+                                    <input type="text" class="form-control" placeholder="Masukkan nama transaksi">
+                                </div>
+                                <div class="form my-5">
+                                    <label for="name"><h5>Tanggal Mulai</h5></label>
+                                    <input type="text" class="form-control" placeholder="Masukkan tanggal mulai">
+                                </div>
+                                <div class="form my-5">
+                                    <label for="name"><h5>Tanggal Selesai</h5></label>
+                                    <input type="text" class="form-control" placeholder="Masukkan tanggal selesai">
+                                </div>
+                                <div class="form my-5">
+                                    <label for="name"><h5>Deskripsi</h5></label>
+                                    <textarea class="form-control" rows="5" placeholder="Masukkan deskripsi transaksi"></textarea>
+                                </div>
                             </div>
-                            <div class="card-body pt-5">
-                                
+                            <br><br>
+                            <div class="card" style="border:1px solid gold;">
+                                <div class="card-body">
+                                    <h3 style="color:gold;">Bahan Bakar</h3>
+                                    <br>
+                                    <div class="wrap-bbm">
+                                        
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
