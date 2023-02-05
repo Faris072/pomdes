@@ -49,16 +49,19 @@ class FuelController extends Controller
 
             $attributes = [
                 'user_id' => 'Supplier',
-                'name' => 'Nama bahan bakar'
+                'name' => 'Nama bahan bakar',
+                'price' => 'Harga'
             ];
 
             $messages = [
                 'required' => ':attribute wajib dipilih.',
+                'numeric' => ':attribute harus berupa angka.',
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'user_id' => 'required|numeric',
-                'name' => 'required'
+                'name' => 'required',
+                'price' => 'required|numeric'
             ],$messages,$attributes);
 
             if($validatedData->fails()){
@@ -172,16 +175,19 @@ class FuelController extends Controller
 
             $attributes = [
                 'user_id' => 'Supplier',
-                'name' => 'Nama bahan bakar'
+                'name' => 'Nama bahan bakar',
+                'price' => 'Harga'
             ];
 
             $messages = [
                 'required' => ':attribute wajib dipilih.',
+                'numeric' => ':attribute harus berupa angka.',
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'user_id' => 'required|numeric',
-                'name' => 'required'
+                'name' => 'required',
+                'price' => 'required|numeric'
             ],$messages,$attributes);
 
             if($validatedData->fails()){
@@ -219,6 +225,42 @@ class FuelController extends Controller
         }
         catch(\Exception $e){
             return $this->getResponse([], $e->getMessage(), 500);
+        }
+    }
+
+    public function select_list(Request $request){
+        try{
+            $query = Fuel::with(['supplier.profile']);
+
+            if(isset($request->user_id)){
+                $query = $query->where('user_id', $request->user_id);
+            }
+
+            if(isset($request->search)){
+                $query = $query->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'")
+                    // ->orWhereRaw("price LIKE '%".$request->search."%'")
+                    ->orWhereHas('supplier', function($q) use ($request){
+                        $q->whereRaw("LOWER(username) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('supplier.profile', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    });
+            }
+
+            if(isset($request->limit)){
+                $query = $query->limit($request->limit);
+            }
+
+            $query = $query->get();
+
+            if(!$query){
+                return $this->getResponse([],'Bahan bakar gagal ditampilkan', 500);
+            }
+
+            return $this->getResponse($query,'Bahan bakar berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),400);
         }
     }
 }

@@ -114,7 +114,14 @@ export default {
 
         global.$moment = (date) => {
             return moment(date);
-        }
+        };
+
+        global.$rupiahFormat = (data) => {
+            return new Intl.NumberFormat("id-ID", {
+                // style: "currency",
+                // currency: "IDR"
+            }).format(data);
+        };
     }
 }
 

@@ -21,6 +21,9 @@
                                                 <b>{{ context?.name }}</b>
                                             </td>
                                             <td valign="middle">
+                                                <b>Rp{{ $rupiahFormat(context?.price) }}</b>
+                                            </td>
+                                            <td valign="middle">
                                                 <b>{{ context?.supplier?.username}}</b>
                                             </td>
                                             <td valign="middle">
@@ -64,6 +67,9 @@
                         <br>
                         <label for="city"><h5>Bahan Bakar</h5></label>
                         <input type="text" class="form-control" v-model="form.data.name" placeholder="Isi nama kota">
+                        <br>
+                        <label for="price"><h5>Harga (Rp)</h5></label>
+                        <app-money3 v-model="form.data.price" class="form-control" placeholder="Isi harga bahan bakar" v-bind="money3"></app-money3>
                     </div>
 
                     <div class="modal-footer">
@@ -96,7 +102,22 @@
                         user: '',
                         user_id: '',
                         name: '',
+                        price: '',
                     }
+                },
+                money3: {
+                    masked: false,
+                    prefix: '',
+                    suffix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    precision: 2,
+                    disableNegative: false,
+                    disabled: false,
+                    min: null,
+                    max: null,
+                    allowBlank: true,
+                    minimumNumberOfCharacters: 0,
                 },
                 tableConfig: {
                     data: {
@@ -119,6 +140,21 @@
                             {
                                 text: 'Nama Bahan Bakar',
                                 sort_by: 'name',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    wrap: '',
+                                    text: '',
+                                }
+                            },
+                            {
+                                text: 'Harga',
+                                sort_by: 'price',
                                 sort: true,
                                 class: {
                                     column: '',
@@ -253,6 +289,7 @@
                 $('#modal-form').modal('show');
                 this.form.data.name = data?.name;
                 this.form.data.user = {id: data?.supplier?.id, text: data?.supplier?.username}
+                this.form.data.price = data?.price;
             },
             update(){
                 let that = this;

@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DiscrepancyTypeSeeder::class,
             StatusSeeder::class,
+            ProvinceSeeder::class,
+            CitySeeder::class,
+            ProfileSeeder::class,
         ]);
     }
 }
