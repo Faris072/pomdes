@@ -11,27 +11,22 @@
                     <br>
                     <div class="card mb-5 mb-xl-8">
                         <div class="card-body pt-5 container">
-                            <h2>Form Pengajuan Pembelian BBM</h2>
+                            <div class="d-flex justify-content-between">
+                                <h2>Form Pengajuan Pembelian BBM</h2>
+                                <button class="btn btn-warning" @click="simpan()">Simpan</button>
+                            </div>
                             <br>
                             <div class="wrap-form">
                                 <div class="form my-5">
                                     <label for="name"><h5>Nama Transaksi</h5></label>
-                                    <input type="text" class="form-control" placeholder="Masukkan nama transaksi">
-                                </div>
-                                <div class="form my-5">
-                                    <label for="name"><h5>Tanggal Mulai</h5></label>
-                                    <input type="text" class="form-control" placeholder="Masukkan tanggal mulai">
-                                </div>
-                                <div class="form my-5">
-                                    <label for="name"><h5>Tanggal Selesai</h5></label>
-                                    <input type="text" class="form-control" placeholder="Masukkan tanggal selesai">
+                                    <input v-model="form.name" type="text" class="form-control" placeholder="Masukkan nama transaksi">
                                 </div>
                                 <div class="form my-5">
                                     <label for="name"><h5>Deskripsi</h5></label>
-                                    <textarea class="form-control" rows="5" placeholder="Masukkan deskripsi transaksi"></textarea>
+                                    <textarea v-model="form.description" class="form-control" rows="5" placeholder="Masukkan deskripsi transaksi"></textarea>
                                 </div>
                             </div>
-                            <br><br>
+                            <br>
                             <div class="card" style="border:1px solid gold;">
                                 <div class="card-body">
                                     <h3 style="color:gold;">Bahan Bakar</h3>
@@ -40,7 +35,7 @@
                                     <app-select2 v-model="form.supplier" :options="selectList.supplier.list" :loading="selectList.supplier.loading" @get-options="getSupplier" placeholder="Pilih supplier" :multiple="false" @change-options="resetFuel()"></app-select2>
                                     <br>
                                     <div class="wrap-bbm">
-                                        <div class="row my-5 align-items-end" v-for="(context,index) in form.fuel">
+                                        <div class="row my-5 align-items-end" v-for="(context,index) in form.fuels">
                                             <div class="col-md-4">
                                                 <h6>Jenis BBM</h6>
                                                 <app-select2 v-model="context.fuel" :options="selectList.fuel.list" :loading="selectList.fuel.loading" @get-options="getFuel" placeholder="Pilih BBM" :multiple="false" :disabled="!form.supplier.id" @change-options="context.price = ''; context.volume = ''"></app-select2>
@@ -54,9 +49,21 @@
                                                 <app-money3 v-model="context.price" class="form-control" placeholder="Isi harga BBM" v-bind="money3" :disabled="!form.supplier.id || !context.fuel.id" @keyup="calculateFuelVolume(index)"></app-money3>
                                             </div>
                                             <div class="col-md-2">
-                                                <button class="btn btn-light-success" @click="form.fuel.push({fuel: '',volume: '',price: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
-                                                <button class="btn btn-light-danger" @click="form.fuel.splice(index,1)" v-else :disabled="!form.supplier.id">Hapus</button>
+                                                <button class="btn btn-light-success" @click="form.fuels.push({fuel: '',volume: '',price: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
+                                                <button class="btn btn-light-danger" @click="form.fuels.splice(index,1)" v-else :disabled="!form.supplier.id">Hapus</button>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br><br>
+                            <div class="file">
+                                <div class="dropzone" id="dropzoe-file" style="border:2px dashed gold; background-color:#fffdf1;">
+                                    <div class="dz-message needsclick">
+                                        <i class="bi bi-file-earmark-arrow-up text-warning fs-3x"></i>
+                                        <div class="ms-4">
+                                            <h3 class="fs-5 fw-bolder text-gray-900 mb-1">Drop files here or click to upload.</h3>
+                                            <span class="fs-7 fw-bold text-gray-400">Upload up to 10 files</span>
                                         </div>
                                     </div>
                                 </div>
@@ -74,6 +81,7 @@
         data(){
             return {
                 token: localStorage.getItem('pomdes_token'),
+                dropzoneFile: '',
                 selectList: {
                     fuel: {
                         loading: false,
@@ -86,9 +94,12 @@
                 },
                 form: {
                     supplier: '',
-                    fuel: [
+                    name: '',
+                    description: '',
+                    fuels: [
                         {
                             fuel: '',
+                            fuel_id: '',
                             volume: '',
                             price: ''
                         }
@@ -111,9 +122,38 @@
             }
         },
         mounted(){
-
+            this.initDropzone();
         },
         methods: {
+            initDropzone(){
+                this.dropzoneFile = new Dropzone("#dropzoe-file", {
+                    url: "/",
+                    dictCancelUpload: "Cancel",
+                    maxFilesize: 50,
+                    parallelUploads: 100,
+                    uploadMultiple: true,
+                    maxFiles: 100,
+                    addRemoveLinks: true,
+                    acceptedFiles: ".jpg,.jpeg,.png,.pdf,.xlsx,.doc,.docx",
+                    autoProcessQueue: false,
+                    init: function () {
+                        this.on("error", function (file) {
+                        if (!file.accepted) {
+                            this.removeFile(file);
+                            that.$swal("Silahkan periksa file Anda lagi");
+                        } else if (file.status == "error") {
+                            this.removeFile(file);
+                            that.$swal("Terjadi kesalahan koneksi");
+                        }
+                        });
+
+                        this.on("resetFiles", function (file) {
+                        this.removeAllFiles();
+                        });
+                    },
+                    }
+                );
+            },
             getFuel(search, limit){
                 let that = this;
 
@@ -153,7 +193,7 @@
                     });
             },
             resetFuel(){
-                this.form.fuel = [
+                this.form.fuels = [
                     {
                         fuel: '',
                         volume: '',
@@ -162,11 +202,22 @@
                 ]
             },
             calculateFuelPrice(index){
-                this.form.fuel[index].price = this.form.fuel[index].fuel.price * this.form.fuel[index].volume;
+                this.form.fuels[index].price = this.form.fuels[index].fuel.price * this.form.fuels[index].volume;
             },
             calculateFuelVolume(index){
-                this.form.fuel[index].volume = this.form.fuel[index].price / this.form.fuel[index].fuel.price;
+                this.form.fuels[index].volume = this.form.fuels[index].price / this.form.fuels[index].fuel.price;
             },
+            simpan(){
+                let that = this;
+
+                let data = this.form;
+
+                $.each(data?.fuels, function(i,val){
+                    val.fuel_id = val?.fuel?.id;
+                });
+
+                console.log(data);
+            }
         },
     }
 </script>

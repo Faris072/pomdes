@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Status;
 use App\Models\User;
+use App\Http\Controllers\API\FuelTransactionController;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -17,29 +18,32 @@ class TransactionController extends Controller
                 $request->user_id = auth()->user()->id;
             }
 
+            $request->status_id = 1;
+
             $attributes = [
                 'user_id' => 'Id user',
                 'status_id' => 'Id status',
                 'name' => 'Nama transaksi',
-                'start_date' => 'Tanggal mulai',
-                'end_date' => 'Tanggal selesai',
                 'description' => 'Deskripsi',
+                'fuels.*.fuel_id' => 'Id fuel',
+                'fuels.*.volume' => 'Volume',
+                'fuels.*.price' => 'Harga',
             ];
 
             $messages = [
                 'required' => ':attribute wajib di isi.',
                 'numeric' => ':attribute harus berupa angka.',
-                'description.min' => 'Deskripsi minimal 5 karakter'
+                'description.min' => 'Deskripsi minimal 5 karakter',
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'status_id' => 'required|numeric',
                 'user_id' => 'required|numeric',
                 'name' => 'required',
-                'start_date' => 'required',
-                'end_date' => 'required',
                 'description' => 'required|min:5',
-
+                'fuels.*.fuel_id' => 'required|numeric',
+                'fuels.*.volume' => 'required|numeric',
+                'fuels.*.price' => 'required|numeric',
             ],$messages,$attributes);
 
             if($validatedData->fails()){
@@ -70,7 +74,13 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Data gagal disimpan',500);
             }
 
-            return $this->getResponse($query,'Data berhasil disimpan.');
+            $fuelTransaction = (new FuelTransactionController)->store($request, $query);
+
+            if(!$fuelTransaction){
+                return $this->getResponse([],'Data gagal disimpan', 500);
+            }
+
+            return $this->getResponse(Transaction::with(['fuel_transactions'])->find($query->id),'Data berhasil disimpan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
@@ -169,8 +179,6 @@ class TransactionController extends Controller
                 'user_id' => 'Id user',
                 'status_id' => 'Id status',
                 'name' => 'Nama transaksi',
-                'start_date' => 'Tanggal mulai',
-                'end_date' => 'Tanggal selesai',
                 'description' => 'Deskripsi',
             ];
 
@@ -184,8 +192,6 @@ class TransactionController extends Controller
                 'status_id' => 'required|numeric',
                 'user_id' => 'required|numeric',
                 'name' => 'required',
-                'start_date' => 'required',
-                'end_date' => 'required',
                 'description' => 'required|min:5',
 
             ],$messages,$attributes);

@@ -18,8 +18,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
-            $table->date('start_date');
-            $table->date('end_date');
             $table->string('description');
             $table->timestamps();
             $table->softDeletes();

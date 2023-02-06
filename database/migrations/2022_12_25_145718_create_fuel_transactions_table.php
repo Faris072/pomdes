@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('fuel_id')->constrained('fuel')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
             $table->double('volume');
+            $table->double('price');
             $table->timestamps();
             $table->softDeletes();
         });
