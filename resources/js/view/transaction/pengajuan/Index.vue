@@ -21,15 +21,15 @@
                                                 <b>{{ context?.name }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ context?.province?.name }}</b>
+                                                <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
+                                                <b>{{ context?.description }}</b>
                                             </td>
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="edit(context?.id, context)">Edit</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `pengajuan/edit/${context.id}`})">Edit</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)">Hapus</a>
                                                 </div>
                                             </td>
@@ -69,7 +69,6 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
                         <button type="button" class="btn btn-primary" @click="simpan()" v-if="form.flag == 'tambah'">Simpan</button>
-                        <button type="button" class="btn btn-primary" @click="update()" v-else>Update</button>
                     </div>
                 </div>
             </div>
@@ -117,23 +116,8 @@
                                 }
                             },
                             {
-                                text: 'Nama Kota',
+                                text: 'Nama Transaksi',
                                 sort_by: 'name',
-                                sort: true,
-                                class: {
-                                    column: '',
-                                    wrap: '',
-                                    text: ''
-                                },
-                                style: {
-                                    column: '',
-                                    wrap: '',
-                                    text: '',
-                                }
-                            },
-                            {
-                                text: 'Nama Provinsi',
-                                sort_by: 'province_id',
                                 sort: true,
                                 class: {
                                     column: '',
@@ -149,6 +133,21 @@
                             {
                                 text: 'Tanggal Pembuatan',
                                 sort_by: 'created_at',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    wrap: '',
+                                    text: '',
+                                }
+                            },
+                            {
+                                text: 'Keterangan',
+                                sort_by: 'description',
                                 sort: true,
                                 class: {
                                     column: '',
@@ -231,7 +230,7 @@
             getDataTable(){
                 let that = this;
                 this.tableConfig.config.loading = true;
-                this.$axios().get(`location/city`, {params: this.tableConfig?.config})
+                this.$axios().get(`transaction`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;
                         this.tableConfig.data.body = res?.data?.data?.data;
@@ -245,31 +244,6 @@
                     .then(() => {
                         this.tableConfig.config.loading = false;
                     })
-            },
-            edit(id,data){
-                this.resetModal();
-                this.form.flag = 'edit';
-                this.form.idEdit = id;
-                $('#modal-form').modal('show');
-                this.form.data.name = data?.name;
-                this.form.data.province = {id: data?.province?.id, text: data?.province?.name}
-            },
-            update(){
-                let that = this;
-                this.$pageLoadingShow();
-                this.form.data.province_id = this.form?.data?.province?.id;
-                this.$axios().put(`location/city/${this.form.idEdit}`, this.form.data)
-                    .then(res => {
-                        $('.modal').modal('hide');
-                        Swal.fire('Berhasil', 'Data kota berhasil diubah.', 'success');
-                        this.getDataTable();
-                    })
-                    .catch(err => {
-                        this.$axiosHandleError(err);
-                    })
-                    .then(() => {
-                        this.$pageLoadingHide();
-                    });
             },
             hapus(id){
                 Swal.fire({

@@ -567,7 +567,7 @@ import { toDisplayString } from 'vue';
                         $.each(data, function(i,val){
                             that.selectList.pusat.list.push({
                                 id: val?.id,
-                                text: val?.profile?.name
+                                text: val?.username
                             });
                         });
                     })

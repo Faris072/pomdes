@@ -17,6 +17,7 @@ import MasterFuel from '@/view/master/fuel/Index.vue';
 // transaction
 import PengajuanTransaksi from '@/view/transaction/pengajuan/Index.vue';
 import TambahPengajuanTransaksi from '@/view/transaction/pengajuan/Tambah.vue';
+import EditPengajuanTransaksi from '@/view/transaction/pengajuan/Edit.vue';
 
 let routes = [
     {
@@ -69,6 +70,11 @@ let routes = [
                 path: 'transaksi/pengajuan/tambah',
                 name: 't-pengajuan-tambah',
                 component: TambahPengajuanTransaksi,
+            },
+            {
+                path: 'transaksi/pengajuan/edit/:id',
+                name: 't-pengajuan-edit',
+                component: EditPengajuanTransaksi,
             },
         ]
     },

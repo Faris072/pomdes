@@ -48,4 +48,8 @@ class Transaction extends Model
     public function discrepancy(){
         return $this->hasOne(Discrepancy::class, 'transaction_id','id');
     }
+
+    public function submission_files(){
+        return $this->hasMany(SubmissionFiles::class, 'transaction_id','id');
+    }
 }

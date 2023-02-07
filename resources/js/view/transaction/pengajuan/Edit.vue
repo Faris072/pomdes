@@ -14,7 +14,7 @@
                             <br>
                             <div class="d-flex justify-content-between align-items-center">
                                 <h2>Form Pengajuan Pembelian BBM</h2>
-                                <button class="btn btn-warning" @click="simpan()">Simpan</button>
+                                <button class="btn btn-warning" @click="simpan()">Simpan Perubahan</button>
                             </div>
                             <br>
                             <div class="wrap-form">
@@ -133,6 +133,7 @@
         },
         mounted(){
             this.initDropzone();
+            this.getData();
         },
         unmounted(){
             this.dropzoneFile.destroy();
@@ -168,6 +169,35 @@
                         });
                     },
                 });
+            },
+            getData(){
+                let that = this;
+                this.$axios().get(`transaction/${this.$route.params.id}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        console.log(data);
+                        this.form.user = {id: data?.user?.id, text: data?.user?.username};
+                        this.form.supplier = {id: data?.fuel_transactions[0]?.fuel?.supplier?.id, text: data?.fuel_transactions[0]?.fuel?.supplier?.username};
+                        this.form.name = data?.name;
+                        this.form.description = data?.description;
+                        if(data?.fuel_transactions?.length > 0){
+                            this.form.fuels = []
+                        }
+                        $.each(data?.fuel_transactions, function(i,val){
+                            that.form.fuels.push({
+                                fuel: {id: val?.fuel?.id, text: val?.fuel?.name},
+                                fuel_id: '',
+                                volume: val?.volume,
+                                price: val?.price
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+
+                    });
             },
             getFuel(search, limit){
                 let that = this;

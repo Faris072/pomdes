@@ -16,9 +16,11 @@ class TransactionController extends Controller
         try{
             if(auth()->user()->role_id != 1){
                 $request->user_id = auth()->user()->id;
+                $request['user_id'] = auth()->user()->id;
             }
 
             $request->status_id = 1;
+            $request['status_id'] = 1;
 
             $attributes = [
                 'user_id' => 'Id user',
@@ -77,34 +79,55 @@ class TransactionController extends Controller
             $fuelTransaction = (new FuelTransactionController)->store($request, $query);
 
             if(!$fuelTransaction){
-                return $this->getResponse([],'Data gagal disimpan', 500);
+                return $this->getResponse([],'Data bahan bakar gagal disimpan', 500);
             }
 
-            return $this->getResponse(Transaction::with(['fuel_transactions'])->find($query->id),'Data berhasil disimpan');
+            $uploadSubmission = (new SubmissionFilesController)->upload($request, $query);
+
+            if(!$uploadSubmission){
+                return $this->getResponse([],'File gagal diupload',500);
+            }
+
+            return $this->getResponse(Transaction::with(['fuel_transactions','submission_files'])->find($query->id),'Data berhasil disimpan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
 
-    public function get(){
+    public function get(Request $request){
         try{
             $transactions = Transaction::with([
-                    'user',
-                    'status',
-                    'invoice_pomdes',
-                    'invoice_pusat',
-                    'payment_to_pusat',
-                    'payment_to_supplier',
-                    'fuel_transactions',
-                    'hindrance',
-                    // 'hindrance.hindrance_files',
-                    'discrepancy',
-                    // 'discrepancy.fuel_discrepancies',
-                    // 'discrepancy.fuel_discrepancies.discrepancy_files',
-                    // 'discrepancy.fuel_discrepancies.discrepancy_type',
-                    // 'discrepancy.fuel_discrepancies.fuel_transaction',
-                ])->get();
+                'user.profile',
+                'status',
+                'invoice_pomdes',
+                'invoice_pusat',
+                'payment_to_pusat',
+                'payment_to_supplier',
+                'fuel_transactions',
+                'hindrance',
+                // 'hindrance.hindrance_files',
+                'discrepancy',
+                // 'discrepancy.fuel_discrepancies',
+                // 'discrepancy.fuel_discrepancies.discrepancy_files',
+                // 'discrepancy.fuel_discrepancies.discrepancy_type',
+                // 'discrepancy.fuel_discrepancies.fuel_transaction',
+            ]);
+
+            if(isset($request->search)){
+                $transactions = $transactions->whereRaw("LOWER(name) LIKE '".strtolower($request->search)."'")
+                    ->orWhereHas('user', function($q) use ($request){
+                        $q->whereRaw("LOWER(username) LIKE '%".$request->search."%'");
+                    })
+                    ->orWhereHas('user.profile', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('fuel_transactions', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    });
+            }
+
+            $transactions = $this->getDataTable($transactions, $request);
 
             if(!$transactions){
                 return $this->getResponse([],'Terjadi kesalahan koneksi',500);
@@ -135,16 +158,9 @@ class TransactionController extends Controller
                     'payment_to_pusat.payment_to_pusat_files',
                     'payment_to_supplier',
                     'payment_to_supplier.payment_to_supplier_files',
-                    'fuel_transactions',
-                    'fuel_transactions.fuel',
                     'fuel_transactions.fuel.supplier',
                     'hindrance',
                     'hindrance.hindrance_files',
-                    'discrepancy',
-                    'discrepancy.fuel_discrepancies',
-                    'discrepancy.fuel_discrepancies.discrepancy_files',
-                    'discrepancy.fuel_discrepancies.discrepancy_type',
-                    'discrepancy.fuel_discrepancies.fuel_transaction',
                     'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
                 ])->find($id);
 
@@ -173,19 +189,26 @@ class TransactionController extends Controller
 
             if(auth()->user()->role_id != 1){
                 $request->user_id = auth()->user()->id;
+                $request['user_id'] = auth()->user()->id;
             }
+
+            $request->status_id = 1;
+            $request['status_id'] = 1;
 
             $attributes = [
                 'user_id' => 'Id user',
                 'status_id' => 'Id status',
                 'name' => 'Nama transaksi',
                 'description' => 'Deskripsi',
+                'fuels.*.fuel_id' => 'Id fuel',
+                'fuels.*.volume' => 'Volume',
+                'fuels.*.price' => 'Harga',
             ];
 
             $messages = [
                 'required' => ':attribute wajib di isi.',
                 'numeric' => ':attribute harus berupa angka.',
-                'description.min' => 'Deskripsi minimal 5 karakter'
+                'description.min' => 'Deskripsi minimal 5 karakter',
             ];
 
             $validatedData = Validator::make($request->all(),[
@@ -193,7 +216,9 @@ class TransactionController extends Controller
                 'user_id' => 'required|numeric',
                 'name' => 'required',
                 'description' => 'required|min:5',
-
+                'fuels.*.fuel_id' => 'required|numeric',
+                'fuels.*.volume' => 'required|numeric',
+                'fuels.*.price' => 'required|numeric',
             ],$messages,$attributes);
 
             if($validatedData->fails()){
@@ -201,6 +226,12 @@ class TransactionController extends Controller
             }
 
             $user = User::find($request->user_id);
+
+            $status = Status::find($request->status_id);
+
+            if(!$status){
+                return $this->getResponse([],'Status tidak ditemukan',404);
+            }
 
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',404);
@@ -218,7 +249,19 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Transaksi gagal diubah',500);
             }
 
-            return $this->getResponse(Transaction::find($transaction->id),'Transaksi berhasil diubah');
+            $fuelTransaction = (new FuelTransactionController)->update($request, $query, $id);
+
+            if(!$fuelTransaction){
+                return $this->getResponse([],'Data bahan bakar gagal disimpan', 500);
+            }
+
+            $uploadSubmission = (new SubmissionFilesController)->upload($request, $query);
+
+            if(!$uploadSubmission){
+                return $this->getResponse([],'File gagal diupload',500);
+            }
+
+            return $this->getResponse(Transaction::with(['fuel_transactions','submission_files'])->find($query->id),'Data berhasil disimpan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

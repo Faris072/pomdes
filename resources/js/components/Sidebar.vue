@@ -41,18 +41,18 @@
                                 <span class="menu-title">Dashboard</span>
                             </a>
                         </div>
-                        <div class="menu-item">
+                        <div class="menu-item" v-if="$store.state.auth.role_id == 1 || $store.state.auth.role_id == 4">
                             <div class="menu-content pt-8 pb-2">
                                 <span class="menu-section text-muted text-uppercase fs-8 ls-1">Master</span>
                             </div>
                         </div>
-                        <div class="menu-item">
+                        <div class="menu-item" v-if="$store.state.auth.role_id == 1">
                             <a :class="`menu-link ${pageActive('m-users')}`" href="javascript:;" @click="this.$router.push({name: 'm-users'})">
                                 <span class="menu-icon"><i class="bi bi-people-fill fa-lg"></i></span>
                                 <span class="menu-title">Users</span>
                             </a>
                         </div>
-                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                        <div data-kt-menu-trigger="click" class="menu-item menu-accordion" v-if="$store.state.auth.role_id == 1">
                             <span class="menu-link">
                                 <span class="menu-icon"><i class="bi bi-geo-alt-fill fa-lg"></i></span>
                                 <span class="menu-title">Location</span>
@@ -77,7 +77,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="menu-item">
+                        <div class="menu-item" v-if="$store.state.auth.role_id == 1 || $store.state.auth.role_id == 4">
                             <a :class="`menu-link ${pageActive('m-fuel')}`" href="javascript:;" @click="this.$router.push({name: 'm-fuel'})">
                                 <span class="menu-icon">
                                     <i class="bi bi-fuel-pump-fill fa-lg"></i>

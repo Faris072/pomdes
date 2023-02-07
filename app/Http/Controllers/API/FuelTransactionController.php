@@ -33,4 +33,32 @@ class FuelTransactionController extends Controller
             return false;
         }
     }
+
+    public function update($request, $id){
+        try{
+            FuelTransaction::where('transaction_id', $id)->delete();
+
+            foreach($request->all()['fuels'] as $fuel){
+                $fuel = (object) $fuel;
+
+                $query = FuelTransaction::create([
+                    'fuel_id' => $fuel->fuel_id,
+                    'transaction_id' => $id,
+                    'volume' => $fuel->volume,
+                    'price' => $fuel->price,
+                ]);
+
+                if(!$query){
+                    FuelTransaction::where('transaction_id', $id)->forceDelete();
+                    FuelTransaction::onlyTrashed()->where('transaction_id',$id)->restore();
+                    return $this->getResponse([], 'Data gagal disimpan', 500);
+                }
+            };
+
+            return true;
+        }
+        catch(\Exception $e){
+            return false;
+        }
+    }
 }

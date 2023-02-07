@@ -378,7 +378,7 @@ class AuthController extends Controller
 
     public function select_pusat(Request $request){
         try{
-            $query = User::with(['profile'])->where('role_id', 2);
+            $query = User::with(['profile'])->where('role_id', 2)->where('is_active',1);
 
             if(isset($request->search)){
                 $query = $query->whereRaw("LOWER(username) LIKE '%".strtolower($request->search)."%'")
@@ -455,6 +455,36 @@ class AuthController extends Controller
             }
 
             return $this->getResponse([],'Password user berhasil diperbarui');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function select_pomdes(Request $request){
+        try{
+            $query = User::with(['profile'])->where('role_id', 3)->where('is_active',1);
+
+            if(isset($request->search)){
+                $query = $query->whereRaw("LOWER(username) LIKE '%".strtolower($request->search)."%'")
+                    ->orWhereHas('profile',function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('profile.city', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
+                    ->orWhereHas('profile.city.province', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    });
+            }
+
+            $query = $query->get();
+
+            if(!$query){
+                return $this->getResponse([],'Data gagal ditemukan',500);
+            }
+
+            return $this->getResponse($query,'Data berhasil ditampilkan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

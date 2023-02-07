@@ -35,6 +35,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
         Route::put('/switch-status/{id}','App\Http\Controllers\API\AuthController@switch_status');
         Route::get('show-trashed/{id}','App\Http\Controllers\API\AuthController@show_trashed');
+        Route::get('select-pomdes','App\Http\Controllers\API\AuthController@select_pomdes');
         Route::get('select-pusat','App\Http\Controllers\API\AuthController@select_pusat');
         Route::put('restore/{id}','App\Http\Controllers\API\AuthController@restore');
         Route::put('reset-password/{id}','App\Http\Controllers\API\AuthController@reset_password');
@@ -96,6 +97,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix'=>'invoice-pusat'],function(){
             Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
         });
+        Route::post('upload/{id}','App\Http\Controllers\API\SubmissionFilesController@upload');
         Route::put('trash/{id}','App\Http\Controllers\API\TransactionController@restore_trash');
         Route::put('approve-submission/{id}','App\Http\Controllers\API\TransactionController@approve_submission');
         Route::get('trash','App\Http\Controllers\API\TransactionController@get_trash');
@@ -121,7 +123,4 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::post('/','App\Http\Controllers\API\FuelController@create');
         Route::put('/{id}','App\Http\Controllers\API\FuelController@update');
     });
-
-
-
 });
