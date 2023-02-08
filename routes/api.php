@@ -97,6 +97,8 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix'=>'invoice-pusat'],function(){
             Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
         });
+        Route::delete('delete-file/{id}','App\Http\Controllers\API\SubmissionFilesController@delete');
+        Route::get('render-file/{id}','App\Http\Controllers\API\SubmissionFilesController@render_file')->name('render-submission-files');
         Route::post('upload/{id}','App\Http\Controllers\API\SubmissionFilesController@upload');
         Route::put('trash/{id}','App\Http\Controllers\API\TransactionController@restore_trash');
         Route::put('approve-submission/{id}','App\Http\Controllers\API\TransactionController@approve_submission');

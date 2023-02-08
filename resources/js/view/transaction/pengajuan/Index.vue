@@ -26,6 +26,9 @@
                                             <td valign="middle">
                                                 <b>{{ context?.description }}</b>
                                             </td>
+                                            <td valign="middle">
+                                                <b>{{ context?.status?.name }}</b>
+                                            </td>
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
@@ -161,6 +164,21 @@
                                 }
                             },
                             {
+                                text: 'Status',
+                                sort_by: 'status_id',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    wrap: '',
+                                    text: '',
+                                }
+                            },
+                            {
                                 text: 'Aksi',
                                 sort_by: '',
                                 sort: false,
@@ -179,7 +197,7 @@
                         body: []
                     },
                     config: {
-                        order_by: 'asc',
+                        order_by: 'desc',
                         sort_by: 'id',
                         loading: false,
                         limit: 10,

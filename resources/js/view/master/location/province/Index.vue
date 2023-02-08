@@ -151,7 +151,7 @@
                         body: []
                     },
                     config: {
-                        order_by: 'asc',
+                        order_by: 'desc',
                         sort_by: 'id',
                         loading: false,
                         limit: 10,

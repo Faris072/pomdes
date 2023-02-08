@@ -44,4 +44,30 @@ class SubmissionFilesController extends Controller
             return $this->getResponse([],$e->getMessage(),500);
         }
     }
+
+    public function render_file($id){
+        $query = SubmissionFiles::find($id)->name;
+        return response()->file(Storage::path('assignment/'.$query));
+    }
+
+    public function delete($id){
+        try{
+            $file = SubmissionFiles::find($id);
+
+            if(!$file){
+                return $this->getResponse([],'File tidak ditemukan',404);
+            }
+
+            $query = $file->forceDelete();
+
+            if(!$query){
+                return $this->getResponse([],'File gagal dihapus', 500);
+            }
+
+            return $this->getResponse($file, 'File pengajuan berhasil dihapus', 200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([], $e->getMessage(),500);
+        }
+    }
 }
