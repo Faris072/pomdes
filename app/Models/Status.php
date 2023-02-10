@@ -16,4 +16,8 @@ class Status extends Model
     public function transactions(){
         return $this->hasMany(Transaction::class, 'status_id','id');
     }
+
+    public function reject(){
+        return $this->hasMany(Reject::class, 'status_id', 'id');
+    }
 }

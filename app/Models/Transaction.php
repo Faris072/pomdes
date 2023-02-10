@@ -52,4 +52,8 @@ class Transaction extends Model
     public function submission_files(){
         return $this->hasMany(SubmissionFiles::class, 'transaction_id','id');
     }
+
+    public function reject(){
+        return $this->hasMany(Reject::class,'transaction_id','id');
+    }
 }

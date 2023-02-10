@@ -1,4 +1,4 @@
-<template>
+''<template>
     <div>
         <div id="main-content">
             <div class="post d-flex flex-column-fluid" id="kt_post">
@@ -32,6 +32,8 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)">detail</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)">detail</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `pengajuan/edit/${context.id}`})">Edit</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)">Hapus</a>
                                                 </div>
@@ -46,14 +48,14 @@
             </div>
         </div>
 
-        <div class="modal fade" tabindex="-1" id="modal-form">
-            <div class="modal-dialog modal-lg">
+        <div class="modal fade" tabindex="-1" id="modal-detail">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <div class="m-auto" style="width:100%;">
                             <center>
-                                <h3 class="modal-title">{{ form.flag == 'tambah' ? 'Tambah' : 'Edit' }} Kota</h3>
-                                <span class="text-muted">Isi form berikut untuk {{ form.flag == 'tambah' ? 'menambah' : 'mengubah' }} kota PDOMS</span>
+                                <h3 class="modal-title">Detail Pengajuan</h3>
+                                <span class="text-muted">Berikut adalah detail pengajuan transaksi pada aplikasi PDOMS</span>
                             </center>
                         </div>
                         <!--begin::Close-->
@@ -61,21 +63,109 @@
                         <!--end::Close-->
                     </div>
 
-                    <div class="modal-body">
-                        <label for="province"><h5>Provinsi</h5></label>
-                        <app-select2 id="province" v-model="form.data.province" :options="selectList.province.list" :loading="selectList.province.loading" @get-options="getProvince" placeholder="Pilih provinsi" :multiple="false" />
-                        <br>
-                        <label for="city"><h5>Nama Kota</h5></label>
-                        <input type="text" class="form-control" v-model="form.data.name" placeholder="Isi nama kota">
+                    <div class="modal-body" style="height:93vh; overflow-x:auto;">
+                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="detail.loading">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="wrap-detail" v-else>
+                            <div class="info-bbm container">
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">User</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ detail?.data?.user || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Nama Transaksi</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ detail?.data?.nama || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Deskripsi Transaksi</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ detail?.data?.deskripsi || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">File Pendukung</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row mb-5">
+                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.files">
+                                                <div class="card card-file">
+                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                            <div class="icon-file">
+                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                            </div>
+                                                            <div class="info-file">
+                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <!--begin::Accordion-->
+                                <div class="accordion" id="accordion-pengajuan">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="kt_accordion_1_header_1">
+                                            <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-pengajuan-content" aria-expanded="true" aria-controls="accordion-pengajuan">Bahan Bakar yang Dipesan</button>
+                                        </h2>
+                                        <div id="accordion-pengajuan-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-pengajuan">
+                                            <div class="accordion-body">
+                                                <h5>Supplier: {{ detail?.data?.supplier || '-' }}</h5>
+                                                <div class="table-pomdes" style="overflow:auto;">
+                                                    <table class="table table-bordered" style="border:1px solid black;">
+                                                        <thead style="background-color:#F5F8FA !important;">
+                                                            <tr>
+                                                                <th class="text-center"><b>No</b></th>
+                                                                <th><b>Jenis BBM</b></th>
+                                                                <th><b>Volume BBM (Liter)</b></th>
+                                                                <th><b>Harga BBM (Rp)</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(context, index) in detail?.data?.fuel">
+                                                                <td class="text-center">{{ index+1 }}</td>
+                                                                <td>{{ context?.fuel?.name }}</td>
+                                                                <td>{{ $rupiahFormat(context?.volume) }}</td>
+                                                                <td>{{ $rupiahFormat(context?.price) }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tr>
+                                                            <td colspan="2"><b>Total</b></td>
+                                                            <td><b>{{ countVolumeBbm }} Liter</b></td>
+                                                            <td><b>Rp{{ countPriceBbm }}</b></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Accordion-->
+                            </div>
+                        </div>
                     </div>
-
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-primary" @click="simpan()" v-if="form.flag == 'tambah'">Simpan</button>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -98,6 +188,17 @@
                         province: '',
                         province_id: '',
                         name: '',
+                    }
+                },
+                detail: {
+                    loading: false,
+                    data: {
+                        user:'',
+                        nama:'',
+                        deskripsi:'',
+                        supplier: '',
+                        fuel:[],
+                        files:[]
                     }
                 },
                 tableConfig: {
@@ -228,6 +329,19 @@
                     }
                 }
             },
+            resetDetail(){
+                this.detail = {
+                    loading: false,
+                    data: {
+                        user:'',
+                        nama:'',
+                        deskripsi:'',
+                        supplier: '',
+                        fuel:[],
+                        files:[]
+                    }
+                }
+            },
             simpan(){
                 let that = this;
                 this.$pageLoadingShow();
@@ -312,7 +426,51 @@
                     .then(() => {
                         this.selectList.province.loading = false;
                     })
-            }
+            },
+            showDetail(id){
+                let that = this;
+
+                this.resetDetail();
+                $('#modal-detail').modal('show');
+                this.detail.loading = true;
+                this.$axios().get(`transaction/${id}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        console.log(data);
+                        this.detail.data = {
+                            user: data?.user?.username,
+                            nama: data?.name,
+                            deskripsi:data?.description,
+                            supplier: data?.fuel_transactions?.length ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-',
+                            fuel: data?.fuel_transactions,
+                            files: data?.submission_files
+                        };
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.detail.loading = false;
+                    });
+            },
+        },
+        computed: {
+            countPriceBbm(){
+                let that = this;
+                let price = 0;
+                $.each(this?.detail?.data?.fuel, function(i,val){
+                    price += Number(val?.price);
+                });
+                return this.$rupiahFormat(price);
+            },
+            countVolumeBbm(){
+                let that = this;
+                let volume = 0;
+                $.each(this?.detail?.data?.fuel, function(i,val){
+                    volume += Number(val?.volume);
+                });
+                return this.$rupiahFormat(volume);
+            },
         }
     }
 </script>

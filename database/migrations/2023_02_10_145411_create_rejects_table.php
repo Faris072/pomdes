@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('reject', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('role')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('pusat_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('username')->unique();
-            $table->string('password');
+            $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('is_active')->default(1);
-            $table->rememberToken();
+            $table->text('description');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('rejects');
     }
 };

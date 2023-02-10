@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\Reject;
 use App\Http\Controllers\API\FuelTransactionController;
 use Illuminate\Support\Facades\Validator;
 
@@ -397,6 +398,74 @@ class TransactionController extends Controller
             }
 
             return $this->getResponse(Transaction::find($id),'Pengajuan transaksi berhasil disetujui',200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function reject(Request $request,$id){
+        try{
+            $transaction = Transaction::find($id);
+
+            if(!$transaction){
+                return $this->getResponse([], 'Transaksi tidak ditemukan',404);
+            }
+
+            $status_list = [1,4,5];
+            $status_id = $transaction->status_id;
+
+            if(!in_array($status_id, $status_list)){
+                return $this->getResponse([],'Akses ditolak karena status tidak sesuai',403);
+            }
+
+            $check = Reject::where('transaction_id',$id)->where('status_id',$status_id)->first();
+
+            if($check){
+                $reject = $check->update(['descripion' => $request->description]);
+
+                if(!$reject){
+                    return $this->getResponse([],'Transaksi gagal ditolak', 500);
+                }
+
+                return $this->getResponse(Reject::find($check->id), 'Transaksi berhasil ditolak');
+            }
+
+            $attributes = [
+                'description' => 'Alasan penolakan'
+            ];
+
+            $messages = [
+                'required' => ':attribute tidak boleh kosong.'
+            ];
+
+            $validatedData = Validator::make($request->all(),[
+                'description' => 'required',
+            ],$messages,$attributes);
+
+            if($validatedData->fails()){
+                return $this->getResponse([],$validatedData->getMessageBag(),422);
+            }
+
+            $reject = Reject::create([
+                'transaction_id' => $id,
+                'status_id' => $status_id,
+                'is_active' => 1,
+                'description' => $request->description,
+            ]);
+
+            if(!$reject){
+                return $this->getResponse([],'Transaksi gagal ditolak', 500);
+            }
+
+            $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id+1]);
+
+            if(!$change_status){
+                Reject::find($reject->id)->forceDelete();
+                return $this->getResponse([],'Transaksi gagal ditolak',500);
+            }
+
+            return $this->getResponse(Transaction::with(['reject'])->find($id), 'Transaksi berhasil ditolak');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
