@@ -106,6 +106,7 @@ class TransactionController extends Controller
                 'payment_to_pusat',
                 'payment_to_supplier',
                 'fuel_transactions',
+                'reject',
                 'hindrance',
                 // 'hindrance.hindrance_files',
                 'discrepancy',
@@ -151,6 +152,7 @@ class TransactionController extends Controller
             $transactions = Transaction::with([
                     'user',
                     'submission_files',
+                    'reject',
                     'status',
                     'invoice_pomdes.invoice_pomdes_files',
                     'invoice_pusat.invoice_pusat_files',
@@ -390,7 +392,7 @@ class TransactionController extends Controller
             }
 
             $update = $transaction->update([
-                'status_id' => 2
+                'status_id' => 4
             ]);
 
             if(!$update){
@@ -412,25 +414,6 @@ class TransactionController extends Controller
                 return $this->getResponse([], 'Transaksi tidak ditemukan',404);
             }
 
-            $status_list = [1,4,5];
-            $status_id = $transaction->status_id;
-
-            if(!in_array($status_id, $status_list)){
-                return $this->getResponse([],'Akses ditolak karena status tidak sesuai',403);
-            }
-
-            $check = Reject::where('transaction_id',$id)->where('status_id',$status_id)->first();
-
-            if($check){
-                $reject = $check->update(['descripion' => $request->description]);
-
-                if(!$reject){
-                    return $this->getResponse([],'Transaksi gagal ditolak', 500);
-                }
-
-                return $this->getResponse(Reject::find($check->id), 'Transaksi berhasil ditolak');
-            }
-
             $attributes = [
                 'description' => 'Alasan penolakan'
             ];
@@ -447,6 +430,32 @@ class TransactionController extends Controller
                 return $this->getResponse([],$validatedData->getMessageBag(),422);
             }
 
+            $status_list = [2,5];
+            $status_id = $transaction->status_id;
+
+            if(in_array($status_id, $status_list)){
+                return $this->getResponse([],'Akses ditolak karena status tidak sesuai',403);
+            }
+
+            $check = Reject::where('transaction_id',$id)->where('status_id',$status_id)->first();
+
+            if($check){
+                $reject = $check->update(['descripion' => $request->description]);
+
+                $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id]);
+
+                if(!$change_status){
+                    Reject::find($reject->id)->forceDelete();
+                    return $this->getResponse([],'Transaksi gagal ditolak',500);
+                }
+
+                if(!$reject){
+                    return $this->getResponse([],'Transaksi gagal ditolak', 500);
+                }
+
+                return $this->getResponse(Reject::find($check->id), 'Transaksi berhasil ditolak');
+            }
+
             $reject = Reject::create([
                 'transaction_id' => $id,
                 'status_id' => $status_id,
@@ -458,7 +467,7 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Transaksi gagal ditolak', 500);
             }
 
-            $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id+1]);
+            $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id%3 == 0 ? (int) $status_id-1 : (int) $status_id+1]);
 
             if(!$change_status){
                 Reject::find($reject->id)->forceDelete();
@@ -466,6 +475,47 @@ class TransactionController extends Controller
             }
 
             return $this->getResponse(Transaction::with(['reject'])->find($id), 'Transaksi berhasil ditolak');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function reason_reject(Request $request, $id){
+        try{
+            $find = Reject::where('transaction_id',$id)->where('status_id',$request->status_id)->first();
+            if(!$find){
+                return $this->getResponse([],'Data tidak ditemukan',404);
+            }
+
+            return $this->getResponse($find,'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function repair($id){
+        try{
+            $transaction = Transaction::find($id);
+
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            $status_list = [2,5];
+
+            if(!in_array($transaction->status_id, $status_list)){
+                return $this->getResponse([],'Akses ditolak karena status tidak sesuai',403);
+            }
+
+            $repair = $transaction->update(['status_id' => (int) $transaction->status_id+1]);
+
+            if(!$repair){
+                return $this->getResponse([],'Transaksi gagal diperbaiki',500);
+            }
+
+            return $this->getResponse(Transaction::find($id),'Perbaikan berhasil diajukan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

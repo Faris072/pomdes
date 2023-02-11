@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                                 <br><br>
-                                <div class="preview-file">
+                                <div class="preview-file" v-if="files?.length">
                                     <h3 class="text-warning">Preview File</h3>
                                     <div class="row my-5">
                                         <div class="col-md-3 my-3" v-for="(context, index) in files">

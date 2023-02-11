@@ -64,10 +64,16 @@ class SubmissionFilesController extends Controller
                 return $this->getResponse([],'File gagal dihapus', 500);
             }
 
+            Storage::delete('assignment/'.$file->name);
+
             return $this->getResponse($file, 'File pengajuan berhasil dihapus', 200);
         }
         catch(\Exception $e){
             return $this->getResponse([], $e->getMessage(),500);
         }
     }
+
+    // public function dimas(Request $request){
+    //     @dd($request->all());
+    // }
 }

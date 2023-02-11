@@ -44,6 +44,7 @@
                                                 <div class="dropdown m-auto d-flex justify-content-center">
                                                     <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                     <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="showReject(context?.id)">Approve</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="getDetail(context?.id)">Detail</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="edit(context?.id)">Edit</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="resetPassword(context?.id)">Reset Password</a>
@@ -422,6 +423,11 @@ import { toDisplayString } from 'vue';
                         password: ''
                     }
                 },
+                reject: {
+                    data: {
+                        description:'',
+                    }
+                },
                 tableConfig: {
                     data: {
                         header: [
@@ -792,6 +798,9 @@ import { toDisplayString } from 'vue';
                             });
                     }
                 });
+            },
+            showReject(){
+                $('#modal-reject').modal('show');
             }
         }
     }

@@ -19,6 +19,8 @@ import PengajuanTransaksi from '@/view/transaction/pengajuan/Index.vue';
 import TambahPengajuanTransaksi from '@/view/transaction/pengajuan/Tambah.vue';
 import EditPengajuanTransaksi from '@/view/transaction/pengajuan/Edit.vue';
 
+import dimas from '@/view/dimas/Index.vue';
+
 let routes = [
     {
         path: '/login',
@@ -75,6 +77,11 @@ let routes = [
                 path: 'transaksi/pengajuan/edit/:id',
                 name: 't-pengajuan-edit',
                 component: EditPengajuanTransaksi,
+            },
+            {
+                path: 'dimas',
+                name: 'c-dimas',
+                component: dimas,
             },
         ]
     },

@@ -27,15 +27,20 @@
                                                 <b>{{ context?.description }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ context?.status?.name }}</b>
+                                                <span :class="`badge badge-light-primary`" v-if="context?.status_id == 1"><b>{{ context?.status?.name }}</b></span>
+                                                <span :class="`badge badge-light-danger`" v-if="context?.status_id == 2"><b>{{ context?.status?.name }}</b></span>
+                                                <span :class="`badge badge-light-warning`" v-if="context?.status_id == 3"><b>{{ context?.status?.name }}</b></span>
                                             </td>
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)">detail</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)">detail</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `pengajuan/edit/${context.id}`})">Edit</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)">Hapus</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Setujui Pengajuan</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showReject(context?.id)"><i class="bi bi-x-circle fa-lg me-2"></i> Tolak Pengajuan</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="alasanPenolakan(context?.id, context?.status_id)"><i class="bi bi-info-circle fa-lg me-2"></i> Alasan Penolakan</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="perbaikan(context?.id)"><i class="bi bi-wrench-adjustable fa-lg me-2"></i> Ajukan Perbaikan</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `pengajuan/edit/${context.id}`})"><i class="bi bi-pencil-square fa-lg me-2"></i> Edit</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)"><i class="bi bi-trash fa-lg me-2"></i> Hapus</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -157,6 +162,68 @@
                                     </div>
                                 </div>
                                 <!--end::Accordion-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" id="modal-reject">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Tolak Pengajuan</h3>
+                                <span class="text-muted">Isi form berikut ini untuk mengisi alasan penolakan</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body" style="overflow-x:auto;">
+                        <div class="form">
+                            <label for="alasan-penolakan"><h5>Alasan Penolakan</h5></label>
+                            <textarea id="alasan-penolakan" rows="5" class="form-control" placeholder="Cth: Stok supplier telah habis" v-model="reject.data.description"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" @click="tolak()">Tolak Pengajuan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" id="modal-alasan">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Alasan penolakan</h3>
+                                <span class="text-muted">Berikut adalah alasan penolakan dari transaksi yang dipilih.</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body" style="overflow-x:auto;">
+                        <div class="loading d-flex justify-content-center align-items-center" v-if="reasonReject.loading">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="form" v-else>
+                            <label for="alasan-penolakan"><h5>Alasan Penolakan</h5></label>
+                            <div class="card" style="border:1px solid gold;">
+                                <div class="card-body p-5">
+                                    {{ reasonReject.description }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,6 +374,16 @@
                         search: ''
                     }
                 },
+                reject: {
+                    idReject: '',
+                    data: {
+                        description: '',
+                    }
+                },
+                reasonReject: {
+                    loading: false,
+                    description: ''
+                },
             }
         },
         mounted(){
@@ -453,6 +530,102 @@
                         this.detail.loading = false;
                     });
             },
+            showReject(id){
+                this.reject={
+                    idReject: id,
+                    data: {
+                        description: '',
+                    }
+                };
+                $('#modal-reject').modal('show');
+            },
+            tolak(){
+                this.$pageLoadingShow();
+                this.$axios().post(`transaction/reject/${this.reject.idReject}`, this.reject.data)
+                    .then(res => {
+                        $('.modal').modal('hide');
+                        Swal.fire('Berhasil', 'Pengajuan berhasil ditolak','success');
+                        this.getDataTable();
+                    })
+                    .catch(err =>{
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+                        this.$pageLoadingHide();
+                    });
+            },
+            perbaikan(id){
+                Swal.fire({
+                    title: `Perbaiki pengajuan yang dipilih?`,
+                    html: `Pastikan data sudah lengkap dan sesuai sebelum mengajukan perbaikan.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ajukan Perbaikan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#41FF1C'
+                }).then(result => {
+                    if(result.isConfirmed){
+                    this.$pageLoadingShow();
+                    this.$axios().post(`transaction/repair/${id}`)
+                        .then(res => {
+                            $('.modal').modal('hide');
+                            Swal.fire('Berhasil', 'Perbaikan berhasil diajukan','success');
+                            this.getDataTable();
+                        })
+                        .catch(err =>{
+                            this.$axiosHandleError(err);
+                        })
+                        .then(()=>{
+                            this.$pageLoadingHide();
+                        });
+                    }
+                });
+            },
+            alasanPenolakan(id, status_id){
+                this.reasonReject = {
+                    loading: true,
+                    description: ''
+                };
+
+                $('#modal-alasan').modal('show');
+
+                this.$axios().post(`transaction/reason-reject/${id}`, {status_id: status_id})
+                    .then(res => {
+                        this.reasonReject.description = res?.data?.data?.description;
+                    })
+                    .catch(err =>{
+                        this.$axiosHandleError(err);
+                    })
+                    .then(()=>{
+                        this.reasonReject.loading = false;
+                    });
+            },
+            approve(id){
+                Swal.fire({
+                    title: `Setujui pengajuan yang dipilih?`,
+                    html: `Pengajuan akan diteruskan ke tahap selanjutnya.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Setujui',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#41FF1C'
+                }).then(result => {
+                    if(result.isConfirmed){
+                    this.$pageLoadingShow();
+                    this.$axios().put(`transaction/approve-submission/${id}`)
+                        .then(res => {
+                            Swal.fire('Berhasil', 'Pengajuan berhasil disetujui','success');
+                            this.getDataTable();
+                        })
+                        .catch(err =>{
+                            this.$axiosHandleError(err);
+                        })
+                        .then(()=>{
+                            this.$pageLoadingHide();
+                        });
+                    }
+                });
+            }
         },
         computed: {
             countPriceBbm(){

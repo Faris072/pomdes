@@ -97,6 +97,8 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix'=>'invoice-pusat'],function(){
             Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
         });
+        Route::post('reason-reject/{id}','App\Http\Controllers\API\TransactionController@reason_reject');
+        Route::post('repair/{id}','App\Http\Controllers\API\TransactionController@repair');
         Route::post('reject/{id}','App\Http\Controllers\API\TransactionController@reject');
         Route::delete('delete-file/{id}','App\Http\Controllers\API\SubmissionFilesController@delete');
         Route::get('render-file/{id}','App\Http\Controllers\API\SubmissionFilesController@render_file')->name('render-submission-files');
@@ -126,4 +128,6 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::post('/','App\Http\Controllers\API\FuelController@create');
         Route::put('/{id}','App\Http\Controllers\API\FuelController@update');
     });
+
+    // Route::post('dimas','App\Http\Controllers\API\SubmissionFilesController@dimas');
 });
