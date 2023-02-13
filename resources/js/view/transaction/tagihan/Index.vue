@@ -6,7 +6,7 @@
                     <div class="card card-flush mt-5 mb-5 mb-xl-10" id="kt_profile_details_view">
                         <div class="card card-xl-stretch mb-5 mb-xl-8">
                             <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
-                                <button class="btn btn-warning" @click="$router.push({name: 't-pengajuan-tambah'})">Tambah Data</button>
+                                <button class="btn btn-warning" @click="$router.push({name: 't-tagihan-tambah'})">Tambah Data</button>
                             </div>
                             <div class="card-body pt-5">
                                 <app-data-table :table-config="tableConfig" @get-data="getDataTable">
@@ -439,7 +439,7 @@
             getDataTable(){
                 let that = this;
                 this.tableConfig.config.loading = true;
-                this.$axios().get(`transaction/data-table/1`, {params: this.tableConfig?.config})
+                this.$axios().get(`transaction/data-table/2`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;
                         this.tableConfig.data.body = res?.data?.data?.data;

@@ -15,9 +15,15 @@ import MasterCity from '@/view/master/location/city/Index.vue';
 import MasterFuel from '@/view/master/fuel/Index.vue';
 
 // transaction
+// pengajuan
 import PengajuanTransaksi from '@/view/transaction/pengajuan/Index.vue';
 import TambahPengajuanTransaksi from '@/view/transaction/pengajuan/Tambah.vue';
 import EditPengajuanTransaksi from '@/view/transaction/pengajuan/Edit.vue';
+
+// tagihan
+import TagihanTransaksi from '@/view/transaction/tagihan/Index.vue';
+import TambahTagihanTransaksi from '@/view/transaction/tagihan/Tambah.vue';
+import EditTagihanTransaksi from '@/view/transaction/tagihan/Edit.vue';
 
 import dimas from '@/view/dimas/Index.vue';
 
@@ -77,6 +83,21 @@ let routes = [
                 path: 'transaksi/pengajuan/edit/:id',
                 name: 't-pengajuan-edit',
                 component: EditPengajuanTransaksi,
+            },
+            {
+                path: 'transaksi/tagihan',
+                name: 't-tagihan',
+                component: TagihanTransaksi,
+            },
+            {
+                path: 'transaksi/tagihan/tambah',
+                name: 't-tagihan-tambah',
+                component: TambahTagihanTransaksi,
+            },
+            {
+                path: 'transaksi/tagihan/edit/:id',
+                name: 't-tagihan-edit',
+                component: EditTagihanTransaksi,
             },
             {
                 path: 'dimas',

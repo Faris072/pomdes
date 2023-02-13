@@ -21,7 +21,7 @@ class StatusSeeder extends Seeder
             ['name'=>'Perbaikan Pengajuan'],
 
             ['name'=>'Tagihan Pomdes'],
-            ['name'=>'Tolak Pembayaran Pomdes'],
+            ['name'=>'Tagihan Disimpan'],
             ['name'=>'Perbaikan Pembayaran Pomdes'],
 
             ['name'=>'Menunggu Penerbitan Tagihan'],

@@ -96,25 +96,35 @@ class TransactionController extends Controller
         }
     }
 
-    public function get(Request $request){
+    public function get(Request $request,$steps = 1){
         try{
             $transactions = Transaction::with([
                 'user.profile',
                 'status',
-                'invoice_pomdes',
+                'invoice_pomdes.additional_costs',
                 'invoice_pusat',
                 'payment_to_pusat',
                 'payment_to_supplier',
                 'fuel_transactions',
                 'reject',
-                'hindrance',
-                // 'hindrance.hindrance_files',
+                'hindrance.hindrance_files',
                 'discrepancy',
-                // 'discrepancy.fuel_discrepancies',
-                // 'discrepancy.fuel_discrepancies.discrepancy_files',
-                // 'discrepancy.fuel_discrepancies.discrepancy_type',
-                // 'discrepancy.fuel_discrepancies.fuel_transaction',
+                'discrepancy.fuel_discrepancies.discrepancy_files',
+                'discrepancy.fuel_discrepancies.discrepancy_type',
+                'discrepancy.fuel_discrepancies.fuel_transaction',
             ]);
+
+            switch($steps){
+                case 1:
+                    $transactions = $transactions->where('status_id',1)
+                        ->orWhere('status_id',2)
+                        ->orWhere('status_id',3);
+                    break;
+                case 2:
+                    $transactions = $transactions->where('status_id',4)
+                        ->orWhere('status_id',5);
+                    break;
+            }
 
             if(isset($request->search)){
                 $transactions = $transactions->whereRaw("LOWER(name) LIKE '".strtolower($request->search)."'")

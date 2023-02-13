@@ -8,6 +8,7 @@ use App\Models\InvoicePomdes;
 use App\Models\InvoicePomdesFiles;
 use App\Models\InvoicePusat;
 use App\Models\Transaction;
+use App\Models\AdditionalCost;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,9 +16,20 @@ class InvoicePomdesController extends Controller
 {
     public function store(Request $request){
         try{
+            $transaction =  Transaction::find($request->transaction_id);
+
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            if($transaction->status_id == 4 || $transaction->status_id == 5){}
+            else{
+                return $this->getResponse([],'Akses ditolak karena status tidak sesuai', 403);
+            }
+
             $attributes = [
                 'transaction_id' => 'Transaksi',
-                'nominal' => 'Nominal'
+                'total' => 'Total'
             ];
 
             $messages = [
@@ -25,40 +37,67 @@ class InvoicePomdesController extends Controller
                 'numeric' => ':attribute harus berupa angka.'
             ];
 
-            $validatedData = Validator::make($request->all(),[
-                'transaction_id' => 'required',
-                'nominal' => 'required|numeric'
-            ],$messages,$attributes);
+            if(isset($request->additional_costs)){
+                $rules = [
+                    'transaction_id' => 'required',
+                    'total' => 'required|numeric',
+                    'additional_costs.*.name' => 'required',
+                    'additional_costs.*.nominal' => 'required|numeric',
+                ];
+            }
+            else{
+                $rules = [
+                    'transaction_id' => 'required',
+                    'total' => 'required|numeric',
+                ];
+            }
+
+            $validatedData = Validator::make($request->all(),$rules,$messages,$attributes);
 
             if($validatedData->fails()){
                 return $this->getResponse([],$validatedData->getMessageBag(),422);
             }
 
-            $transaction =  Transaction::find($request->transaction_id);
-
-            if(!$transaction){
-                return $this->getResponse([],'Transaksi tidak ditemukan',404);
-            }
-
             $exist = InvoicePomdes::firstWhere('transaction_id', $transaction->id);
 
             if($exist){
-                return $this->getResponse([],'Invoice pomdes sudah ada',422);
+                AdditionalCost::where('invoice_pomdes_id', $exist->id)->delete();
+                $invoice = InvoicePomdes::find($exist->id)->update($request->all());
+
+                if(!$invoice){
+                    AdditionalCost::where('invoice_pomdes_id', $exist->id)->restore();
+                    return $this->getResponse([],'Tagihan gagal disimpan',500);
+                }
+                AdditionalCost::where('invoice_pomdes_id', $exist->id)->forceDelete();
+            }
+            else{
+                $invoice = InvoicePomdes::create($request->all());
+
+                if(!$invoice){
+                    return $this->getResponse([],'Tagihan gagal disimpan',500);
+                }
             }
 
-            $status = $transaction->update(['status_id' => 3]);
+            $status = $transaction->update(['status_id' => 5]);
 
             if(!$status){
+                $status = $transaction->update(['status_id' => 4]);
                 return $this->getResponse([],'Tagihan gagal disimpan',500);
             }
 
-            $invoice = InvoicePomdes::create($request->all());
+            $invoicePomdes = InvoicePomdes::firstWhere('transaction_id', $request->transaction_id);
 
-            if(!$invoice){
-                return $this->getResponse([],'Tagihan gagal disimpan',500);
+            if(isset($request->additional_costs)){
+                foreach($request->additional_costs as $ac){
+                    AdditionalCost::create([
+                        'invoice_pomdes_id' => $invoicePomdes->id,
+                        'name' => $ac['name'],
+                        'nominal' => $ac['nominal']
+                    ]);
+                }
             }
 
-            return $this->getResponse($invoice,'Tagihan berhasil disimpan');
+            return $this->getResponse(InvoicePomdes::with(['transaction','additional_costs','invoice_pomdes_files'])->firstWhere('transaction_id', $request->transaction_id),'Tagihan berhasil disimpan');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
@@ -89,45 +128,6 @@ class InvoicePomdesController extends Controller
             }
 
             return $this->getResponse($invoice_pomdes, 'Data berhasil ditampilkan');
-        }
-        catch(\Exception $e){
-            return $this->getResponse([],$e->getMessage(),500);
-        }
-    }
-
-    public function update(Request $request, $id){
-        try{
-            $invoice_pomdes = InvoicePomdes::find($id);
-            if(!$invoice_pomdes){
-                return $this->getResponse([],'Data tidak ditemukan',404);
-            }
-
-            $attributes = [
-                'transaction_id' => 'Transaksi',
-                'nominal' => 'Nominal'
-            ];
-
-            $messages = [
-                'required' => ':attribute tidak boleh kosong.',
-                'numeric' => ':attribute harus berupa angka.'
-            ];
-
-            $validatedData = Validator::make($request->all(),[
-                // 'transaction_id' => 'required',
-                'nominal' => 'required|numeric'
-            ],$messages,$attributes);
-
-            if($validatedData->fails()){
-                return $this->getResponse([],$validatedData->getMessageBag(),422);
-            }
-
-            $update = $invoice_pomdes->update($request->all());
-
-            if(!$update){
-                return $this->getResponse([],'Data gagal diupdate',500);
-            }
-
-            return $this->getResponse(InvoicePomdes::find($id),'Data berhasil diupdate');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

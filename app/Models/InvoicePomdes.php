@@ -20,4 +20,8 @@ class InvoicePomdes extends Model
     public function invoice_pomdes_files(){
         return $this->hasMany(InvoicePomdesFiles::class, 'invoice_pomdes_id','id');
     }
+
+    public function additional_costs(){
+        return $this->hasMany(AdditionalCost::class,'invoice_pomdes_id','id');
+    }
 }

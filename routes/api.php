@@ -89,7 +89,6 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('get-trash','App\Http\Controllers\API\InvoicePomdesController@get_trash');
             Route::delete('delete/{id}','App\Http\Controllers\API\InvoicePomdesController@delete');
             Route::post('/','App\Http\Controllers\API\InvoicePomdesController@store');
-            Route::put('/{id}','App\Http\Controllers\API\InvoicePomdesController@update');
             Route::get('/','App\Http\Controllers\API\InvoicePomdesController@get');
             Route::get('/{id}','App\Http\Controllers\API\InvoicePomdesController@show');
             Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
@@ -97,6 +96,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix'=>'invoice-pusat'],function(){
             Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
         });
+        Route::get('data-table/{steps}','App\Http\Controllers\API\TransactionController@get');
         Route::post('reason-reject/{id}','App\Http\Controllers\API\TransactionController@reason_reject');
         Route::post('repair/{id}','App\Http\Controllers\API\TransactionController@repair');
         Route::post('reject/{id}','App\Http\Controllers\API\TransactionController@reject');
@@ -109,7 +109,6 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::get('trash/{id}','App\Http\Controllers\API\TransactionController@show_trash');
         Route::delete('delete/{id}','App\Http\Controllers\API\TransactionController@delete');
         Route::post('/','App\Http\Controllers\API\TransactionController@store');
-        Route::get('/','App\Http\Controllers\API\TransactionController@get');
         Route::get('/{id}','App\Http\Controllers\API\TransactionController@show');
         Route::put('/{id}','App\Http\Controllers\API\TransactionController@update');
         Route::delete('/{id}','App\Http\Controllers\API\TransactionController@destroy');
