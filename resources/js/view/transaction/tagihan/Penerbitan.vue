@@ -5,14 +5,22 @@
                 <div id="kt_content_container" class="container-xxl">
                     <div class="d-flex justify-content-end">
                         <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
-                            <button class="btn btn-secondary" @click="$router.push({name: 't-pengajuan'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
+                            <button class="btn btn-secondary" @click="$router.push({name: 't-tagihan'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
                         </div>
                     </div>
                     <br>
-                    <div class="card mb-5 mb-xl-8">
+                    <div class="card" v-show="loading">
+                        <div class="card-body d-flex justify-content-center align-items-center">
+                            <app-loader></app-loader>
+                        </div>
+                    </div>
+                    <div class="card mb-5 mb-xl-8" v-show="!loading">
                         <div class="card-body container">
                             <div class="informasi my-5">
-                                <h1>Form Penerbitan Tagihan</h1>
+                                <div class="head d-flex justify-content-between align-items-center">
+                                    <h1>Form Penerbitan Tagihan</h1>
+                                    <button class="btn btn-warning" @click="simpan()">Simpan</button>
+                                </div>
                                 <br>
                                 <div class="informasi">
                                     <div class="card" style="box-shadow:0px 0px 10px lightgray;">
@@ -24,7 +32,7 @@
                                                     <h5 class="text-gray-700">Nama Pemesan</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5 class="text-primary" style="cursor:pointer;" @click="detailProfile()">Nama Pemesan</h5>
+                                                    <h5 class="text-primary" style="cursor:pointer;" @click="detailProfile()">{{ informasi.namaPemesan.username }}</h5>
                                                 </div>
                                             </div>
                                             <div class="row my-4">
@@ -32,7 +40,7 @@
                                                     <h5 class="text-gray-700">Nama Transaksi</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5>Transaksi A</h5>
+                                                    <h5>{{ informasi?.nama }}</h5>
                                                 </div>
                                             </div>
                                             <div class="row my-4">
@@ -40,7 +48,7 @@
                                                     <h5 class="text-gray-700">Tanggal Pengajuan</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5>1 Januari 2022 09:00</h5>
+                                                    <h5>{{ $moment(informasi.tanggal).format('DD-MM-YYYY H:m:s') }}</h5>
                                                 </div>
                                             </div>
                                             <div class="row my-4">
@@ -48,7 +56,7 @@
                                                     <h5 class="text-gray-700">Deskripsi</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Exercitationem, expedita soluta ab in dicta placeat vitae accusamus? Similique, voluptatibus ipsa accusantium at ut corrupti minus aut dicta temporibus, eveniet animi.</h5>
+                                                    <h5>{{ informasi.deskripsi }}</h5>
                                                 </div>
                                             </div>
                                             <div class="row my-4">
@@ -61,7 +69,7 @@
                                                             </h2>
                                                             <div id="accordion-pengajuan-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-pengajuan">
                                                                 <div class="accordion-body">
-                                                                    <h5>Supplier: Pertamina</h5>
+                                                                    <h5>Supplier: {{ informasi?.supplier }}</h5>
                                                                     <div class="table-pomdes" style="overflow:auto;">
                                                                         <table class="table table-bordered" style="border:1px solid black;">
                                                                             <thead style="background-color:#F5F8FA !important;">
@@ -73,17 +81,17 @@
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                <tr v-for="(context, index) in 5">
+                                                                                <tr v-for="(context, index) in informasi.bbm">
                                                                                     <td class="text-center">{{ index+1 }}</td>
-                                                                                    <td>Pertamax</td>
-                                                                                    <td>100</td>
-                                                                                    <td>10.000.000</td>
+                                                                                    <td>{{ context?.jenis }}</td>
+                                                                                    <td>{{ $rupiahFormat(context?.volume) }}</td>
+                                                                                    <td>{{ $rupiahFormat(context?.harga)}}</td>
                                                                                 </tr>
                                                                             </tbody>
                                                                             <tr>
                                                                                 <td colspan="2"><b>Total</b></td>
-                                                                                <td><b>1.000 Liter</b></td>
-                                                                                <td><b>Rp1.000</b></td>
+                                                                                <td><b>{{ $rupiahFormat(countTotalVolume) }} Liter</b></td>
+                                                                                <td><b>Rp{{ $rupiahFormat(countHargaBbm) }}</b></td>
                                                                             </tr>
                                                                         </table>
                                                                     </div>
@@ -108,7 +116,7 @@
                                                     <h5 class="text-gray-700">Total Biaya BBM</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5>Rp1.200.000</h5>
+                                                    <h5>Rp{{ $rupiahFormat(countHargaBbm) }}</h5>
                                                 </div>
                                             </div>
                                             <br>
@@ -130,6 +138,11 @@
                                                             <button class="btn btn-light-danger" @click="hapusBiayaTambahan(index)">Hapus</button>
                                                         </div>
                                                     </div>
+                                                    <br>
+                                                    <div class="row">
+                                                        <div class="col-md-3"><h5 class="text-gray-700">Total Biaya Tambahan</h5></div>
+                                                        <div class="col-md-9"><h5>Rp{{ $rupiahFormat(countAdditionalCosts) }}</h5></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <br>
@@ -138,7 +151,41 @@
                                                     <h5 class="text-gray-700">Total Biaya Transaksi</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h5 class="text-gray-700">Rp{{ this.$rupiahFormat(countTotal) }}</h5>
+                                                    <h4>Rp{{ $rupiahFormat(total) }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br><br>
+                                    <div class="file">
+                                        <div class="dropzone" id="dropzoe-file" style="border:2px dashed gold; background-color:#fffdf1;">
+                                            <div class="dz-message needsclick">
+                                                <i class="bi bi-file-earmark-arrow-up text-warning fs-3x"></i>
+                                                <div class="ms-4">
+                                                    <h3 class="fs-5 fw-bolder text-gray-900 mb-1">Drop files here or click to upload.</h3>
+                                                    <span class="fs-7 fw-bold text-gray-400">Upload up to 10 files</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br><br>
+                                    <div class="preview-file" v-if="files?.length">
+                                        <h3 class="text-warning">Preview File</h3>
+                                        <div class="row my-5">
+                                            <div class="col-md-3 my-3" v-for="(context, index) in files">
+                                                <div class="card card-file">
+                                                    <div @click="hapusFile(context?.id)" class="close" style="position: absolute !important; top:10px; right:10px; z-index:1000; cursor:pointer;"><i class="bi bi-x"></i></div>
+                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                            <div class="icon-file">
+                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                            </div>
+                                                            <div class="info-file">
+                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -159,19 +206,14 @@
             return {
                 token: localStorage.getItem('pomdes_token'),
                 dropzoneFile: '',
-                selectList: {
-                    fuel: {
-                        loading: false,
-                        list: []
-                    },
-                    supplier: {
-                        loading: false,
-                        list: []
-                    },
-                    user: {
-                        loading: false,
-                        list: []
-                    },
+                loading : false,
+                files: [],
+                informasi: {
+                    namaPemesan: '',
+                    nama: '',
+                    tanggal: '',
+                    deskripsi: '',
+                    bbm: []
                 },
                 form: {
                     total: '',
@@ -194,11 +236,12 @@
             }
         },
         mounted(){
-            // this.initDropzone();
+            this.initDropzone();
             this.resetForm();
+            this.getData();
         },
         unmounted(){
-            // this.dropzoneFile.destroy();
+            this.dropzoneFile.destroy();
         },
         methods: {
             initDropzone(){
@@ -232,6 +275,47 @@
                     },
                 });
             },
+            getData(){
+                let that = this;
+                this.loading = true;
+                this.$axios().get(`transaction/${this.$route.params.id}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        console.log(data);
+                        this.informasi = {
+                            namaPemesan: data?.user,
+                            nama: data?.name,
+                            tanggal: data?.created_at,
+                            deskripsi: data?.description,
+                            supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-'
+                        };
+
+                        this.files = data?.invoice_pomdes?.invoice_pomdes_files;
+
+                        this.informasi.bbm = [];
+                        $.each(data?.fuel_transactions, function(i,val){
+                            that.informasi.bbm.push({
+                                jenis: val?.fuel?.name,
+                                volume: val?.volume,
+                                harga: val?.price
+                            });
+                        });
+
+                        this.form.additionalCosts = [];
+                        $.each(data?.invoice_pomdes?.additional_costs, function(i,val){
+                            that.form.additionalCosts.push({
+                                name: val?.name,
+                                nominal: Number(val?.nominal).toFixed(2)
+                            });
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.loading = false;
+                    });
+            },
             resetForm(){
                 this.form = {
                     total: '',
@@ -250,24 +334,26 @@
             simpan(){
                 let that = this;
 
-                let data = this.form;
+                let data = {
+                    transaction_id: this.$route.params.id,
+                    total: this.form.total,
+                    additional_costs: []
+                };
 
-                data.user_id = data?.user?.id;
-
-                $.each(data?.fuels, function(i,val){
-                    val.fuel_id = val?.fuel?.id;
+                $.each(this.form?.additionalCosts, function(i,val){
+                    data.additional_costs.push({name: val?.name, nominal: val?.nominal});
                 });
 
                 this.$pageLoadingShow();
-                this.$axios().post(`transaction`, data)
+                this.$axios().post(`transaction/invoice-pomdes`, data)
                     .then(res => {
                         if(this.dropzoneFile?.files?.length > 0){
                             this.uploadFile(res?.data?.data?.id);
                         }
                         else{
                             this.$pageLoadingHide();
-                            Swal.fire('Berhasil', 'Pengajuan transaksi berhasil disimpan.','success').then(()=>{
-                                that.$router.push({name: 't-pengajuan'});
+                            Swal.fire('Berhasil', 'Penerbitan tagihan transaksi berhasil disimpan.','success').then(()=>{
+                                that.$router.push({name: 't-tagihan'});
                             })
                         }
                     })
@@ -282,21 +368,78 @@
             uploadFile(id){
                 let that = this;
                 this.dropzoneFile.on('processing', function(){
-                    this.options.url = urlApi+`transaction/upload/${id}`;
+                    this.options.url = urlApi+`transaction/invoice-pomdes/file/${id}`;
                 });
                 this.dropzoneFile.processQueue();
                 this.dropzoneFile.on('success', function(){
                     that.$pageLoadingHide();
-                    Swal.fire('Berhasil', 'Pengajuan transaksi dan file berhasil disimpan.','success').then(()=>{
-                        that.$router.push({name: 't-pengajuan'});
+                    Swal.fire('Berhasil', 'Penerbitan tagihan transaksi dan file berhasil disimpan.','success').then(()=>{
+                        that.$router.push({name: 't-tagihan'});
                     });
+                });
+            },
+            hapusFile(id){
+                let that = this;
+
+                Swal.fire({
+                    title: `Hapus file yang dipilih?`,
+                    html: `File akan dihapus dan tidak dapat dikembalikan lagi.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#DB3700'
+                }).then(result => {
+                    if(result.isConfirmed){
+                        this.$pageLoadingShow();
+                        this.$axios().delete(`transaction/invoice-pomdes/file/${id}`)
+                            .then(res => {
+                                this.getData();
+                                toastr.success('File berhasil dihapus');
+                            })
+                            .catch(err => {
+                                this.$axiosHandleError(err);
+                            })
+                            .then(() => {
+                                this.$pageLoadingHide();
+                            });
+                    }
                 });
             }
         },
         computed: {
             countTotal(){
                 return 10000;
-            }
+            },
+            countTotalVolume(){
+                let that = this;
+                let total = 0;
+                $.each(this.informasi.bbm, function(i,val){
+                    total+=Number(val?.volume);
+                });
+                return total;
+            },
+            countHargaBbm(){
+                let that = this;
+                let total = 0;
+                $.each(this.informasi.bbm, function(i,val){
+                    total+=Number(val?.harga);
+                });
+                return total;
+            },
+            countAdditionalCosts(){
+                let that = this;
+                let total = 0;
+                $.each(this.form.additionalCosts, function(i,val){
+                    total+=Number(val?.nominal);
+                });
+                return total;
+            },
+            total(){
+                let total = this.countHargaBbm + this.countAdditionalCosts;
+                this.form.total = total;
+                return total;
+            },
         }
     }
 </script>

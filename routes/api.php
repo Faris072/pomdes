@@ -81,9 +81,9 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix' => 'invoice-pomdes'],function(){
             Route::group(['prefix' => 'file'],function(){
                 Route::post('/{id}','App\Http\Controllers\API\InvoicePomdesController@upload_files');
+                Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@delete_file');
             });
-            Route::post('update-file/{id}','App\Http\Controllers\API\InvoicePomdesController@update_upload');
-            Route::post('store-file','App\Http\Controllers\API\InvoicePomdesController@store_upload');
+            Route::get('render-file/{id}','App\Http\Controllers\API\InvoicePomdesController@render_file')->name('render-additional-cost-files');
             Route::put('restore-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@restore_trash');
             Route::get('show-trash/{id}','App\Http\Controllers\API\InvoicePomdesController@show_trash');
             Route::get('get-trash','App\Http\Controllers\API\InvoicePomdesController@get_trash');

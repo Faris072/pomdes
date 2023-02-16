@@ -59,6 +59,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-3"><h5 class="text-muted">Total Pesanan</h5></div>
+                                        <div class="col-md-3"><h5>Rp{{ $rupiahFormat(countHargaBbm) }}</h5></div>
+                                    </div>
                                 </div>
                             </div>
                             <br><br>
@@ -292,6 +297,16 @@
                 });
             }
         },
+        computed: {
+            countHargaBbm(){
+                let that = this;
+                let total = 0;
+                $.each(this.form.fuels, function(i,val){
+                    total+=Number(val?.price);
+                });
+                return total;
+            }
+        }
     }
 </script>
 

@@ -6,7 +6,6 @@
                     <div class="card card-flush mt-5 mb-5 mb-xl-10" id="kt_profile_details_view">
                         <div class="card card-xl-stretch mb-5 mb-xl-8">
                             <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
-                                <button class="btn btn-warning" @click="$router.push({name: 't-tagihan-tambah'})">Tambah Data</button>
                             </div>
                             <div class="card-body pt-5">
                                 <app-data-table :table-config="tableConfig" @get-data="getDataTable">
@@ -34,12 +33,8 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Setujui Pengajuan</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showReject(context?.id)"><i class="bi bi-x-circle fa-lg me-2"></i> Tolak Pengajuan</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="alasanPenolakan(context?.id, context?.status_id)"><i class="bi bi-info-circle fa-lg me-2"></i> Alasan Penolakan</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="perbaikan(context?.id)"><i class="bi bi-wrench-adjustable fa-lg me-2"></i> Ajukan Perbaikan</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `pengajuan/edit/${context.id}`})"><i class="bi bi-pencil-square fa-lg me-2"></i> Edit</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `/transaksi/tagihan/penerbitan/${context.id}`})"><i class="bi bi-pencil-square fa-lg me-2"></i> {{ context?.invoice_pomdes?.additional_costs ? 'Pembaruan Penerbitan' : 'Buat Penerbitan' }}</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="hapus(context.id)"><i class="bi bi-trash fa-lg me-2"></i> Hapus</a>
                                                 </div>
                                             </td>
@@ -162,68 +157,6 @@
                                     </div>
                                 </div>
                                 <!--end::Accordion-->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" tabindex="-1" id="modal-reject">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="m-auto" style="width:100%;">
-                            <center>
-                                <h3 class="modal-title">Tolak Pengajuan</h3>
-                                <span class="text-muted">Isi form berikut ini untuk mengisi alasan penolakan</span>
-                            </center>
-                        </div>
-                        <!--begin::Close-->
-                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <!--end::Close-->
-                    </div>
-
-                    <div class="modal-body" style="overflow-x:auto;">
-                        <div class="form">
-                            <label for="alasan-penolakan"><h5>Alasan Penolakan</h5></label>
-                            <textarea id="alasan-penolakan" rows="5" class="form-control" placeholder="Cth: Stok supplier telah habis" v-model="reject.data.description"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-primary" @click="tolak()">Tolak Pengajuan</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" tabindex="-1" id="modal-alasan">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="m-auto" style="width:100%;">
-                            <center>
-                                <h3 class="modal-title">Alasan penolakan</h3>
-                                <span class="text-muted">Berikut adalah alasan penolakan dari transaksi yang dipilih.</span>
-                            </center>
-                        </div>
-                        <!--begin::Close-->
-                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                        <!--end::Close-->
-                    </div>
-
-                    <div class="modal-body" style="overflow-x:auto;">
-                        <div class="loading d-flex justify-content-center align-items-center" v-if="reasonReject.loading">
-                            <app-loader></app-loader>
-                        </div>
-                        <div class="form" v-else>
-                            <label for="alasan-penolakan"><h5>Alasan Penolakan</h5></label>
-                            <div class="card" style="border:1px solid gold;">
-                                <div class="card-body p-5">
-                                    {{ reasonReject.description }}
-                                </div>
                             </div>
                         </div>
                     </div>

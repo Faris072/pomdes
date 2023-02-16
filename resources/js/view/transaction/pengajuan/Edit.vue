@@ -63,6 +63,11 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-3"><h5 class="text-muted">Total Pesanan</h5></div>
+                                            <div class="col-md-3"><h5>Rp{{ $rupiahFormat(countHargaBbm) }}</h5></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <br><br>
@@ -216,8 +221,8 @@
                             that.form.fuels.push({
                                 fuel: {id: val?.fuel?.id, text: val?.fuel?.name},
                                 fuel_id: '',
-                                volume: val?.volume,
-                                price: val?.price
+                                volume: Number(val?.volume).toFixed(2),
+                                price: Number(val?.price).toFixed(2)
                             });
                         });
                     })
@@ -380,6 +385,16 @@
                 });
             },
         },
+        computed: {
+            countHargaBbm(){
+                let that = this;
+                let total = 0;
+                $.each(this.form.fuels, function(i,val){
+                    total+=Number(val?.price);
+                });
+                return total;
+            }
+        }
     }
 </script>
 

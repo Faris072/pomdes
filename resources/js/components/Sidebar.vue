@@ -97,7 +97,7 @@
                             </a>
                         </div>
                         <div class="menu-item">
-                            <a :class="`menu-link ${pageActive(['t-tagihan','t-tagihan-tambah','t-tagihan-edit'])}`" href="javascript:;" @click="this.$router.push({name: 't-tagihan'})">
+                            <a :class="`menu-link ${pageActive(['t-tagihan','t-tagihan-penerbitan'])}`" href="javascript:;" @click="this.$router.push({name: 't-tagihan'})">
                                 <span class="menu-icon"><i class="bi bi-receipt-cutoff fa-lg"></i></span>
                                 <span class="menu-title">Penerbitan Tagihan</span>
                             </a>

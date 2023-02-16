@@ -22,8 +22,7 @@ import EditPengajuanTransaksi from '@/view/transaction/pengajuan/Edit.vue';
 
 // tagihan
 import TagihanTransaksi from '@/view/transaction/tagihan/Index.vue';
-import TambahTagihanTransaksi from '@/view/transaction/tagihan/Tambah.vue';
-import EditTagihanTransaksi from '@/view/transaction/tagihan/Edit.vue';
+import PenerbitanTagihanTransaksi from '@/view/transaction/tagihan/Penerbitan.vue';
 
 import dimas from '@/view/dimas/Index.vue';
 
@@ -90,14 +89,9 @@ let routes = [
                 component: TagihanTransaksi,
             },
             {
-                path: 'transaksi/tagihan/tambah',
-                name: 't-tagihan-tambah',
-                component: TambahTagihanTransaksi,
-            },
-            {
-                path: 'transaksi/tagihan/edit/:id',
-                name: 't-tagihan-edit',
-                component: EditTagihanTransaksi,
+                path: 'transaksi/tagihan/penerbitan/:id',
+                name: 't-tagihan-penerbitan',
+                component: PenerbitanTagihanTransaksi,
             },
             {
                 path: 'dimas',

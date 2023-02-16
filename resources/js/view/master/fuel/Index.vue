@@ -289,7 +289,7 @@
                 $('#modal-form').modal('show');
                 this.form.data.name = data?.name;
                 this.form.data.user = {id: data?.supplier?.id, text: data?.supplier?.username}
-                this.form.data.price = data?.price;
+                this.form.data.price = Number(data?.price).toFixed(2);
             },
             update(){
                 let that = this;

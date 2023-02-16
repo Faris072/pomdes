@@ -154,28 +154,32 @@ class TransactionController extends Controller
 
     public function show($id){
         try{
-
             if(empty($id)){
                 return $this->getResponse([],'Id wajib di isi.',422);
             }
 
             $transactions = Transaction::with([
-                    'user',
-                    'submission_files',
-                    'reject',
-                    'status',
-                    'invoice_pomdes.invoice_pomdes_files',
-                    'invoice_pusat.invoice_pusat_files',
-                    'payment_to_pusat.payment_to_pusat_files',
-                    'payment_to_supplier.payment_to_supplier_files',
-                    'fuel_transactions.fuel.supplier',
-                    'hindrance.hindrance_files',
-                    'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
-                ])->find($id);
+                'user',
+                'submission_files',
+                'reject',
+                'status',
+                'invoice_pomdes.invoice_pomdes_files',
+                'invoice_pomdes.additional_costs',
+                'invoice_pusat.invoice_pusat_files',
+                'payment_to_pusat.payment_to_pusat_files',
+                'payment_to_supplier.payment_to_supplier_files',
+                'fuel_transactions.fuel.supplier',
+                'hindrance.hindrance_files',
+                'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
+            ])->find($id);
 
-                foreach($transactions->submission_files as $file){
-                    $file->link = route('render-submission-files',$file->id);
-                }
+            foreach($transactions->submission_files as $file){
+                $file->link = route('render-submission-files',$file->id);
+            }
+
+            foreach($transactions->invoice_pomdes->invoice_pomdes_files as $file){
+                $file->link = route('render-additional-cost-files',$file->id);
+            }
 
             if(!$transactions){
                 return $this->getResponse([],'Data tidak ditemukan',404);
