@@ -96,6 +96,8 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::group(['prefix'=>'invoice-pusat'],function(){
             Route::post('/','App\Http\Controllers\API\InvoicePusatController@store');
         });
+        Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
+        Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');
         Route::get('data-table/{steps}','App\Http\Controllers\API\TransactionController@get');
         Route::post('reason-reject/{id}','App\Http\Controllers\API\TransactionController@reason_reject');
         Route::post('repair/{id}','App\Http\Controllers\API\TransactionController@repair');

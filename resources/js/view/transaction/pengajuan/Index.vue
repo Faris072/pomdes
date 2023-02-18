@@ -24,7 +24,7 @@
                                                 <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
                                             </td>
                                             <td valign="middle">
-                                                <b>{{ context?.description }}</b>
+                                                <b>{{ context?.fuel_transactions ? context?.fuel_transactions[0]?.fuel?.supplier?.username : '-'}}</b>
                                             </td>
                                             <td valign="middle">
                                                 <span :class="`badge badge-light-primary`" v-if="context?.status_id == 1"><b>{{ context?.status?.name }}</b></span>
@@ -317,9 +317,9 @@
                                 }
                             },
                             {
-                                text: 'Keterangan',
-                                sort_by: 'description',
-                                sort: true,
+                                text: 'Supplier',
+                                sort_by: '',
+                                sort: false,
                                 class: {
                                     column: '',
                                     wrap: '',

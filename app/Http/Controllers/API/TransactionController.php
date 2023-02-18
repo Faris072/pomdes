@@ -105,7 +105,7 @@ class TransactionController extends Controller
                 'invoice_pusat',
                 'payment_to_pusat',
                 'payment_to_supplier',
-                'fuel_transactions',
+                'fuel_transactions.fuel.supplier',
                 'reject',
                 'hindrance.hindrance_files',
                 'discrepancy',
@@ -113,6 +113,16 @@ class TransactionController extends Controller
                 'discrepancy.fuel_discrepancies.discrepancy_type',
                 'discrepancy.fuel_discrepancies.fuel_transaction',
             ]);
+
+            if(auth()->user()->role_id == 1){}
+            else if(auth()->user()->role_id == 4){
+                // $transactions = $transactions->whereHas('fuel_transactions', function($q){
+                //     $q;
+                // });
+            }
+            else{
+                $transactions = $transactions->where('user_id', auth()->user()->id);
+            }
 
             switch($steps){
                 case 1:
@@ -123,6 +133,9 @@ class TransactionController extends Controller
                 case 2:
                     $transactions = $transactions->where('status_id',4)
                         ->orWhere('status_id',5);
+                    break;
+                case 3:
+                    $transactions = $transactions->where('status_id',6);
                     break;
             }
 
@@ -530,6 +543,60 @@ class TransactionController extends Controller
             }
 
             return $this->getResponse(Transaction::find($id),'Perbaikan berhasil diajukan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    //terbitkan penagihan
+    public function publish_billing($id){
+        try{
+            if(auth()->user()->role_id == 1 || auth()->user()->role_id == 2){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['status'])->find($id);
+
+            if($transaction->status_id != 5){
+                return $this->getResponse([],'Status tidak sesuai', 403);
+            }
+
+            $publish = $transaction->update(['status_id' => 6]);
+
+            if(!$publish){
+                return $this->getResponse([],'Penerbitan gagal. Silahkan coba kembali nanti..',500);
+            }
+
+            return $this->getResponse([],'Penerbitan berhasil.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    //Setujui pembayaran
+    public function approve_payment($id){
+        try{
+            if(auth()->user()->role_id == 1 || auth()->user()->role_id == 2){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['status'])->find($id);
+
+            if($transaction->status_id != 6){
+                return $this->getResponse([],'Status tidak sesuai', 403);
+            }
+
+            $publish = $transaction->update(['status_id' => 7]);
+
+            if(!$publish){
+                return $this->getResponse([],'Approve gagal. Silahkan coba kembali nanti..',500);
+            }
+
+            return $this->getResponse([],'Approve berhasil.');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

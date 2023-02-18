@@ -24,6 +24,9 @@ import EditPengajuanTransaksi from '@/view/transaction/pengajuan/Edit.vue';
 import TagihanTransaksi from '@/view/transaction/tagihan/Index.vue';
 import PenerbitanTagihanTransaksi from '@/view/transaction/tagihan/Penerbitan.vue';
 
+// pembayaran
+import PembayaranTransaksi from '@/view/transaction/payment/Index.vue';
+
 import dimas from '@/view/dimas/Index.vue';
 
 let routes = [
@@ -92,6 +95,11 @@ let routes = [
                 path: 'transaksi/tagihan/penerbitan/:id',
                 name: 't-tagihan-penerbitan',
                 component: PenerbitanTagihanTransaksi,
+            },
+            {
+                path: 'transaksi/pembayaran',
+                name: 't-pembayaran',
+                component: PembayaranTransaksi,
             },
             {
                 path: 'dimas',

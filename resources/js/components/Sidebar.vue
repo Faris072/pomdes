@@ -102,6 +102,12 @@
                                 <span class="menu-title">Penerbitan Tagihan</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a :class="`menu-link ${pageActive(['t-pembayaran'])}`" href="javascript:;" @click="this.$router.push({name: 't-pembayaran'})">
+                                <span class="menu-icon"><i class="bi bi-credit-card fa-lg"></i></span>
+                                <span class="menu-title">Pembayaran Tagihan</span>
+                            </a>
+                        </div>
                     </div>
                     <!--end::Menu-->
                 </div>

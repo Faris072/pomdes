@@ -26,15 +26,13 @@
                                                 <b>{{ context?.fuel_transactions ? context?.fuel_transactions[0]?.fuel?.supplier?.username : '-'}}</b>
                                             </td>
                                             <td valign="middle">
-                                                <span :class="`badge badge-light-primary`" v-if="context?.status_id == 4"><b>{{ context?.status?.name }}</b></span>
-                                                <span :class="`badge badge-light-success`" v-if="context?.status_id == 5"><b>{{ context?.status?.name }}</b></span>
+                                                <span :class="`badge badge-light-warning`" v-if="context?.status_id == 6"><b>{{ context?.status?.name }}</b></span>
                                             </td>
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="terbitkan(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Terbitkan Penagihan</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Approve Pembayaran</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `/transaksi/tagihan/penerbitan/${context.id}`})"><i class="bi bi-pencil-square fa-lg me-2"></i> {{ context?.invoice_pomdes?.additional_costs ? 'Pembaruan Penerbitan' : 'Buat Penerbitan' }}</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -116,17 +114,42 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Lampiran File Tagihan</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row mb-5">
+                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.invoice?.invoice_pomdes_files">
+                                                <div class="card card-file">
+                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                            <div class="icon-file">
+                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                            </div>
+                                                            <div class="info-file">
+                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <br>
                                 <!--begin::Accordion-->
                                 <div class="accordion" id="accordion-pengajuan">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="kt_accordion_1_header_1">
-                                            <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-pengajuan-content" aria-expanded="true" aria-controls="accordion-pengajuan">Bahan Bakar yang Dipesan</button>
+                                            <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-pengajuan-content" aria-expanded="true" aria-controls="accordion-pengajuan">Detail Nominal Transaksi</button>
                                         </h2>
                                         <div id="accordion-pengajuan-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-pengajuan">
                                             <div class="accordion-body">
                                                 <h5>Supplier: {{ detail?.data?.supplier || '-' }}</h5>
                                                 <div class="table-pomdes" style="overflow:auto;">
+                                                    <center><h5>Pesanan BBM</h5></center>
                                                     <table class="table table-bordered" style="border:1px solid black;">
                                                         <thead style="background-color:#F5F8FA !important;">
                                                             <tr>
@@ -146,11 +169,38 @@
                                                         </tbody>
                                                         <tr>
                                                             <td colspan="2"><b>Total</b></td>
-                                                            <td><b>{{ countVolumeBbm }} Liter</b></td>
-                                                            <td><b>Rp{{ countPriceBbm }}</b></td>
+                                                            <td><b>{{ $rupiahFormat(countVolumeBbm) }} Liter</b></td>
+                                                            <td><b>Rp{{ $rupiahFormat(countPriceBbm) }}</b></td>
+                                                        </tr>
+                                                    </table>
+                                                    <br>
+                                                    <center><h5>Biaya Tambahan</h5></center>
+                                                    <table class="table table-bordered" style="border:1px solid black;">
+                                                        <thead style="background-color:#F5F8FA !important;">
+                                                            <tr>
+                                                                <th class="text-center"><b>No</b></th>
+                                                                <th><b>Nama Biaya Tambahan</b></th>
+                                                                <th><b>Nominal</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(context, index) in detail?.data?.invoice?.additional_costs" v-if="detail?.data?.invoice?.additional_costs?.length">
+                                                                <td class="text-center">{{ index+1 }}</td>
+                                                                <td>{{ context?.name }}</td>
+                                                                <td>{{ $rupiahFormat(context?.nominal) }}</td>
+                                                            </tr>
+                                                            <tr v-else>
+                                                                <td colspan="3">Tidak ada biaya tambahan</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tr>
+                                                            <td colspan="2"><b>Total</b></td>
+                                                            <td><b>Rp{{ $rupiahFormat(countAdditionalCosts) }}</b></td>
                                                         </tr>
                                                     </table>
                                                 </div>
+                                                <br>
+                                                <h5><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts) }}</b></h5>
                                             </div>
                                         </div>
                                     </div>
@@ -197,7 +247,8 @@
                         deskripsi:'',
                         supplier: '',
                         fuel:[],
-                        files:[]
+                        files:[],
+                        invoice:[]
                     }
                 },
                 tableConfig: {
@@ -347,7 +398,8 @@
                         deskripsi:'',
                         supplier: '',
                         fuel:[],
-                        files:[]
+                        files:[],
+                        invoice: []
                     }
                 }
             },
@@ -371,7 +423,7 @@
             getDataTable(){
                 let that = this;
                 this.tableConfig.config.loading = true;
-                this.$axios().get(`transaction/data-table/2`, {params: this.tableConfig?.config})
+                this.$axios().get(`transaction/data-table/3`, {params: this.tableConfig?.config})
                     .then(res => {
                         let data = res?.data?.data;
                         this.tableConfig.data.body = res?.data?.data?.data;
@@ -386,56 +438,6 @@
                         this.tableConfig.config.loading = false;
                     })
             },
-            hapus(id){
-                Swal.fire({
-                    title: `Hapus kota yang dipilih?`,
-                    html: `Kota akan dihapus dan data pada kota tersebut akan terhapus.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#DB3700'
-                }).then(result => {
-                    if(result.isConfirmed){
-                        this.$pageLoadingShow();
-                        this.$axios().delete(`location/city/delete/${id}`)
-                            .then(res => {
-                                Swal.fire('Berhasil', 'Kota berhasil dihapus','success');
-                                this.getDataTable();
-                            })
-                            .catch(err =>{
-                                this.$axiosHandleError(err);
-                            })
-                            .then(()=>{
-                                this.$pageLoadingHide();
-                            });
-                    }
-                });
-            },
-            getProvince(search, limit){
-                let that = this;
-                this.selectList.province.loading = true;
-
-                let data = {
-                    search,
-                    limit
-                };
-
-                this.$axios().get(`location/province/select-list`, {params: data})
-                    .then(res => {
-                        let data = res?.data?.data;
-                        this.selectList.province.list = [];
-                        $.each(data, function(i,val){
-                            that.selectList.province.list.push({id: val?.id, text: val?.name});
-                        });
-                    })
-                    .catch(err => {
-                        this.$axiosHandleError(err);
-                    })
-                    .then(() => {
-                        this.selectList.province.loading = false;
-                    })
-            },
             showDetail(id){
                 let that = this;
 
@@ -445,14 +447,14 @@
                 this.$axios().get(`transaction/${id}`)
                     .then(res => {
                         let data = res?.data?.data;
-                        console.log(data);
                         this.detail.data = {
                             user: data?.user?.username,
                             nama: data?.name,
                             deskripsi:data?.description,
                             supplier: data?.fuel_transactions?.length ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-',
                             fuel: data?.fuel_transactions,
-                            files: data?.submission_files
+                            files: data?.submission_files,
+                            invoice: data?.invoice_pomdes,
                         };
                     })
                     .catch(err => {
@@ -462,89 +464,19 @@
                         this.detail.loading = false;
                     });
             },
-            showReject(id){
-                this.reject={
-                    idReject: id,
-                    data: {
-                        description: '',
-                    }
-                };
-                $('#modal-reject').modal('show');
-            },
-            tolak(){
-                this.$pageLoadingShow();
-                this.$axios().post(`transaction/reject/${this.reject.idReject}`, this.reject.data)
-                    .then(res => {
-                        $('.modal').modal('hide');
-                        Swal.fire('Berhasil', 'Pengajuan berhasil ditolak','success');
-                        this.getDataTable();
-                    })
-                    .catch(err =>{
-                        this.$axiosHandleError(err);
-                    })
-                    .then(()=>{
-                        this.$pageLoadingHide();
-                    });
-            },
-            perbaikan(id){
+            approve(id){
                 Swal.fire({
-                    title: `Perbaiki pengajuan yang dipilih?`,
-                    html: `Pastikan data sudah lengkap dan sesuai sebelum mengajukan perbaikan.`,
+                    title: `Setujui pembayaran transaksi yang dipilih?`,
+                    html: `Transaksi akan dianggap sudah melakukan pembayaran dan akan diteruskan ke pengiriman.`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Ajukan Perbaikan',
+                    confirmButtonText: 'Setujui',
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#41FF1C'
                 }).then(result => {
                     if(result.isConfirmed){
                     this.$pageLoadingShow();
-                    this.$axios().post(`transaction/repair/${id}`)
-                        .then(res => {
-                            $('.modal').modal('hide');
-                            Swal.fire('Berhasil', 'Perbaikan berhasil diajukan','success');
-                            this.getDataTable();
-                        })
-                        .catch(err =>{
-                            this.$axiosHandleError(err);
-                        })
-                        .then(()=>{
-                            this.$pageLoadingHide();
-                        });
-                    }
-                });
-            },
-            alasanPenolakan(id, status_id){
-                this.reasonReject = {
-                    loading: true,
-                    description: ''
-                };
-
-                $('#modal-alasan').modal('show');
-
-                this.$axios().post(`transaction/reason-reject/${id}`, {status_id: status_id})
-                    .then(res => {
-                        this.reasonReject.description = res?.data?.data?.description;
-                    })
-                    .catch(err =>{
-                        this.$axiosHandleError(err);
-                    })
-                    .then(()=>{
-                        this.reasonReject.loading = false;
-                    });
-            },
-            terbitkan(id){
-                Swal.fire({
-                    title: `Terbitkan penagihan transaksi yang dipilih?`,
-                    html: `Pengajuan akan diteruskan ke tahap pembayaran.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Terbitkan',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#41FF1C'
-                }).then(result => {
-                    if(result.isConfirmed){
-                    this.$pageLoadingShow();
-                    this.$axios().put(`transaction/publish-billing/${id}`)
+                    this.$axios().put(`transaction/approve-payment/${id}`)
                         .then(res => {
                             Swal.fire('Berhasil', 'Pengajuan berhasil disetujui','success');
                             this.getDataTable();
@@ -566,7 +498,7 @@
                 $.each(this?.detail?.data?.fuel, function(i,val){
                     price += Number(val?.price);
                 });
-                return this.$rupiahFormat(price);
+                return price;
             },
             countVolumeBbm(){
                 let that = this;
@@ -574,8 +506,16 @@
                 $.each(this?.detail?.data?.fuel, function(i,val){
                     volume += Number(val?.volume);
                 });
-                return this.$rupiahFormat(volume);
+                return volume;
             },
+            countAdditionalCosts(){
+                let that = this;
+                let nominal = 0;
+                $.each(this?.detail?.data?.invoice?.additional_costs, function(i,val){
+                    nominal += Number(val?.nominal);
+                });
+                return nominal;
+            }
         }
     }
 </script>
