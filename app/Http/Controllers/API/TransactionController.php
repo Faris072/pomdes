@@ -186,12 +186,16 @@ class TransactionController extends Controller
                 'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
             ])->find($id);
 
-            foreach($transactions->submission_files as $file){
-                $file->link = route('render-submission-files',$file->id);
+            if($transactions->submission_files){
+                foreach($transactions->submission_files as $file){
+                    $file->link = route('render-submission-files',$file->id);
+                }
             }
 
-            foreach($transactions->invoice_pomdes->invoice_pomdes_files as $file){
-                $file->link = route('render-additional-cost-files',$file->id);
+            if($transactions->invoice_pomdes && $transactions->invoice_pomdes->invoice_pomdes_files){
+                foreach($transactions->invoice_pomdes->invoice_pomdes_files as $file){
+                    $file->link = route('render-additional-cost-files',$file->id);
+                }
             }
 
             if(!$transactions){
