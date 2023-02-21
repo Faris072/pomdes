@@ -16,8 +16,4 @@ class Reject extends Model
     public function transaction(){
         return $this->belongsTo(Transaction::class, 'transaction_id','id');
     }
-
-    public function status(){
-        return $this->belongsTo(Status::class, 'status_id','id');
-    }
 }

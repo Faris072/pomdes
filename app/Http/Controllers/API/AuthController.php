@@ -122,7 +122,23 @@ class AuthController extends Controller
 
     public function show_user($id){
         try{
-            $user = User::with(['pusat.profile.city.province', 'pomdes.profile.city.province', 'role', 'profile.city.province', 'profile.photo_profile'])->find($id);
+            $user = User::with(['pusat.profile.city.province', 'pomdes.profile.city.province', 'role', 'profile.city.province', 'profile.photo_profile','fuels'])->find($id);
+            if(!$user){
+                return $this->getResponse([],'User tidak ditemukan',422);
+            }
+
+            $user->profile && $user->profile->photo_profile ? $user->profile->photo_profile->link = route('render-gambar-profile', $user->profile->photo_profile->id) : '';
+
+            return $this->getResponse($user,'User berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function show_supplier($id){
+        try{
+            $user = User::with(['pusat.profile.city.province', 'pomdes.profile.city.province', 'role', 'profile.city.province', 'profile.photo_profile','fuels'])->find($id);
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',422);
             }

@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('/','App\Http\Controllers\API\ProfileController@show');
         });
 
+        Route::get('/supplier/{id}','App\Http\Controllers\API\AuthController@show_supplier');
         Route::delete('delete/{id}','App\Http\Controllers\API\AuthController@delete');
         Route::get('get-trashed','App\Http\Controllers\API\AuthController@get_trashed');
         Route::put('/switch-status/{id}','App\Http\Controllers\API\AuthController@switch_status');

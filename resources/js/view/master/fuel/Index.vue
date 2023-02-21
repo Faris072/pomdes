@@ -70,6 +70,9 @@
                         <br>
                         <label for="price"><h5>Harga (Rp)</h5></label>
                         <app-money3 v-model="form.data.price" class="form-control" placeholder="Isi harga bahan bakar" v-bind="money3"></app-money3>
+                        <br>
+                        <label for="stock"><h5>Stok (Opsional / Liter)</h5></label>
+                        <app-money3 v-model="form.data.stock" class="form-control" placeholder="Isi stok bahan bakar" v-bind="money3"></app-money3>
                     </div>
 
                     <div class="modal-footer">
@@ -103,6 +106,7 @@
                         user_id: '',
                         name: '',
                         price: '',
+                        stock: ''
                     }
                 },
                 money3: {
@@ -244,6 +248,7 @@
                         user: '',
                         user_id: '',
                         name: '',
+                        stock: ''
                     }
                 }
             },
@@ -290,6 +295,7 @@
                 this.form.data.name = data?.name;
                 this.form.data.user = {id: data?.supplier?.id, text: data?.supplier?.username}
                 this.form.data.price = Number(data?.price).toFixed(2);
+                this.form.data.stock = Number(data?.stock).toFixed(2);
             },
             update(){
                 let that = this;

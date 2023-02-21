@@ -245,6 +245,9 @@
         },
         methods: {
             initDropzone(){
+                if(this.dropzoneFile){
+                    this.dropzoneFile.destroy();
+                }
                 this.dropzoneFile = new Dropzone("#dropzoe-file", {
                     url: "/",
                     dictCancelUpload: "Cancel",

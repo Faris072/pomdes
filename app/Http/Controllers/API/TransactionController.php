@@ -418,9 +418,9 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Transaksi tidak ditemukan',404);
             }
 
-            if($transaction->status_id == 2){
-                return $this->getResponse([],'Transaksi sudah disetujui',403);
-            }
+            // if($transaction->status_id == 2){
+            //     return $this->getResponse([],'Transaksi sudah disetujui',403);
+            // }
 
             $update = $transaction->update([
                 'status_id' => 4
@@ -461,51 +461,43 @@ class TransactionController extends Controller
                 return $this->getResponse([],$validatedData->getMessageBag(),422);
             }
 
-            $status_list = [2,5];
-            $status_id = $transaction->status_id;
-
-            if(in_array($status_id, $status_list)){
-                return $this->getResponse([],'Akses ditolak karena status tidak sesuai',403);
+            if($transaction->status_id == 1 || $transaction->status_id == 3){}
+            else{
+                return $this->getResponse([],'Akses ditolak. Status tidak sesuai',403);
             }
 
-            $check = Reject::where('transaction_id',$id)->where('status_id',$status_id)->first();
-
+            $check = Reject::firstWhere('transaction_id',$id);
             if($check){
-                $reject = $check->update(['descripion' => $request->description]);
-
-                $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id]);
-
-                if(!$change_status){
-                    Reject::find($reject->id)->forceDelete();
-                    return $this->getResponse([],'Transaksi gagal ditolak',500);
-                }
-
+                $reject = $check->update(['description' => $request->description]);
                 if(!$reject){
-                    return $this->getResponse([],'Transaksi gagal ditolak', 500);
+                    return $this->getResponse([],'Penolakan gagal.',500);
                 }
 
-                return $this->getResponse(Reject::find($check->id), 'Transaksi berhasil ditolak');
+                $change = Transaction::find($id)->update(['status_id' => 2]);
+                if(!$change){
+                    $check->forceDelete();
+                    return $this->getResponse([],'Penolakan gagal.',500);
+                }
+
+                return $this->getResponse(Transaction::with(['reject'])->find($id),'Transaksi berhasil ditolak.',200);
             }
 
             $reject = Reject::create([
                 'transaction_id' => $id,
-                'status_id' => $status_id,
-                'is_active' => 1,
-                'description' => $request->description,
+                'description' => $request->description
             ]);
 
             if(!$reject){
-                return $this->getResponse([],'Transaksi gagal ditolak', 500);
-            }
-
-            $change_status = Transaction::find($id)->update(['status_id' => (int) $status_id%3 == 0 ? (int) $status_id-1 : (int) $status_id+1]);
-
-            if(!$change_status){
-                Reject::find($reject->id)->forceDelete();
                 return $this->getResponse([],'Transaksi gagal ditolak',500);
             }
 
-            return $this->getResponse(Transaction::with(['reject'])->find($id), 'Transaksi berhasil ditolak');
+            $change = Transaction::find($id)->update(['status_id' => 2]);
+            if(!$change){
+                Reject::firstWhere('transaction_id',$id)->forceDelete();
+                return $this->getResponse([],'Data gagal ditolak',500);
+            }
+
+            return $this->getResponse(Transaction::with(['reject'])->find($id),'Tramsalso berhasil ditolak',200);
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);
@@ -514,7 +506,8 @@ class TransactionController extends Controller
 
     public function reason_reject(Request $request, $id){
         try{
-            $find = Reject::where('transaction_id',$id)->where('status_id',$request->status_id)->first();
+            $find = Reject::where('transaction_id',$id)->first();
+            // ->where('status_id',$request->status_id)->first();
             if(!$find){
                 return $this->getResponse([],'Data tidak ditemukan',404);
             }

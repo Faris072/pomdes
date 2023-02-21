@@ -16,8 +16,6 @@ return new class extends Migration
         Schema::create('reject', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('is_active')->default(1);
             $table->text('description');
             $table->timestamps();
             $table->softDeletes();

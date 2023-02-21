@@ -318,6 +318,9 @@
         methods: {
             initDropzone() {
                 const that = this;
+                if(this.profile.photo.data){
+                    this.profile.photo.data.destroy();
+                }
                 this.profile.photo.data = new Dropzone("#dropzone_photo_profile", {
                     url: urlApi+"users/profile/photo",
                     dictCancelUpload: "Cancel",
@@ -438,6 +441,7 @@
                         Swal.fire('Berhasil', 'Data profil berhasil diubah', 'success');
                     })
                     .catch(err => {
+                        console.log(err)
                         this.$axiosHandleError(err);
                     })
                     .then(() => {

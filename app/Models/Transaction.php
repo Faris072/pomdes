@@ -54,6 +54,6 @@ class Transaction extends Model
     }
 
     public function reject(){
-        return $this->hasMany(Reject::class,'transaction_id','id');
+        return $this->hasOne(Reject::class,'transaction_id','id');
     }
 }

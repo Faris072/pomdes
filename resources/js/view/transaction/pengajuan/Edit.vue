@@ -28,7 +28,7 @@
                                     </div>
                                     <div class="form my-5">
                                         <label for="name"><h5>Nama Transaksi</h5></label>
-                                        <input v-model="form.name" type="text" class="form-control" placeholder="Masukkan nama transaksi">
+                                        <input v-model="form.name" type="text" class="form-control" placeholder="Masukkan nama transaksi" disabled>
                                     </div>
                                     <div class="form my-5">
                                         <label for="name"><h5>Deskripsi</h5></label>
@@ -40,14 +40,28 @@
                                     <div class="card-body">
                                         <h3 style="color:gold;">Bahan Bakar</h3>
                                         <br>
-                                        <label for="supplier"><h6>Pilih Supplier</h6></label>
-                                        <app-select2 v-model="form.supplier" :options="selectList.supplier.list" :loading="selectList.supplier.loading" @get-options="getSupplier" placeholder="Pilih supplier" :multiple="false" @change-options="resetFuel()"></app-select2>
+                                        <div class="row d-flex">
+                                            <div class="col-md-9">
+                                                <label for="supplier"><h6>Pilih Supplier</h6></label>
+                                                <app-select2 v-model="form.supplier" :options="selectList.supplier.list" :loading="selectList.supplier.loading" @get-options="getSupplier" placeholder="Pilih supplier" :multiple="false" @change-options="resetFuel()"></app-select2>
+                                            </div>
+                                            <div class="col-md-3 d-flex align-items-end">
+                                                <button class="btn btn-light-info" @click="showSupplier(form?.supplier?.id)" :disabled="!form?.supplier?.id"><i class="bi bi-info-square fa-lg"></i> Informasi Supplier</button>
+                                            </div>
+                                        </div>
                                         <br>
                                         <div class="wrap-bbm">
                                             <div class="row my-5 align-items-end" v-for="(context,index) in form.fuels">
+                                                <div class="card my-3 bg-light-warning" style="border:1px dashed gold;" v-if="Number(context?.fuel?.stock) < Number(context?.volume)">
+                                                    <div class="card-body d-flex align-items-center p-4">
+                                                        <div class="icon me-3"><i class="bi bi-exclamation-triangle-fill fa-2x text-warning"></i></div>
+                                                        <div class="message text-warning">Pesanan BBM melebihi stok supplier yang dipilih. Hal ini mungkin dapat menyebabkan tertundanya pengiriman BBM oleh supplier.</div>
+                                                    </div>
+                                                </div>
+                                                <br>
                                                 <div class="col-md-4">
                                                     <h6>Jenis BBM</h6>
-                                                    <app-select2 v-model="context.fuel" :options="selectList.fuel.list" :loading="selectList.fuel.loading" @get-options="getFuel" placeholder="Pilih BBM" :multiple="false" :disabled="!form.supplier.id" @change-options="context.price = ''; context.volume = ''"></app-select2>
+                                                    <app-select2 v-model="context.fuel" :options="selectList.fuel.list" :loading="selectList.fuel.loading" @get-options="getFuel" placeholder="Pilih BBM" :multiple="false" :disabled="!form.supplier.id" @change-options="context.price = ''; context.volume = '', context.stock = ''"></app-select2>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <h6>Volume BBM (Liter)</h6>
@@ -58,7 +72,7 @@
                                                     <app-money3 v-model="context.price" class="form-control" placeholder="Isi harga BBM" v-bind="money3" :disabled="!form.supplier.id || !context.fuel.id" @keyup="calculateFuelVolume(index)"></app-money3>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <button class="btn btn-light-success" @click="form.fuels.push({fuel: '',volume: '',price: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
+                                                    <button class="btn btn-light-success" @click="form.fuels.push({fuel: '',volume: '',price: '', stock: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
                                                     <button class="btn btn-light-danger" @click="form.fuels.splice(index,1)" v-else :disabled="!form.supplier.id">Hapus</button>
                                                 </div>
                                             </div>
@@ -110,6 +124,99 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" tabindex="-1" id="modal-supplier">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Detail Supplier</h3>
+                                <span class="text-muted">Berikut adalah detail supplier</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="loading d-flex justify-content-center" v-if="loadingSupplier">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="content-supplier" v-else>
+                            <div class="info-bbm container">
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Nama</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ dataSupplier?.profile?.name || '' }} ({{ dataSupplier?.username }})</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Status</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <span class="badge badge-light-success" v-if="dataSupplier?.is_active == 1">Aktif</span>
+                                        <span class="badge badge-light-danger" v-else>Tidak Aktif</span>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Lokasi</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ dataSupplier?.profile?.city?.name || '-' }} {{ dataSupplier?.profile?.city?.province?.name ? `,${dataSupplier?.profile?.city?.province?.name}` : '' || '' }}</h5>
+                                    </div>
+                                </div>
+                                <br>
+                                <!--begin::Accordion-->
+                                <div class="accordion" id="accordion-pengajuan">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="kt_accordion_1_header_1">
+                                            <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-pengajuan-content" aria-expanded="true" aria-controls="accordion-pengajuan">Ketersediaan BBM</button>
+                                        </h2>
+                                        <div id="accordion-pengajuan-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-pengajuan">
+                                            <div class="accordion-body">
+                                                <div class="table-pomdes" style="overflow:auto;">
+                                                    <div class="supplier-empty" v-if="!dataSupplier?.fuels?.length">
+                                                        <h6>Belum ada BBM.</h6>
+                                                    </div>
+                                                    <table class="table table-bordered" style="border:1px solid black;" v-else>
+                                                        <thead style="background-color:#F5F8FA !important;">
+                                                            <tr>
+                                                                <th class="text-center"><b>No</b></th>
+                                                                <th><b>Jenis BBM</b></th>
+                                                                <th><b>Harga BBM (Rp)</b></th>
+                                                                <th><b>Stok BBM (Liter)</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(context, index) in dataSupplier?.fuels">
+                                                                <td class="text-center">{{ index+1 }}</td>
+                                                                <td>{{ context?.name }}</td>
+                                                                <td>{{ $rupiahFormat(context?.price) }}</td>
+                                                                <td>{{ $rupiahFormat(context?.stock) }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Accordion-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -137,14 +244,16 @@
                 form: {
                     user: '',
                     supplier: '',
-                    name: '',
+                    name: `Transaksi-${this.$store.state.auth.username}-${this.$moment().format('DDMMYYYY')}`,
+                    hiddenName: '',
                     description: '',
                     fuels: [
                         {
                             fuel: '',
                             fuel_id: '',
                             volume: '',
-                            price: ''
+                            price: '',
+                            stock: ''
                         }
                     ]
                 },
@@ -173,6 +282,9 @@
         },
         methods: {
             initDropzone(){
+                if(this.dropzoneFile){
+                    this.dropzoneFile.destroy();
+                }
                 this.dropzoneFile = new Dropzone("#dropzoe-file", {
                     url: "/",
                     dictCancelUpload: "Cancel",
@@ -212,6 +324,7 @@
                         this.form.user = {id: data?.user?.id, text: data?.user?.username};
                         this.form.supplier = {id: data?.fuel_transactions[0]?.fuel?.supplier?.id, text: data?.fuel_transactions[0]?.fuel?.supplier?.username};
                         this.form.name = data?.name;
+                        this.form.hiddenName = data?.name;
                         this.form.description = data?.description;
                         this.files = data?.submission_files;
                         if(data?.fuel_transactions?.length > 0){
@@ -219,12 +332,13 @@
                         }
                         $.each(data?.fuel_transactions, function(i,val){
                             that.form.fuels.push({
-                                fuel: {id: val?.fuel?.id, text: val?.fuel?.name},
+                                fuel: {id: val?.fuel?.id, text: val?.fuel?.name, volume: val?.fuel?.volume, price: val?.fuel?.price, stock: val?.fuel?.stock},
                                 fuel_id: '',
                                 volume: Number(val?.volume).toFixed(2),
-                                price: Number(val?.price).toFixed(2)
+                                price: Number(val?.price).toFixed(2),
                             });
                         });
+                        console.log(this.form.fuels)
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
@@ -245,7 +359,7 @@
                         let data = res?.data?.data;
                         this.selectList.fuel.list = [];
                         $.each(data, function(i,val){
-                            that.selectList.fuel.list.push({id: val?.id, text: val?.name, price: val?.price});
+                            that.selectList.fuel.list.push({id: val?.id, text: val?.name, price: val?.price, stock: val?.stock});
                         });
                     })
                     .catch(err => {
@@ -303,7 +417,8 @@
                     {
                         fuel: '',
                         volume: '',
-                        price: ''
+                        price: '',
+                        stock: ''
                     }
                 ]
             },
@@ -319,6 +434,7 @@
                 let data = this.form;
 
                 data.user_id = data?.user?.id;
+                data.name = data?.hiddenName;
 
                 $.each(data?.fuels, function(i,val){
                     val.fuel_id = val?.fuel?.id;
@@ -384,6 +500,22 @@
                     }
                 });
             },
+            showSupplier(id){
+                id = id || '';
+                $('#modal-supplier').modal('show');
+                this.loadingSupplier = true;
+                this.$axios().get(`users/supplier/${id}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.dataSupplier = data;
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.loadingSupplier = false;
+                    });
+            }
         },
         computed: {
             countHargaBbm(){

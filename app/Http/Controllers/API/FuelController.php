@@ -50,18 +50,21 @@ class FuelController extends Controller
             $attributes = [
                 'user_id' => 'Supplier',
                 'name' => 'Nama bahan bakar',
-                'price' => 'Harga'
+                'price' => 'Harga',
+                'stock' => 'Stok'
             ];
 
             $messages = [
                 'required' => ':attribute wajib dipilih.',
                 'numeric' => ':attribute harus berupa angka.',
+                'nullable' => ':attribute boleh kosong'
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'user_id' => 'required|numeric',
                 'name' => 'required',
-                'price' => 'required|numeric'
+                'price' => 'required|numeric',
+                'stock' => 'nullable|numeric'
             ],$messages,$attributes);
 
             if($validatedData->fails()){
