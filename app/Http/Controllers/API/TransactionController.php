@@ -102,9 +102,6 @@ class TransactionController extends Controller
                 'user.profile',
                 'status',
                 'invoice_pomdes.additional_costs',
-                'invoice_pusat',
-                'payment_to_pusat',
-                'payment_to_supplier',
                 'fuel_transactions.fuel.supplier',
                 'reject',
                 'hindrance.hindrance_files',
@@ -115,32 +112,51 @@ class TransactionController extends Controller
             ]);
 
             if(auth()->user()->role_id == 1){}
+            else if(auth()->user()->role_id == 2){
+                $transactions = $transactions->whereHas('user', function($q){
+                    $q->where('user_id',auth()->user()->id);
+                });
+            }
+            else if(auth()->user()->role_id == 3){
+                $transactions = $transactions->where('user_id', auth()->user()->id);
+            }
             else if(auth()->user()->role_id == 4){
-                // $transactions = $transactions->whereHas('fuel_transactions', function($q){
-                //     $q;
-                // });
+                $transactions = $transactions->whereHas('fuel_transactions', function($q){
+                    $q->whereHas('fuel', function($q){
+                        $q->where('user_id',auth()->user()->id);
+                    });
+                });
             }
             else{
                 $transactions = $transactions->where('user_id', auth()->user()->id);
             }
 
             switch($steps){
-                case 1:
+                case 1://pengajuan
                     $transactions = $transactions->where('status_id',1)
                         ->orWhere('status_id',2)
                         ->orWhere('status_id',3);
                     break;
-                case 2:
+                case 2://penerbitan tagihan
                     $transactions = $transactions->where('status_id',4)
                         ->orWhere('status_id',5);
                     break;
-                case 3:
+                case 3://pembayaran tagihan
                     $transactions = $transactions->where('status_id',6);
+                    break;
+                case 4://pengiriman
+                    $transactions = $transactions->where('status_id',7)
+                    ->orWhere('status_id',8)
+                    ->orWhere('status_id',9);
                     break;
             }
 
             if(isset($request->search)){
                 $transactions = $transactions->whereRaw("LOWER(name) LIKE '".strtolower($request->search)."'")
+                    ->orWhereRaw("created_at LIKE '%".$request->search."%'")
+                    ->orWhereHas('status', function($q) use ($request){
+                        $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
+                    })
                     ->orWhereHas('user', function($q) use ($request){
                         $q->whereRaw("LOWER(username) LIKE '%".$request->search."%'");
                     })
@@ -178,9 +194,6 @@ class TransactionController extends Controller
                 'status',
                 'invoice_pomdes.invoice_pomdes_files',
                 'invoice_pomdes.additional_costs',
-                'invoice_pusat.invoice_pusat_files',
-                'payment_to_pusat.payment_to_pusat_files',
-                'payment_to_supplier.payment_to_supplier_files',
                 'fuel_transactions.fuel.supplier',
                 'hindrance.hindrance_files',
                 'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
@@ -554,7 +567,7 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Akses ditolak',403);
             }
 
-            $transaction = Transaction::with(['status'])->find($id);
+            $transaction = Transaction::with(['status','invoice_pomdes'])->find($id);
 
             if($transaction->status_id != 5){
                 return $this->getResponse([],'Status tidak sesuai', 403);

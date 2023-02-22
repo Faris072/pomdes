@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('invoice_pusat_files', function (Blueprint $table) {
+        Schema::create('delivery_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_pusat_id')->constrained('invoice_pusat')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('delivery_id')->constrained('delivery')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invoice_pusat_files');
+        Schema::dropIfExists('delivery_files');
     }
 };

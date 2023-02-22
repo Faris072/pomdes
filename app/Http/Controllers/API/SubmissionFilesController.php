@@ -72,8 +72,4 @@ class SubmissionFilesController extends Controller
             return $this->getResponse([], $e->getMessage(),500);
         }
     }
-
-    // public function dimas(Request $request){
-    //     @dd($request->all());
-    // }
 }

@@ -52,16 +52,9 @@
                                         <br>
                                         <div class="wrap-bbm">
                                             <div class="row my-5 align-items-end" v-for="(context,index) in form.fuels">
-                                                <div class="card my-3 bg-light-warning" style="border:1px dashed gold;" v-if="Number(context?.fuel?.stock) < Number(context?.volume)">
-                                                    <div class="card-body d-flex align-items-center p-4">
-                                                        <div class="icon me-3"><i class="bi bi-exclamation-triangle-fill fa-2x text-warning"></i></div>
-                                                        <div class="message text-warning">Pesanan BBM melebihi stok supplier yang dipilih. Hal ini mungkin dapat menyebabkan tertundanya pengiriman BBM oleh supplier.</div>
-                                                    </div>
-                                                </div>
-                                                <br>
                                                 <div class="col-md-4">
                                                     <h6>Jenis BBM</h6>
-                                                    <app-select2 v-model="context.fuel" :options="selectList.fuel.list" :loading="selectList.fuel.loading" @get-options="getFuel" placeholder="Pilih BBM" :multiple="false" :disabled="!form.supplier.id" @change-options="context.price = ''; context.volume = '', context.stock = ''"></app-select2>
+                                                    <app-select2 v-model="context.fuel" :options="selectList.fuel.list" :loading="selectList.fuel.loading" @get-options="getFuel" placeholder="Pilih BBM" :multiple="false" :disabled="!form.supplier.id" @change-options="context.price = ''; context.volume = ''"></app-select2>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <h6>Volume BBM (Liter)</h6>
@@ -72,7 +65,7 @@
                                                     <app-money3 v-model="context.price" class="form-control" placeholder="Isi harga BBM" v-bind="money3" :disabled="!form.supplier.id || !context.fuel.id" @keyup="calculateFuelVolume(index)"></app-money3>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <button class="btn btn-light-success" @click="form.fuels.push({fuel: '',volume: '',price: '', stock: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
+                                                    <button class="btn btn-light-success" @click="form.fuels.push({fuel: '',volume: '',price: ''})" v-if="index == 0" :disabled="!form.supplier.id">Tambah</button>
                                                     <button class="btn btn-light-danger" @click="form.fuels.splice(index,1)" v-else :disabled="!form.supplier.id">Hapus</button>
                                                 </div>
                                             </div>
@@ -190,7 +183,6 @@
                                                                 <th class="text-center"><b>No</b></th>
                                                                 <th><b>Jenis BBM</b></th>
                                                                 <th><b>Harga BBM (Rp)</b></th>
-                                                                <th><b>Stok BBM (Liter)</b></th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -198,7 +190,6 @@
                                                                 <td class="text-center">{{ index+1 }}</td>
                                                                 <td>{{ context?.name }}</td>
                                                                 <td>{{ $rupiahFormat(context?.price) }}</td>
-                                                                <td>{{ $rupiahFormat(context?.stock) }}</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
@@ -253,7 +244,6 @@
                             fuel_id: '',
                             volume: '',
                             price: '',
-                            stock: ''
                         }
                     ]
                 },
@@ -332,7 +322,7 @@
                         }
                         $.each(data?.fuel_transactions, function(i,val){
                             that.form.fuels.push({
-                                fuel: {id: val?.fuel?.id, text: val?.fuel?.name, volume: val?.fuel?.volume, price: val?.fuel?.price, stock: val?.fuel?.stock},
+                                fuel: {id: val?.fuel?.id, text: val?.fuel?.name, volume: val?.fuel?.volume, price: val?.fuel?.price},
                                 fuel_id: '',
                                 volume: Number(val?.volume).toFixed(2),
                                 price: Number(val?.price).toFixed(2),
@@ -359,7 +349,7 @@
                         let data = res?.data?.data;
                         this.selectList.fuel.list = [];
                         $.each(data, function(i,val){
-                            that.selectList.fuel.list.push({id: val?.id, text: val?.name, price: val?.price, stock: val?.stock});
+                            that.selectList.fuel.list.push({id: val?.id, text: val?.name, price: val?.price});
                         });
                     })
                     .catch(err => {
@@ -418,7 +408,6 @@
                         fuel: '',
                         volume: '',
                         price: '',
-                        stock: ''
                     }
                 ]
             },

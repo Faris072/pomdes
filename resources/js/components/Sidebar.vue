@@ -108,6 +108,12 @@
                                 <span class="menu-title">Pembayaran Tagihan</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a :class="`menu-link ${pageActive(['t-pengiriman'])}`" href="javascript:;" @click="this.$router.push({name: 't-pengiriman'})">
+                                <span class="menu-icon"><i class="bi bi-truck fa-lg"></i></span>
+                                <span class="menu-title">Pengiriman</span>
+                            </a>
+                        </div>
                     </div>
                     <!--end::Menu-->
                 </div>

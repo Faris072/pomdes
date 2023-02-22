@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('payment_to_pusat_files', function (Blueprint $table) {
+        Schema::create('delivery', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_to_pusat_id')->constrained('payment_to_pusat')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
-            $table->integer('size');
-            $table->string('extension');
-            $table->boolean('is_image');
+            $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->date('estimation_date');
+            $table->text('text');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payment_to_pusat_files');
+        Schema::dropIfExists('deliveries');
     }
 };

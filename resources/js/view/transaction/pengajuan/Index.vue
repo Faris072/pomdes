@@ -24,6 +24,9 @@
                                                 <b>{{ $moment(context?.created_at).format('DD-MM-YYYY H:m') }}</b>
                                             </td>
                                             <td valign="middle">
+                                                <b>{{ context?.user?.username || '-'}} {{ context?.user?.profile?.name ? `( ${context?.user?.profile?.name} )` : ''}}</b>
+                                            </td>
+                                            <td valign="middle">
                                                 <b>{{ context?.fuel_transactions ? context?.fuel_transactions[0]?.fuel?.supplier?.username : '-'}}</b>
                                             </td>
                                             <td valign="middle">
@@ -304,6 +307,21 @@
                             {
                                 text: 'Tanggal Pembuatan',
                                 sort_by: 'created_at',
+                                sort: true,
+                                class: {
+                                    column: '',
+                                    wrap: '',
+                                    text: ''
+                                },
+                                style: {
+                                    column: '',
+                                    wrap: '',
+                                    text: '',
+                                }
+                            },
+                            {
+                                text: 'Mitra',
+                                sort_by: 'username',
                                 sort: true,
                                 class: {
                                     column: '',

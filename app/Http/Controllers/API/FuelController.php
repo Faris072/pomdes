@@ -51,7 +51,6 @@ class FuelController extends Controller
                 'user_id' => 'Supplier',
                 'name' => 'Nama bahan bakar',
                 'price' => 'Harga',
-                'stock' => 'Stok'
             ];
 
             $messages = [
@@ -64,7 +63,6 @@ class FuelController extends Controller
                 'user_id' => 'required|numeric',
                 'name' => 'required',
                 'price' => 'required|numeric',
-                'stock' => 'nullable|numeric'
             ],$messages,$attributes);
 
             if($validatedData->fails()){

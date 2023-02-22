@@ -25,18 +25,6 @@ class Transaction extends Model
         return $this->hasOne(InvoicePomdes::class, 'transaction_id','id');
     }
 
-    public function invoice_pusat(){
-        return $this->hasOne(InvoicePusat::class,'transaction_id','id');
-    }
-
-    public function payment_to_pusat(){
-        return $this->hasOne(PaymentToPusat::class,'transaction_id','id');
-    }
-
-    public function payment_to_supplier(){
-        return $this->hasOne(PaymentToSupplier::class,'transaction_id','id');
-    }
-
     public function fuel_transactions(){
         return $this->hasMany(FuelTransaction::class,'transaction_id','id');
     }

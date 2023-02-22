@@ -16,22 +16,27 @@ class StatusSeeder extends Seeder
     public function run()
     {
         $data = [
+            // step 1
             ['name'=>'Pengajuan Transaksi'],// 1
             ['name'=>'Penolakan Pengajuan'],// 2
             ['name'=>'Perbaikan Pengajuan'],// 3
 
+            //step 2
             ['name'=>'Tagihan Pomdes'],// 4
             ['name'=>'Tagihan Disimpan'],// 5
 
+            // step 3
             ['name'=>'Menunggu Pembayaran'],// 6
 
+            // step 4
             ['name'=>'Menunggu Pengiriman'],// 7
-            ['name'=>'Dikirim'],// 8
+            ['name'=>'Dalam Pengiriman'],// 8
             ['name'=>'Kendala Pengiriman'],// 9
 
-            ['name'=>'BBM Telah Sampai'],// 9 ->supplier
-            ['name'=>'Laporan Ketidaksesuaian'],// 9 ->pomdes
-            ['name'=>'Selesai'],// 9 ->pomdes
+            //step 5
+            ['name'=>'BBM Telah Sampai'],// 10 ->supplier
+            ['name'=>'Laporan Ketidaksesuaian'],// 11 ->pomdes
+            ['name'=>'BBM Sampai'],// 12 ->pomdes
         ];
 
         foreach($data as $d){
