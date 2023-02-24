@@ -94,6 +94,9 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('/{id}','App\Http\Controllers\API\InvoicePomdesController@show');
             Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
         });
+        Route::group(['prefix' => 'delivery'], function(){
+            Route::post('/{id}', 'App\Http\Controllers\API\DeliveryController@save');
+        });
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
         Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');
         Route::get('data-table/{steps}','App\Http\Controllers\API\TransactionController@get');
@@ -127,5 +130,4 @@ Route::group(['middleware' => 'auth:api'],function(){
         Route::post('/','App\Http\Controllers\API\FuelController@create');
         Route::put('/{id}','App\Http\Controllers\API\FuelController@update');
     });
-
 });

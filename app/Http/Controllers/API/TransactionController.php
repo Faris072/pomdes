@@ -104,6 +104,7 @@ class TransactionController extends Controller
                 'invoice_pomdes.additional_costs',
                 'fuel_transactions.fuel.supplier',
                 'reject',
+                'delivery.delivery_files',
                 'hindrance.hindrance_files',
                 'discrepancy',
                 'discrepancy.fuel_discrepancies.discrepancy_files',
@@ -153,7 +154,6 @@ class TransactionController extends Controller
 
             if(isset($request->search)){
                 $transactions = $transactions->whereRaw("LOWER(name) LIKE '".strtolower($request->search)."'")
-                    ->orWhereRaw("created_at LIKE '%".$request->search."%'")
                     ->orWhereHas('status', function($q) use ($request){
                         $q->whereRaw("LOWER(name) LIKE '%".strtolower($request->search)."%'");
                     })
@@ -168,7 +168,16 @@ class TransactionController extends Controller
                     });
             }
 
-            $transactions = $this->getDataTable($transactions, $request);
+            if(isset($request->sort_by)){
+                $transactions = $transactions->orderBy($request->sort_by, $request->order_by);
+            }
+
+            if(isset($request->limit)){
+                $transactions = $transactions->paginate($request->limit);
+            }
+            else{
+                $transactions = $transactions->get();
+            }
 
             if(!$transactions){
                 return $this->getResponse([],'Terjadi kesalahan koneksi',500);
@@ -192,6 +201,7 @@ class TransactionController extends Controller
                 'submission_files',
                 'reject',
                 'status',
+                'delivery.delivery_files',
                 'invoice_pomdes.invoice_pomdes_files',
                 'invoice_pomdes.additional_costs',
                 'fuel_transactions.fuel.supplier',

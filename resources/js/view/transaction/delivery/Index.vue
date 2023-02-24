@@ -36,8 +36,8 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Approve Pembayaran</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-truck fa-lg"></i> Kirim BBM</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="modalBukti(context?.id)"><i class="bi bi-camera fa-lg"></i> Bukti Pengiriman</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -220,29 +220,67 @@
             </div>
         </div>
 
+        <div class="modal fade" tabindex="-1" id="modal-bukti">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Form Bukti Pengiriman</h3>
+                                <span class="text-muted">Isi form bukti pengiriman BBM</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body" style="height:93vh; overflow-x:auto;">
+                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="form.loading">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="wrap-form" v-else>
+                            <div class="form">
+                                <label for="estimasi"><h5>Estimasi Sampai : </h5></label>
+                                <br>
+                                <app-datepicker v-model:value="form.estimationDate" format="DD-MM-YYYY" value-type="YYYY-MM-DD" placeholder="Pilih tanggal"></app-datepicker>
+                            </div>
+                            <div class="file my-5">
+                                <div class="dropzone" id="dropzoe-file" style="border:2px dashed gold; background-color:#fffdf1;">
+                                    <div class="dz-message needsclick">
+                                        <i class="bi bi-file-earmark-arrow-up text-warning fs-3x"></i>
+                                        <div class="ms-4">
+                                            <h3 class="fs-5 fw-bolder text-gray-900 mb-1">Drop files here or click to upload.</h3>
+                                            <span class="fs-7 fw-bold text-gray-400">Upload up to 10 files</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning" @click="simpan()">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
+import Edit from '../pengajuan/Edit.vue';
+
     export default {
         data(){
             return {
                 token: localStorage.getItem('pomdes_token'),
-                selectList: {
-                    province: {
-                        loading: false,
-                        list: []
-                    }
-                },
+                selectList: {},
                 form: {
-                    flag: 'tambah',
-                    isEdit: false,
-                    idEdit: '',
-                    data: {
-                        province: '',
-                        province_id: '',
-                        name: '',
-                    }
+                    loading: false,
+                    id: '',
+                    estimationDate: '',
+                    files: ''
                 },
                 detail: {
                     loading: false,
@@ -377,37 +415,63 @@
                         search: ''
                     }
                 },
-                reject: {
-                    idReject: '',
-                    data: {
-                        description: '',
-                    }
-                },
-                reasonReject: {
-                    loading: false,
-                    description: ''
-                },
             }
         },
         mounted(){
             this.getDataTable();
         },
         methods: {
-            tambah(){
+            initDropzone(){
+                if(this.form.files){
+                    this.form.files.destroy();
+                }
+                this.form.files = new Dropzone("#dropzoe-file", {
+                    url: "/",
+                    dictCancelUpload: "Cancel",
+                    maxFilesize: 50,
+                    parallelUploads: 100,
+                    uploadMultiple: true,
+                    maxFiles: 100,
+                    addRemoveLinks: true,
+                    acceptedFiles: ".jpg,.jpeg,.png,.pdf,.xlsx,.doc,.docx",
+                    autoProcessQueue: false,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        Authorization: "Bearer " + localStorage.getItem("pomdes_token"),
+                    },
+                    init: function () {
+                        this.on("error", function (file) {
+                        if (!file.accepted) {
+                            this.removeFile(file);
+                            Swal.fire("Silahkan periksa file Anda lagi");
+                        } else if (file.status == "error") {
+                            this.removeFile(file);
+                            Swal.fire("Terjadi kesalahan koneksi");
+                        }
+                        });
+                            this.on("resetFiles", function (file) {
+                            this.removeAllFiles();
+                        });
+                    },
+                });
+            },
+            modalBukti(id){
+                this.form.loading = true;
                 this.resetModal();
-                $('#modal-form').modal('show');
+                this.form.id = id;
+                this.edit();
+                $('#modal-bukti').modal('show');
             },
             resetModal(){
                 this.form = {
-                    flag: 'tambah',
-                    isEdit: false,
-                    idEdit: '',
-                    data: {
-                        province: '',
-                        province_id: '',
-                        name: '',
-                    }
+                    loading:false,
+                    id: '',
+                    estimationDate: null,
+                    files: this.form.files
                 }
+            },
+            simpan(){
+                console.log(this.form)
             },
             resetDetail(){
                 this.detail = {
@@ -422,23 +486,6 @@
                         invoice: []
                     }
                 }
-            },
-            simpan(){
-                let that = this;
-                this.$pageLoadingShow();
-                this.form.data.province_id = this.form?.data?.province?.id;
-                this.$axios().post(`location/city`, this.form.data)
-                    .then(res => {
-                        $('.modal').modal('hide');
-                        Swal.fire('Berhasil','Data kota berhasil disimpan.','success');
-                        this.getDataTable();
-                    })
-                    .catch(err => {
-                        this.$axiosHandleError(err);
-                    })
-                    .then(() => {
-                        this.$pageLoadingHide();
-                    })
             },
             getDataTable(){
                 let that = this;
@@ -509,6 +556,27 @@
                         });
                     }
                 });
+            },
+            edit(){
+                let that = this;
+                this.form.loading = true;
+                let id = this.form.id;
+                this.$axios().get(`transaction/${id}`)
+                    .then(res => {
+                        let data = res?.data?.data?.delivery;
+                        if(!data){
+                            return true;
+                        }
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.form.loading = false;
+                        setTimeout(function(){
+                            that.initDropzone();
+                        },200);
+                    });
             }
         },
         computed: {

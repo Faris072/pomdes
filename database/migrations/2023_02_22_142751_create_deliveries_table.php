@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
             $table->date('estimation_date');
-            $table->text('text');
+            $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -44,4 +44,8 @@ class Transaction extends Model
     public function reject(){
         return $this->hasOne(Reject::class,'transaction_id','id');
     }
+
+    public function delivery(){
+        return $this->hasOne(Delivery::class, 'transaction_id', 'id');
+    }
 }
