@@ -221,6 +221,12 @@ class TransactionController extends Controller
                 }
             }
 
+            if($transactions->delivery && $transactions->delivery->delivery_files){
+                foreach($transactions->delivery->delivery_files as $file){
+                    $file->link = route('render-delivery-files',$file->id);
+                }
+            }
+
             if(!$transactions){
                 return $this->getResponse([],'Data tidak ditemukan',404);
             }
@@ -617,6 +623,62 @@ class TransactionController extends Controller
             }
 
             return $this->getResponse([],'Approve berhasil.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function send_delivery($id){
+        try{
+            if(auth()->user()->role_id == 1 ||auth()->user()->role_id == 4){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['delivery.delivery_files'])->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan.',404);
+            }
+
+            if($transaction->status_id != 7){
+                return $this->getResponse([],'Akses ditolak. Status tidak sesuai.',403);
+            }
+
+            $edit = $transaction->update(['status_id' => 8]);
+            if(!$edit){
+                return $this->getResponse([],'Transaksi gagal dikirimkan',500);
+            }
+
+            return $this->getResponse(Transaction::with(['delivery.delivery_files'])->find($id),'Transaksi berhasil dikirimkan.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function send_hindrance($id){
+        try{
+            if(auth()->user()->role_id == 1 ||auth()->user()->role_id == 4){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['hindrance.hindrance_files'])->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan.',404);
+            }
+
+            if($transaction->status_id != 8){
+                return $this->getResponse([],'Akses ditolak. Status tidak sesuai.',403);
+            }
+
+            $edit = $transaction->update(['status_id' => 9]);
+            if(!$edit){
+                return $this->getResponse([],'Kendala gagal dikirimkan',500);
+            }
+
+            return $this->getResponse(Transaction::with(['hindrance.hindrance_files'])->find($id),'Transaksi berhasil dikirimkan.');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

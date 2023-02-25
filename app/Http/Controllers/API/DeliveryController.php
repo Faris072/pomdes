@@ -7,6 +7,7 @@ use App\models\Transaction;
 use App\models\Delivery;
 use App\models\DeliveryFiles;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class DeliveryController extends Controller
@@ -81,6 +82,10 @@ class DeliveryController extends Controller
                 'estimation_date' => $request->estimation_date,
                 'description' => $request->description
             ]);
+            if(!$update){
+                return $this->getResponse([],'Data gagal disimpan',500);
+            }
+
             $deleteFile = DeliveryFiles::where('delivery_id',$delivery->id)->delete();
 
             foreach($request->file as $f){
@@ -107,6 +112,16 @@ class DeliveryController extends Controller
             DeliveryFiles::onlyTrashed()->where('delivery_id',$delivery->id)->forceDelete();
             return $this->getResponse(Delivery::with('delivery_files')->find($delivery->id),'Data berhasil disimpan',200);
 
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function render_file($id){
+        try{
+            $file = DeliveryFiles::find($id)->name;
+            return response()->file(Storage::path('delivery/'.$file));
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

@@ -95,7 +95,14 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
         });
         Route::group(['prefix' => 'delivery'], function(){
+            Route::put('send-delivery/{id}', 'App\Http\Controllers\API\TransactionController@send_delivery');
+            Route::get('render-file/{id}', 'App\Http\Controllers\API\DeliveryController@render_file')->name('render-delivery-files');
             Route::post('/{id}', 'App\Http\Controllers\API\DeliveryController@save');
+        });
+        Route::group(['prefix' => 'hindrance'], function(){
+            Route::put('send-hindrance/{id}', 'App\Http\Controllers\API\TransactionController@send_hindrance');
+            Route::get('render-file/{id}', 'App\Http\Controllers\API\HindranceController@render_file')->name('render-hindrance-files');
+            Route::post('/{id}', 'App\Http\Controllers\API\HindranceController@save');
         });
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
         Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');

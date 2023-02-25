@@ -36,8 +36,16 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-truck fa-lg"></i> Kirim BBM</a>
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="modalBukti(context?.id)"><i class="bi bi-camera fa-lg"></i> Bukti Pengiriman</a>
+                                                    <template v-if="context?.status_id == 7">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="sendDelivery(context?.id)"><i class="bi bi-truck fa-lg"></i> Kirim BBM</a>
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="modalBukti(context?.id)"><i class="bi bi-camera fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Bukti Pengiriman</a>
+                                                    </template>
+                                                    <template v-if="context?.status_id == 8">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="sendHindrance(context?.id)"><i class="bi bi-send-exclamation fa-lg"></i> Kirim Laporan Kendala</a>
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="modalKendala(context?.id)"><i class="bi bi-exclamation-triangle fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Laporan Kendala</a>
+                                                    </template>
                                                 </div>
                                             </td>
                                         </tr>
@@ -97,6 +105,14 @@
                                 </div>
                                 <div class="row my-3">
                                     <div class="col-md-4">
+                                        <h5 class="text-muted">Estimasi Sampai</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ detail?.delivery?.estimation_date || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
                                         <h5 class="text-muted">File Pendukung</h5>
                                     </div>
                                     <div class="col-md-8">
@@ -119,13 +135,37 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row my-3">
+                                <div class="row my-3" v-if="detail.data.invoice?.invoice_pomdes_files?.length">
                                     <div class="col-md-4">
                                         <h5 class="text-muted">Lampiran File Tagihan</h5>
                                     </div>
                                     <div class="col-md-8">
                                         <div class="row mb-5">
                                             <div class="col-md-6 my-3" v-for="(context, index) in detail.data.invoice?.invoice_pomdes_files">
+                                                <div class="card card-file">
+                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                            <div class="icon-file">
+                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                            </div>
+                                                            <div class="info-file">
+                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row my-3" v-if="detail.data.delivery?.delivery_files?.length">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Lampiran File Bukti Pengiriman</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row mb-5">
+                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.delivery?.delivery_files">
                                                 <div class="card card-file">
                                                     <a :href="`${context?.link}?token=${token}`" :download="context?.name">
                                                         <div class="card-body p-2 d-flex align-items-center">
@@ -221,7 +261,7 @@
         </div>
 
         <div class="modal fade" tabindex="-1" id="modal-bukti">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <div class="m-auto" style="width:100%;">
@@ -235,7 +275,7 @@
                         <!--end::Close-->
                     </div>
 
-                    <div class="modal-body" style="height:93vh; overflow-x:auto;">
+                    <div class="modal-body">
                         <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="form.loading">
                             <app-loader></app-loader>
                         </div>
@@ -244,6 +284,30 @@
                                 <label for="estimasi"><h5>Estimasi Sampai : </h5></label>
                                 <br>
                                 <app-datepicker v-model:value="form.estimationDate" format="DD-MM-YYYY" value-type="YYYY-MM-DD" placeholder="Pilih tanggal"></app-datepicker>
+                                <br><br>
+                                <label for="deskripsi"><h5>Deskripsi : </h5></label>
+                                <textarea v-model="form.description" id="deskripsi" class="form-control" rows="3" placeholder="Isikan deskripsi"></textarea>
+                            </div>
+                            <br>
+                            <div class="show-files" v-if="form.showFiles?.length">
+                                <h5>File Terlampir : </h5>
+                                <div class="row my-3">
+                                    <div class="col-md-6 my-3" v-for="(context, index) in form.showFiles">
+                                        <div class="card card-file">
+                                            <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                <div class="card-body p-2 d-flex align-items-center">
+                                                    <div class="icon-file">
+                                                        <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                    </div>
+                                                    <div class="info-file">
+                                                        <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                        <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="file my-5">
                                 <div class="dropzone" id="dropzoe-file" style="border:2px dashed gold; background-color:#fffdf1;">
@@ -265,6 +329,72 @@
             </div>
         </div>
 
+        <div class="modal fade" tabindex="-1" id="modal-kendala">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Form Kendala Pengiriman</h3>
+                                <span class="text-muted">Isi form berikut jika ada kendala saat pengiriman.</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="form.loading">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="wrap-form" v-else>
+                            <div class="form">
+                                <label for="estimasi"><h5>Deskripsi : </h5></label>
+                                <br>
+                                <app-datepicker v-model:value="form.estimationDate" format="DD-MM-YYYY" value-type="YYYY-MM-DD" placeholder="Pilih tanggal"></app-datepicker>
+                            </div>
+                            <br><br>
+                            <div class="show-files" v-if="form.showFiles?.length">
+                                <h5>File Terlampir : </h5>
+                                <div class="row my-3">
+                                    <div class="col-md-6 my-3" v-for="(context, index) in form.showFiles">
+                                        <div class="card card-file">
+                                            <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                <div class="card-body p-2 d-flex align-items-center">
+                                                    <div class="icon-file">
+                                                        <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                    </div>
+                                                    <div class="info-file">
+                                                        <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                        <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file my-5">
+                                <div class="dropzone" id="dropzoe-kendala" style="border:2px dashed gold; background-color:#fffdf1;">
+                                    <div class="dz-message needsclick">
+                                        <i class="bi bi-file-earmark-arrow-up text-warning fs-3x"></i>
+                                        <div class="ms-4">
+                                            <h3 class="fs-5 fw-bolder text-gray-900 mb-1">Drop files here or click to upload.</h3>
+                                            <span class="fs-7 fw-bold text-gray-400">Upload up to 10 files</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning" @click="simpanKendala()">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -280,6 +410,8 @@ import Edit from '../pengajuan/Edit.vue';
                     loading: false,
                     id: '',
                     estimationDate: '',
+                    description: '',
+                    showFiles: [],
                     files: ''
                 },
                 detail: {
@@ -291,7 +423,8 @@ import Edit from '../pengajuan/Edit.vue';
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice:[]
+                        invoice:[],
+                        delivery: []
                     }
                 },
                 tableConfig: {
@@ -415,6 +548,13 @@ import Edit from '../pengajuan/Edit.vue';
                         search: ''
                     }
                 },
+                hindrance: {
+                    loading: false,
+                    id: '',
+                    description: '',
+                    showFiles: [],
+                    files: ''
+                },
             }
         },
         mounted(){
@@ -467,11 +607,29 @@ import Edit from '../pengajuan/Edit.vue';
                     loading:false,
                     id: '',
                     estimationDate: null,
+                    description: '',
+                    showFiles: [],
                     files: this.form.files
                 }
             },
             simpan(){
-                console.log(this.form)
+                let that = this;
+                this.form.files.on("sending",function(file,xhr,data){
+                    data.append("estimation_date",that.form.estimationDate);
+                    data.append("description",that.form.description);
+                });
+                this.form.files.on('processing', function(){
+                    this.options.url = urlApi+`transaction/delivery/${that.form.id}`;
+                });
+                this.$pageLoadingShow();
+                this.form.files.processQueue();
+                this.form.files.on('success', function(){
+                    that.$pageLoadingHide();
+                    $('.modal').modal('hide');
+                    Swal.fire('Berhasil', 'Data pengiriman telah disimpan.','success').then(()=>{
+                        that.getDataTable();
+                    });
+                });
             },
             resetDetail(){
                 this.detail = {
@@ -483,7 +641,8 @@ import Edit from '../pengajuan/Edit.vue';
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice: []
+                        invoice: [],
+                        delivery: []
                     }
                 }
             },
@@ -522,7 +681,9 @@ import Edit from '../pengajuan/Edit.vue';
                             fuel: data?.fuel_transactions,
                             files: data?.submission_files,
                             invoice: data?.invoice_pomdes,
+                            delivery: data?.delivery,
                         };
+                        console.log(this.detail.data);
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
@@ -531,21 +692,21 @@ import Edit from '../pengajuan/Edit.vue';
                         this.detail.loading = false;
                     });
             },
-            approve(id){
+            sendDelivery(id){
                 Swal.fire({
-                    title: `Setujui pembayaran transaksi yang dipilih?`,
-                    html: `Transaksi akan dianggap sudah melakukan pembayaran dan akan diteruskan ke pengiriman.`,
+                    title: `Kirim transaksi yang dipilih?`,
+                    html: `Status transaksi akan diubah ke <b>dalam pengiriman</b> dan tidak dapat diubah kembali.`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Setujui',
+                    confirmButtonText: 'Kirim',
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#41FF1C'
                 }).then(result => {
                     if(result.isConfirmed){
                     this.$pageLoadingShow();
-                    this.$axios().put(`transaction/approve-payment/${id}`)
+                    this.$axios().put(`transaction/delivery/send-delivery/${id}`)
                         .then(res => {
-                            Swal.fire('Berhasil', 'Pengajuan berhasil disetujui','success');
+                            Swal.fire('Berhasil', 'Status transaksi berhasil diubah ke dalam pengiriman','success');
                             this.getDataTable();
                         })
                         .catch(err =>{
@@ -567,6 +728,10 @@ import Edit from '../pengajuan/Edit.vue';
                         if(!data){
                             return true;
                         }
+
+                        this.form.estimationDate = data?.estimation_date;
+                        this.form.description = data?.description;
+                        this.form.showFiles = data?.delivery_files;
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
@@ -577,7 +742,125 @@ import Edit from '../pengajuan/Edit.vue';
                             that.initDropzone();
                         },200);
                     });
-            }
+            },
+            initDropzoneKendala(){
+                if(this.hindrance.files){
+                    this.hindrance.files.destroy();
+                }
+                this.hindrance.files = new Dropzone("#dropzoe-kendala", {
+                    url: "/",
+                    dictCancelUpload: "Cancel",
+                    maxFilesize: 50,
+                    parallelUploads: 100,
+                    uploadMultiple: true,
+                    maxFiles: 100,
+                    addRemoveLinks: true,
+                    acceptedFiles: ".jpg,.jpeg,.png,.pdf,.xlsx,.doc,.docx",
+                    autoProcessQueue: false,
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                        Authorization: "Bearer " + localStorage.getItem("pomdes_token"),
+                    },
+                    init: function () {
+                        this.on("error", function (file) {
+                        if (!file.accepted) {
+                            this.removeFile(file);
+                            Swal.fire("Silahkan periksa file Anda lagi");
+                        } else if (file.status == "error") {
+                            this.removeFile(file);
+                            Swal.fire("Terjadi kesalahan koneksi");
+                        }
+                        });
+                            this.on("resetFiles", function (file) {
+                            this.removeAllFiles();
+                        });
+                    },
+                });
+            },
+            resetModalKendala(){
+                this.hindrance = {
+                    loading:false,
+                    id: '',
+                    description: null,
+                    showFiles: [],
+                    files: this.hindrance.files
+                }
+            },
+            modalKendala(id){
+                this.hindrance.loading = true;
+                this.resetModalKendala();
+                this.hindrance.id = id;
+                this.editKendala();
+                $('#modal-kendala').modal('show');
+            },
+            editKendala(){
+                let that = this;
+                this.hindrance.loading = true;
+                let id = this.hindrance.id;
+                this.$axios().get(`transaction/${id}`)
+                    .then(res => {
+                        let data = res?.data?.data?.hindrance;
+                        if(!data){
+                            return true;
+                        }
+
+                        this.hindrance.description = data?.description;
+                        this.hindrance.showFiles = data?.hindrance_files;
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.hindrance.loading = false;
+                        setTimeout(function(){
+                            that.initDropzoneKendala();
+                        },200);
+                    });
+            },
+            simpanKendala(){
+                let that = this;
+                this.hindrance.files.on("sending",function(file,xhr,data){
+                    data.append("description",that.hindrance.description);
+                });
+                this.hindrance.files.on('processing', function(){
+                    this.options.url = urlApi+`transaction/hindrance/${that.hindrance.id}`;
+                });
+                this.$pageLoadingShow();
+                this.hindrance.files.processQueue();
+                this.hindrance.files.on('success', function(){
+                    that.$pageLoadingHide();
+                    $('.modal').modal('hide');
+                    Swal.fire('Berhasil', 'Laporan kendala berhasil disimpan.','success').then(()=>{
+                        that.getDataTableKendala();
+                    });
+                });
+            },
+            sendHindrance(id){
+                Swal.fire({
+                    title: `Kirim kendala untuk transaksi yang dipilih?`,
+                    html: `Status transaksi akan diubah ke <b>kendala pengiriman</b> dan tidak dapat diubah kembali.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Kirim',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#41FF1C'
+                }).then(result => {
+                    if(result.isConfirmed){
+                    this.$pageLoadingShow();
+                    this.$axios().put(`transaction/delivery/send-delivery/${id}`)
+                        .then(res => {
+                            Swal.fire('Berhasil', 'Status transaksi berhasil diubah ke kendala','success');
+                            this.getDataTable();
+                        })
+                        .catch(err =>{
+                            this.$axiosHandleError(err);
+                        })
+                        .then(()=>{
+                            this.$pageLoadingHide();
+                        });
+                    }
+                });
+            },
         },
         computed: {
             countPriceBbm(){
