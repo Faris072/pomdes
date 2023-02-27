@@ -48,4 +48,8 @@ class Transaction extends Model
     public function delivery(){
         return $this->hasOne(Delivery::class, 'transaction_id', 'id');
     }
+
+    public function log_approveds(){
+        return $this->hasMany(LogApproved::class,'transaction_id','id');
+    }
 }

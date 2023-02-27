@@ -39,6 +39,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Fuel::class,'user_id', 'id');
     }
 
+    public function log_approveds(){
+        return $this->hasMany(LogApproved::class,'user_id','id');
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

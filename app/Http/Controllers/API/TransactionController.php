@@ -106,6 +106,7 @@ class TransactionController extends Controller
                 'reject',
                 'delivery.delivery_files',
                 'hindrance.hindrance_files',
+                'log_approveds',
                 'discrepancy',
                 'discrepancy.fuel_discrepancies.discrepancy_files',
                 'discrepancy.fuel_discrepancies.discrepancy_type',
@@ -149,6 +150,11 @@ class TransactionController extends Controller
                     $transactions = $transactions->where('status_id',7)
                     ->orWhere('status_id',8)
                     ->orWhere('status_id',9);
+                    break;
+                case 5://arrived (sampai)
+                    $transactions = $transactions->where('status_id',10)
+                    ->orWhere('status_id',11)
+                    ->orWhere('status_id',12);
                     break;
             }
 
@@ -201,6 +207,7 @@ class TransactionController extends Controller
                 'submission_files',
                 'reject',
                 'status',
+                'log_approveds',
                 'delivery.delivery_files',
                 'invoice_pomdes.invoice_pomdes_files',
                 'invoice_pomdes.additional_costs',
@@ -224,6 +231,12 @@ class TransactionController extends Controller
             if($transactions->delivery && $transactions->delivery->delivery_files){
                 foreach($transactions->delivery->delivery_files as $file){
                     $file->link = route('render-delivery-files',$file->id);
+                }
+            }
+
+            if($transactions->hindrance && $transactions->hindrance->hindrance_files){
+                foreach($transactions->hindrance->hindrance_files as $file){
+                    $file->link = route('render-hindrance-files',$file->id);
                 }
             }
 
@@ -674,6 +687,35 @@ class TransactionController extends Controller
             }
 
             $edit = $transaction->update(['status_id' => 9]);
+            if(!$edit){
+                return $this->getResponse([],'Kendala gagal dikirimkan',500);
+            }
+
+            return $this->getResponse(Transaction::with(['hindrance.hindrance_files'])->find($id),'Transaksi berhasil dikirimkan.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function set_arrived(Request $request, $id){
+        try{
+            if(auth()->user()->role_id == 1 ||auth()->user()->role_id == 4){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with([])->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan.',404);
+            }
+
+            if($transaction->status_id == 8 || $transaction->status_id == 9){}
+            else{
+                return $this->getResponse([],'Akses ditolak. Status tidak sesuai.',403);
+            }
+
+            $edit = $transaction->update(['status_id' => 10]);
             if(!$edit){
                 return $this->getResponse([],'Kendala gagal dikirimkan',500);
             }

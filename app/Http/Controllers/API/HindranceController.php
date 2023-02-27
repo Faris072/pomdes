@@ -45,8 +45,50 @@ class HindranceController extends Controller
                     return $this->getResponse([],'Data gagal disimpan',500);
                 }
 
-                $deleteFile = HindranceFiles::where('hindrance_id',$hindrance->id)->delete();
 
+                if(isset($request->file)){
+                    $deleteFile = HindranceFiles::where('hindrance_id',$hindrance->id)->delete();
+                    foreach($request->file as $f){
+                        $data = (object) [
+                            'original' => $f,
+                            'hindrance_id' => $hindrance->id,
+                            'name' => $f->getClientOriginalName(),
+                            'extension' => $f->getClientOriginalExtension(),
+                            'is_image' => substr($f->getMimeType(), 0, 5) == 'image' ? true : false,
+                            'size' => $f->getSize(),
+                        ];
+                        $data->name = date('now').rand('10000','99999').'.'.$data->extension;
+
+                        $file = HindranceFiles::create((array) $data);
+                        if(!$file){
+                            HindranceFiles::where('hindrance_id',$hindrance->id)->forceDelete();
+                            HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->restore();
+                            return $this->getResponse([],'File gagal disimpan',500);
+                        }
+
+                        $data->original->storeAs('hindrance', $data->name);
+                    }
+
+                    HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->delete();
+                }
+                return $this->getResponse(Hindrance::with('hindrance_files')->find($hindrance->id),'Data berhasil disimpan',200);
+            }
+
+            $hindrance = Hindrance::firstWhere('transaction_id',$id);
+            if(!$hindrance){
+                return $this->getResponse([],'Data tidak ditemukan',500);
+            }
+
+            $update = $hindrance->update([
+                'description' => $request->description
+            ]);
+            if(!$update){
+                return $this->getResponse([],'Data gagal disimpan',500);
+            }
+
+
+            if(isset($request->file)){
+                $deleteFile = HindranceFiles::where('hindrance_id',$hindrance->id)->delete();
                 foreach($request->file as $f){
                     $data = (object) [
                         'original' => $f,
@@ -68,46 +110,8 @@ class HindranceController extends Controller
                     $data->original->storeAs('hindrance', $data->name);
                 }
 
-                HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->delete();
-                return $this->getResponse(Hindrance::with('hindrance_files')->find($hindrance->id),'Data berhasil disimpan',200);
+                HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->forceDelete();
             }
-
-            $hindrance = Hindrance::firstWhere('transaction_id',$id);
-            if(!$hindrance){
-                return $this->getResponse([],'Data tidak ditemukan',500);
-            }
-
-            $update = $hindrance->update([
-                'description' => $request->description
-            ]);
-            if(!$update){
-                return $this->getResponse([],'Data gagal disimpan',500);
-            }
-
-            $deleteFile = HindranceFiles::where('hindrance_id',$hindrance->id)->delete();
-
-            foreach($request->file as $f){
-                $data = (object) [
-                    'original' => $f,
-                    'hindrance_id' => $hindrance->id,
-                    'name' => $f->getClientOriginalName(),
-                    'extension' => $f->getClientOriginalExtension(),
-                    'is_image' => substr($f->getMimeType(), 0, 5) == 'image' ? true : false,
-                    'size' => $f->getSize(),
-                ];
-                $data->name = date('now').rand('10000','99999').'.'.$data->extension;
-
-                $file = HindranceFiles::create((array) $data);
-                if(!$file){
-                    HindranceFiles::where('hindrance_id',$hindrance->id)->forceDelete();
-                    HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->restore();
-                    return $this->getResponse([],'File gagal disimpan',500);
-                }
-
-                $data->original->storeAs('hindrance', $data->name);
-            }
-
-            HindranceFiles::onlyTrashed()->where('hindrance_id',$hindrance->id)->forceDelete();
             return $this->getResponse(Hindrance::with('hindrance_files')->find($hindrance->id),'Data berhasil disimpan',200);
 
         }

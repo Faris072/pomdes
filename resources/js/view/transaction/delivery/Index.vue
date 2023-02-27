@@ -108,7 +108,15 @@
                                         <h5 class="text-muted">Estimasi Sampai</h5>
                                     </div>
                                     <div class="col-md-8">
-                                        <h5>{{ detail?.delivery?.estimation_date || '-' }}</h5>
+                                        <h5>{{ $moment(detail?.data?.delivery?.estimation_date).format('DD-MM-YYYY') || '-' }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row my-3">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Deskripsi Pengiriman</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>{{ detail?.data?.delivery?.description || '-' }}</h5>
                                     </div>
                                 </div>
                                 <div class="row my-3">
@@ -345,20 +353,20 @@
                     </div>
 
                     <div class="modal-body">
-                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="form.loading">
+                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="hindrance.loading">
                             <app-loader></app-loader>
                         </div>
                         <div class="wrap-form" v-else>
                             <div class="form">
                                 <label for="estimasi"><h5>Deskripsi : </h5></label>
                                 <br>
-                                <app-datepicker v-model:value="form.estimationDate" format="DD-MM-YYYY" value-type="YYYY-MM-DD" placeholder="Pilih tanggal"></app-datepicker>
+                                <textarea v-model="hindrance.description" rows="3" class="form-control" placeholder="Masukkan deskripsi"></textarea>
                             </div>
                             <br><br>
-                            <div class="show-files" v-if="form.showFiles?.length">
+                            <div class="show-files" v-if="hindrance.showFiles?.length">
                                 <h5>File Terlampir : </h5>
                                 <div class="row my-3">
-                                    <div class="col-md-6 my-3" v-for="(context, index) in form.showFiles">
+                                    <div class="col-md-6 my-3" v-for="(context, index) in hindrance.showFiles">
                                         <div class="card card-file">
                                             <a :href="`${context?.link}?token=${token}`" :download="context?.name">
                                                 <div class="card-body p-2 d-flex align-items-center">
@@ -614,22 +622,44 @@ import Edit from '../pengajuan/Edit.vue';
             },
             simpan(){
                 let that = this;
-                this.form.files.on("sending",function(file,xhr,data){
-                    data.append("estimation_date",that.form.estimationDate);
-                    data.append("description",that.form.description);
-                });
-                this.form.files.on('processing', function(){
-                    this.options.url = urlApi+`transaction/delivery/${that.form.id}`;
-                });
-                this.$pageLoadingShow();
-                this.form.files.processQueue();
-                this.form.files.on('success', function(){
-                    that.$pageLoadingHide();
-                    $('.modal').modal('hide');
-                    Swal.fire('Berhasil', 'Data pengiriman telah disimpan.','success').then(()=>{
-                        that.getDataTable();
+                if(this?.form?.files?.files?.length > 0){
+                    this.form.files.on("sending",function(file,xhr,data){
+                        data.append("estimation_date",that.form.estimationDate);
+                        data.append("description",that.form.description);
                     });
-                });
+                    this.form.files.on('processing', function(){
+                        this.options.url = urlApi+`transaction/delivery/${that.form.id}`;
+                    });
+                    this.$pageLoadingShow();
+                    this.form.files.processQueue();
+                    this.form.files.on('success', function(){
+                        that.$pageLoadingHide();
+                        $('.modal').modal('hide');
+                        that.getDataTable();
+                        Swal.fire('Berhasil', 'Data pengiriman telah disimpan.','success').then(()=>{
+                        });
+                    });
+                }
+                else{
+                    let data = {
+                        estimation_date: this.form.estimationDate,
+                        description: this.form.description
+                    };
+                    this.$pageLoadingShow();
+                    this.$axios().post(`transaction/delivery/${this.form.id}`, data)
+                        .then(res => {
+                            $('.modal').modal('hide');
+                            that.getDataTable();
+                            Swal.fire('Berhasil', 'Data pengiriman telah disimpan.','success').then(()=>{
+                            });
+                        })
+                        .catch(err => {
+                            this.$axiosHandleError(err);
+                        })
+                        .then(() => {
+                            this.$pageLoadingHide();
+                        });
+                }
             },
             resetDetail(){
                 this.detail = {
@@ -819,21 +849,42 @@ import Edit from '../pengajuan/Edit.vue';
             },
             simpanKendala(){
                 let that = this;
-                this.hindrance.files.on("sending",function(file,xhr,data){
-                    data.append("description",that.hindrance.description);
-                });
-                this.hindrance.files.on('processing', function(){
-                    this.options.url = urlApi+`transaction/hindrance/${that.hindrance.id}`;
-                });
-                this.$pageLoadingShow();
-                this.hindrance.files.processQueue();
-                this.hindrance.files.on('success', function(){
-                    that.$pageLoadingHide();
-                    $('.modal').modal('hide');
-                    Swal.fire('Berhasil', 'Laporan kendala berhasil disimpan.','success').then(()=>{
-                        that.getDataTableKendala();
+                if(this?.hindrance?.files?.files?.length > 0){
+                    this.hindrance.files.on("sending",function(file,xhr,data){
+                        data.append("description",that.hindrance.description);
                     });
-                });
+                    this.hindrance.files.on('processing', function(){
+                        this.options.url = urlApi+`transaction/hindrance/${that.hindrance.id}`;
+                    });
+                    this.$pageLoadingShow();
+                    this.hindrance.files.processQueue();
+                    this.hindrance.files.on('success', function(){
+                        that.$pageLoadingHide();
+                        $('.modal').modal('hide');
+                        Swal.fire('Berhasil', 'Laporan kendala berhasil disimpan.','success').then(()=>{
+                            that.getDataTableKendala();
+                        });
+                    });
+                }
+                else{
+                    let data = {
+                        description: this.hindrance.description
+                    };
+                    this.$pageLoadingShow();
+                    this.$axios().post(`transaction/hindrance/${this.form.id}`, data)
+                        .then(res => {
+                            $('.modal').modal('hide');
+                            Swal.fire('Berhasil', 'Data kendala berhasil dikirimkan.','success').then(()=>{
+                                that.getDataTable();
+                            });
+                        })
+                        .catch(err => {
+                            this.$axiosHandleError(err);
+                        })
+                        .then(() => {
+                            this.$pageLoadingHide();
+                        });
+                }
             },
             sendHindrance(id){
                 Swal.fire({
@@ -847,7 +898,7 @@ import Edit from '../pengajuan/Edit.vue';
                 }).then(result => {
                     if(result.isConfirmed){
                     this.$pageLoadingShow();
-                    this.$axios().put(`transaction/delivery/send-delivery/${id}`)
+                    this.$axios().put(`transaction/hindrance/send-hindrance/${id}`)
                         .then(res => {
                             Swal.fire('Berhasil', 'Status transaksi berhasil diubah ke kendala','success');
                             this.getDataTable();

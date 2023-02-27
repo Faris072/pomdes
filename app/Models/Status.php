@@ -17,4 +17,7 @@ class Status extends Model
         return $this->hasMany(Transaction::class, 'status_id','id');
     }
 
+    public function log_approveds(){
+        return $this->hasMany(LogApproved::class,'status_id','id');
+    }
 }
