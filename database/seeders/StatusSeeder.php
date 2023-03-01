@@ -34,9 +34,9 @@ class StatusSeeder extends Seeder
             ['name'=>'Kendala Pengiriman'],// 9
 
             //step 5
-            ['name'=>'BBM Telah Sampai'],// 10 ->supplier
+            ['name'=>'Menunggu Konfirmasi Sampai'],// 10 ->supplier
             ['name'=>'Laporan Ketidaksesuaian'],// 11 ->pomdes
-            ['name'=>'BBM Sampai'],// 12 ->pomdes
+            ['name'=>'Selesai'],// 12 ->pomdes
         ];
 
         foreach($data as $d){

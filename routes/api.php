@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::delete('/{id}','App\Http\Controllers\API\InvoicePomdesController@destroy');
         });
         Route::group(['prefix' => 'delivery'], function(){
+            Route::put('set-arrived/{id}', 'App\Http\Controllers\API\TransactionController@set_arrived');
             Route::put('send-delivery/{id}', 'App\Http\Controllers\API\TransactionController@send_delivery');
             Route::get('render-file/{id}', 'App\Http\Controllers\API\DeliveryController@render_file')->name('render-delivery-files');
             Route::post('/{id}', 'App\Http\Controllers\API\DeliveryController@save');
@@ -104,6 +105,7 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('render-file/{id}', 'App\Http\Controllers\API\HindranceController@render_file')->name('render-hindrance-files');
             Route::post('/{id}', 'App\Http\Controllers\API\HindranceController@save');
         });
+        Route::put('finish/{id}', 'App\Http\Controllers\Api\TransactionController@finish');
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
         Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');
         Route::get('data-table/{steps}','App\Http\Controllers\API\TransactionController@get');

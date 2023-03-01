@@ -30,6 +30,10 @@ import PembayaranTransaksi from '@/view/transaction/payment/Index.vue';
 // pengiriman
 import PengirimanTransaksi from '@/view/transaction/delivery/Index.vue';
 
+//arrived
+import BBMSampaiTransaksi from '@/view/transaction/arrived/Index.vue';
+import BBMSampaiKetidaksesuaianTransaksi from '@/view/transaction/arrived/Discrepancy.vue';
+
 let routes = [
     {
         path: '/login',
@@ -106,6 +110,16 @@ let routes = [
                 path: 'transaksi/pengiriman',
                 name: 't-pengiriman',
                 component: PengirimanTransaksi,
+            },
+            {
+                path: 'transaksi/sampai',
+                name: 't-sampai',
+                component: BBMSampaiTransaksi,
+            },
+            {
+                path: 'transaksi/sampai/ketidaksesuaian/:id',
+                name: 't-sampai-ketidaksesuaian',
+                component: BBMSampaiKetidaksesuaianTransaksi,
             },
         ]
     },

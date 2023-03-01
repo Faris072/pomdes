@@ -9,6 +9,7 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\Reject;
 use App\Http\Controllers\API\FuelTransactionController;
+use App\Models\LogApproved;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -472,6 +473,8 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Pengajuan transaksi gagal disetujui',500);
             }
 
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Setujui pengajuan BBM');
+
             return $this->getResponse(Transaction::find($id),'Pengajuan transaksi berhasil disetujui',200);
         }
         catch(\Exception $e){
@@ -608,6 +611,8 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Penerbitan gagal. Silahkan coba kembali nanti..',500);
             }
 
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Penerbitan tagihan');
+
             return $this->getResponse([],'Penerbitan berhasil.');
         }
         catch(\Exception $e){
@@ -635,6 +640,8 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Approve gagal. Silahkan coba kembali nanti..',500);
             }
 
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Approve pembayaran');
+
             return $this->getResponse([],'Approve berhasil.');
         }
         catch(\Exception $e){
@@ -649,7 +656,7 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Akses ditolak',403);
             }
 
-            $transaction = Transaction::with(['delivery.delivery_files'])->find($id);
+            $transaction = Transaction::with(['delivery.delivery_files','status'])->find($id);
             if(!$transaction){
                 return $this->getResponse([],'Transaksi tidak ditemukan.',404);
             }
@@ -662,6 +669,8 @@ class TransactionController extends Controller
             if(!$edit){
                 return $this->getResponse([],'Transaksi gagal dikirimkan',500);
             }
+
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Kirim BBM');
 
             return $this->getResponse(Transaction::with(['delivery.delivery_files'])->find($id),'Transaksi berhasil dikirimkan.');
         }
@@ -698,7 +707,7 @@ class TransactionController extends Controller
         }
     }
 
-    public function set_arrived(Request $request, $id){
+    public function set_arrived($id){
         try{
             if(auth()->user()->role_id == 1 ||auth()->user()->role_id == 4){}
             else{
@@ -720,7 +729,54 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Kendala gagal dikirimkan',500);
             }
 
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Set BBM Sampai');
+
             return $this->getResponse(Transaction::with(['hindrance.hindrance_files'])->find($id),'Transaksi berhasil dikirimkan.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function finish($id){
+        try{
+            if(auth()->user()->role_id == 1 || auth()->user()->role_id == 3){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['status'])->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            if($transaction->status_id == 10 || $transaction->status_id == 11){}
+            else{
+                return $this->getResponse([],'Akses ditolak, status tidak sesuai',403);
+            }
+
+            $set = $transaction->update(['status_id' => 12]);
+            if(!$set){
+                return $this->getResponse([],'Set finish gagal',500);
+            }
+
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Transaksi selesai');
+
+            return $this->getResponse(Transaction::with(['status'])->find($id),'Transaksi berhasil di set selesai',200);
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function store_log_approved($id, $user_id, $status_id, $name){
+        try{
+            LogApproved::create([
+                'transaction_id' => $id,
+                'user_id' => $user_id,
+                'status_id' => $status_id,
+                'name' => $name,
+            ]);
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

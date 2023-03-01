@@ -42,9 +42,13 @@
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="modalBukti(context?.id)"><i class="bi bi-camera fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Bukti Pengiriman</a>
                                                     </template>
                                                     <template v-if="context?.status_id == 8">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="setArrived(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Set Telah Sampai</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="sendHindrance(context?.id)"><i class="bi bi-send-exclamation fa-lg"></i> Kirim Laporan Kendala</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="modalKendala(context?.id)"><i class="bi bi-exclamation-triangle fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Laporan Kendala</a>
+                                                    </template>
+                                                    <template v-if="context?.status_id == 9">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="setArrived(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Set Telah Sampai</a>
                                                     </template>
                                                 </div>
                                             </td>
@@ -912,6 +916,32 @@ import Edit from '../pengajuan/Edit.vue';
                     }
                 });
             },
+            setArrived(id){
+                Swal.fire({
+                    title: `Ubah status ke sudah sampai untuk transaksi yang dipilih?`,
+                    html: `Status transaksi akan diubah ke <b>BBM Telah Sampai</b> dan tidak dapat diubah kembali.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oke',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#41FF1C'
+                }).then(result => {
+                    if(result.isConfirmed){
+                    this.$pageLoadingShow();
+                    this.$axios().put(`transaction/delivery/set-arrived/${id}`)
+                        .then(res => {
+                            Swal.fire('Berhasil', 'Status transaksi berhasil diubah ke BBM telah sampai','success');
+                            this.getDataTable();
+                        })
+                        .catch(err =>{
+                            this.$axiosHandleError(err);
+                        })
+                        .then(()=>{
+                            this.$pageLoadingHide();
+                        });
+                    }
+                });
+            }
         },
         computed: {
             countPriceBbm(){

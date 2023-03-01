@@ -114,6 +114,12 @@
                                 <span class="menu-title">Pengiriman</span>
                             </a>
                         </div>
+                        <div class="menu-item">
+                            <a :class="`menu-link ${pageActive(['t-sampai','t-sampai-ketidaksesuaian'])}`" href="javascript:;" @click="this.$router.push({name: 't-sampai'})">
+                                <span class="menu-icon"><i class="bi bi-flag-fill fa-lg"></i></span>
+                                <span class="menu-title">BBM Telah Sampai</span>
+                            </a>
+                        </div>
                     </div>
                     <!--end::Menu-->
                 </div>
