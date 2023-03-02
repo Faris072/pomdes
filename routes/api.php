@@ -105,6 +105,9 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::get('render-file/{id}', 'App\Http\Controllers\API\HindranceController@render_file')->name('render-hindrance-files');
             Route::post('/{id}', 'App\Http\Controllers\API\HindranceController@save');
         });
+        Route::group(['prefix' => 'discrepancy'], function(){
+            Route::get('select-discrepancy-type', 'App\Http\Controllers\API\DiscrepancyController@select_discrepancy_type');
+        });
         Route::put('finish/{id}', 'App\Http\Controllers\Api\TransactionController@finish');
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
         Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');

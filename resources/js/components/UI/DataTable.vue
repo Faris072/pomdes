@@ -1,6 +1,9 @@
 <template>
     <div style="overflow-x:auto;">
-        <input type="search" class="form-control form-control-solid" v-model="searchValue" @input="search()" style="width:250px;" placeholder="Search" autocomplete="off">
+        <div class="d-flex justify-content-between align-items-center">
+            <input type="search" class="form-control form-control-solid" v-model="searchValue" @input="search()" style="width:250px;" placeholder="Search" autocomplete="off">
+            <slot name="rightSearch"></slot>
+        </div>
         <table class="table table-hover my-4 data-table-faris" style="table-layout: fixed;">
             <thead>
                 <tr>
@@ -123,15 +126,23 @@
 <style>
     table.data-table-faris tr{
         border-bottom:1px dashed lightgray !important;
-        padding:20px !important;
+        padding:10px !important;
+        padding-top:15px !important;
+        padding-bottom:15px !important;
     }
     table.data-table-faris tr td, table.data-table-faris tr th{
         border:none;
-        padding:20px !important;
+        padding:10px !important;
+        padding-top:15px !important;
+        padding-bottom:15px !important;
     }
     @media screen and (max-width: 700px){
         table.table{
             width:1000px;
         }
     }
+    /* Coloring paginate */
+    /* .page-item.active a{
+        background-color: #D35D3D !important;
+    } */
 </style>

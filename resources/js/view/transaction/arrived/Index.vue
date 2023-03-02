@@ -36,7 +36,7 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)"><i class="bi bi-check2-circle fa-lg me-2" v-if="context?.status_id == 10 || context?.status_id == 11"></i> Konfirmasi Sampai</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)" v-if="context?.status_id == 10 || context?.status_id == 11"><i class="bi bi-check2-circle fa-lg me-2"></i> Konfirmasi Sampai</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `sampai/ketidaksesuaian/${context?.id}`})" v-if="context?.status?.id == 10"><i class="bi bi-clipboard2-x fa-lg"></i> Laporkan Ketidaksesuaian</a>
                                                 </div>

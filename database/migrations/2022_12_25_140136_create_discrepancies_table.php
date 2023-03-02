@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('report_name');
             $table->string('report_description');
+            $table->bigInteger('price');
+            $table->bigInteger('volume');
             $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();

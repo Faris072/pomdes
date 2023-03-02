@@ -31,7 +31,7 @@
                 </ul>
             </div>
             <div :class="`select-multiple ${disabled ? 'disabled' : ''}`" data-bs-toggle="dropdown" v-else>
-                <div :class="`input-select form-select`" :disabled="disabled" @click="$emit('get-options', searchValue, limit)">
+                <div :class="`input-select form-select ${modelValue.length ? 'p-2' : ''}`" :disabled="disabled" @click="$emit('get-options', searchValue, limit)">
                     <div class="placeholder-multiple" v-if="!modelValue?.length">
                         <span class="text-muted">{{ placeholder }}</span>
                     </div>

@@ -113,10 +113,10 @@
                                             <br><br>
                                             <div class="form-ketidaksesuaian">
                                                 <label for="name"><h5>Nama Laporan Ketidaksesuaian</h5></label>
-                                                <input type="text" id="name" class="form-control" placeholder="Masukkan nama laporan ketidaksesuaian">
+                                                <input v-model="form.name" type="text" id="name" class="form-control" placeholder="Masukkan nama laporan ketidaksesuaian">
                                                 <br>
                                                 <label for="descripion"><h5>Deskripsi</h5></label>
-                                                <textarea id="description" rows="5" class="form-control" placeholder="Masukkan deskripsi laporan ketidaksesuaian"></textarea>
+                                                <textarea v-model="form.description" id="description" rows="5" class="form-control" placeholder="Masukkan deskripsi laporan ketidaksesuaian"></textarea>
                                             </div>
                                             <br><br>
                                             <div class="card" style="border:1px solid gold;">
@@ -125,38 +125,59 @@
                                                         <h4>Pilih BBM yang Tidak Sesuai</h4>
                                                     </div>
                                                     <br>
-                                                    <div class="table-pomdes" style="overflow:auto;">
-                                                        <table class="table table-bordered" style="border:1px solid black;">
-                                                            <thead style="background-color:#F5F8FA !important;">
+                                                    <div class="table-ketidaksesuaian">
+                                                        <table style="width:100%;" class="table table-bordered">
+                                                            <thead style="border-bottom:2px solid gray;">
                                                                 <tr>
-                                                                    <th class="text-center"><b>Pilihan</b></th>
-                                                                    <th class="text-center"><b>No</b></th>
-                                                                    <th><b>Jenis BBM</b></th>
+                                                                    <th class="text-center"><h5>Pilihan</h5></th>
+                                                                    <th><h5>Jenis BBM</h5></th>
+                                                                    <th><h5>Tipe Ketidakesuaian</h5></th>
+                                                                    <th><h5>Ketidaksesuaian (Liter)</h5></th>
+                                                                    <th><h5>Ketidaksesuaian (Rp)</h5></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr v-for="(context, index) in informasi.bbm">
-                                                                    <td><input type="checkbox"></td>
-                                                                    <td class="text-center">{{ index+1 }}</td>
-                                                                    <td>{{ context?.jenis }}</td>
+                                                                <tr v-for="(context, index) in form.fuelDiscrepancy">
+                                                                    <td valign="middle">
+                                                                        <div class="form-check form-check-custom form-check-solid justify-content-center">
+                                                                            <input v-model="context.isDiscrepancy" class="form-check-input text-center" type="checkbox" :checked="context?.isDiscrepancy" />
+                                                                        </div>
+                                                                    </td>
+                                                                    <td valign="middle">{{context?.name}}</td>
+                                                                    <td valign="middle">
+                                                                        <app-select2 v-model="context.discrepancy_type_id" :disabled="!context?.isDiscrepancy" :options="selectList.type.list" :loading="selectList.type.loading" @get-options="getDiscrepancyType" placeholder="Pilih tipe ketidaksesuaian" :multiple="false"></app-select2>
+                                                                    </td>
+                                                                    <td valign="middle">
+                                                                        <app-money3 v-model="context.discrepancy_volume" class="form-control" placeholder="Isi volume ketidaksesuaian BBM" v-bind="money3" :disabled="!context?.isDiscrepancy" @keyup="calculateDiscrepancyPrice(index, $event)"></app-money3>
+                                                                    </td>
+                                                                    <td valign="middle">
+                                                                        <app-money3 v-model="context.discrepancy_price" class="form-control" placeholder="Isi harga ketidaksesuaian BBM" v-bind="money3" :disabled="!context?.isDiscrepancy" @keyup="calculateDiscrepancyVolume(index, $event)"></app-money3>
+                                                                    </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                    <br>
-                                                    <div class="row">
-                                                        <div class="col-md-3"><h5 class="text-gray-700">Total Biaya Tambahan</h5></div>
-                                                        <div class="col-md-9"><h5>Rp{{ $rupiahFormat(countFuelDiscrepancy) }}</h5></div>
+                                                    <br><br>
+                                                    <div class="total">
+                                                        <h4>Total ketidaksesuaian Pesanan</h4>
+                                                        <br>
+                                                        <div class="row my-2">
+                                                            <div class="col-md-3">
+                                                                <h5 class="text-gray-700">Total Harga : </h5>
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <h5>Rp{{ $rupiahFormat(countFuelDiscrepancyPrice) }}</h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row my-2">
+                                                            <div class="col-md-3">
+                                                                <h5 class="text-gray-700">Total Volume : </h5>
+                                                            </div>
+                                                            <div class="col-md-9">
+                                                                <h5>{{ $rupiahFormat(countFuelDiscrepancyVolume) }} Liter</h5>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <h5 class="text-gray-700">Total Biaya Transaksi</h5>
-                                                </div>
-                                                <div class="col-md-9">
-                                                    <h4>Rp{{ $rupiahFormat(total) }}</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -174,28 +195,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <br><br>
-                                    <div class="preview-file" v-if="files?.length">
-                                        <h3 class="text-warning">Preview File</h3>
-                                        <div class="row my-5">
-                                            <div class="col-md-3 my-3" v-for="(context, index) in files">
-                                                <div class="card card-file">
-                                                    <div @click="hapusFile(context?.id)" class="close" style="position: absolute !important; top:10px; right:10px; z-index:1000; cursor:pointer;"><i class="bi bi-x"></i></div>
-                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
-                                                        <div class="card-body p-2 d-flex align-items-center">
-                                                            <div class="icon-file">
-                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
-                                                            </div>
-                                                            <div class="info-file">
-                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
-                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -207,13 +206,20 @@
 </template>
 
 <script>
+import { toDisplayString } from 'vue';
+
     export default {
         data(){
             return {
                 token: localStorage.getItem('pomdes_token'),
                 dropzoneFile: '',
                 loading : false,
-                files: [],
+                selectList: {
+                    type: {
+                        loading: false,
+                        list: []
+                    },
+                },
                 informasi: {
                     namaPemesan: '',
                     nama: '',
@@ -222,8 +228,13 @@
                     bbm: []
                 },
                 form: {
-                    total: '',
-                    fuelDiscrepancy: []
+                    name: '',
+                    description: '',
+                    price: '',
+                    volume: '',
+                    fuelDiscrepancy: [
+                        {isDiscrepancy: false, name:'', fuel_transaction_id: '', discrepancy_type_id: '', discrepancy_volume: '', discrepancy_price: '', volume: '', price: '', limitVolume: '', limitPrice:''},
+                    ],
                 },
                 money3: {
                     masked: false,
@@ -298,8 +309,6 @@
                             supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-'
                         };
 
-                        this.files = data?.invoice_pomdes?.invoice_pomdes_files;
-
                         this.informasi.bbm = [];
                         $.each(data?.fuel_transactions, function(i,val){
                             that.informasi.bbm.push({
@@ -310,10 +319,18 @@
                         });
 
                         this.form.fuelDiscrepancy = [];
-                        $.each(data?.invoice_pomdes?.additional_costs, function(i,val){
+                        $.each(data?.fuel_transactions, function(i,val){
                             that.form.fuelDiscrepancy.push({
-                                name: val?.name,
-                                nominal: Number(val?.nominal).toFixed(2)
+                                isDiscrepancy: false,
+                                name: val?.fuel?.name,
+                                fuel_transaction_id: val?.id,
+                                discrepancy_type_id: '',
+                                discrepancy_volume: '',
+                                discrepancy_price: '',
+                                volume: Number(val?.fuel?.volume).toFixed(2),
+                                price: Number(val?.fuel?.price).toFixed(2),
+                                limitVolume: Number(val?.volume).toFixed(2),
+                                limitPrice: Number(val?.price).toFixed(2),
                             });
                         });
                     })
@@ -326,52 +343,37 @@
             },
             resetForm(){
                 this.form = {
-                    total: '',
-                    fuelDiscrepancy: []
-                }
-            },
-            tambahKetidaksesuaianBBM(){
-                this.form.fuelDiscrepancy.push({
                     name: '',
-                    nominal: ''
-                });
-            },
-            hapusBiayaTambahan(index){
-                this.form.fuelDiscrepancy.splice(index,1);
+                    description: '',
+                    price: '',
+                    volume: '',
+                    fuelDiscrepancy: [
+                        {isDiscrepancy: false, name:'', fuel_transaction_id: '', discrepancy_type_id: '', discrepancy_volume: '', discrepancy_price: '', volume: '', price: '', limitVolume: '', limitPrice:''},
+                    ]
+                }
             },
             simpan(){
                 let that = this;
-
+                console.log(this.form);
                 let data = {
-                    transaction_id: this.$route.params.id,
-                    total: this.form.total,
-                    additional_costs: []
+                    name: this.form.name,
+                    description: this.form.description,
+                    price: this.form.price,
+                    volume: this.form.volume,
+                    fuel_discrepancy: [],
                 };
 
-                $.each(this.form?.fuelDiscrepancy, function(i,val){
-                    data.additional_costs.push({name: val?.name, nominal: val?.nominal});
+                $.each(this.form.fuelDiscrepancy, function(i, val){
+                    if(val?.isDiscrepancy){
+                        data.fuel_discrepancy.push({
+                            fuel_transaction_id: val?.fuel_transaction_id,
+                            discrepancy_type_id: val?.discrepancy_type_id?.id,
+                            discrepancy_volume: val?.discrepancy_volume,
+                            discrepancy_price: val?.discrepancy_price,
+                        });
+                    }
                 });
 
-                this.$pageLoadingShow();
-                this.$axios().post(`transaction/invoice-pomdes`, data)
-                    .then(res => {
-                        if(this.dropzoneFile?.files?.length > 0){
-                            this.uploadFile(res?.data?.data?.id);
-                        }
-                        else{
-                            this.$pageLoadingHide();
-                            Swal.fire('Berhasil', 'Penerbitan tagihan transaksi berhasil disimpan.','success').then(()=>{
-                                that.$router.push({name: 't-tagihan'});
-                            })
-                        }
-                    })
-                    .catch(err => {
-                        this.$pageLoadingHide();
-                        this.$axiosHandleError(err);
-                    })
-                    .then(() => {
-
-                    });
             },
             uploadFile(id){
                 let that = this;
@@ -386,34 +388,45 @@
                     });
                 });
             },
-            hapusFile(id){
+            getDiscrepancyType(search, limit){
                 let that = this;
 
-                Swal.fire({
-                    title: `Hapus file yang dipilih?`,
-                    html: `File akan dihapus dan tidak dapat dikembalikan lagi.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#DB3700'
-                }).then(result => {
-                    if(result.isConfirmed){
-                        this.$pageLoadingShow();
-                        this.$axios().delete(`transaction/invoice-pomdes/file/${id}`)
-                            .then(res => {
-                                this.getData();
-                                toastr.success('File berhasil dihapus');
-                            })
-                            .catch(err => {
-                                this.$axiosHandleError(err);
-                            })
-                            .then(() => {
-                                this.$pageLoadingHide();
-                            });
-                    }
-                });
-            }
+                this.selectList.type.loading = true;
+                this.$axios().get(`transaction/discrepancy/select-discrepancy-type?search=${search}&limit=${limit}`)
+                    .then(res => {
+                        let data = res?.data?.data;
+                        this.selectList.type.list = [];
+                        $.each(data, function(i,val){
+                            that.selectList.type.list.push({id: val?.id, text: val?.name});
+                        });
+                    })
+                    .catch(err => {
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+                        this.selectList.type.loading = false;
+                    });
+            },
+            calculateDiscrepancyPrice(index, e){
+                if(this.form.fuelDiscrepancy[index].discrepancy_volume > this.form.fuelDiscrepancy[index].limitVolume && e.keyCode != 8){
+                    toastr.warning('Volume tidak boleh melebihi volume yang telah dipesan.');
+                    this.form.fuelDiscrepancy[index].discrepancy_volume = this.form.fuelDiscrepancy[index].limitVolume;
+                    this.form.fuelDiscrepancy[index].discrepancy_price = this.form.fuelDiscrepancy[index].price * this.form.fuelDiscrepancy[index].discrepancy_volume;
+                }
+                else{
+                    this.form.fuelDiscrepancy[index].discrepancy_price = this.form.fuelDiscrepancy[index].price * this.form.fuelDiscrepancy[index].discrepancy_volume;
+                }
+            },
+            calculateDiscrepancyVolume(index, e){
+                if(this.form.fuelDiscrepancy[index].discrepancy_price > this.form.fuelDiscrepancy[index].limitPrice && e.keyCode != 8){
+                    toastr.warning('Volume tidak boleh melebihi volume yang telah dipesan.');
+                    this.form.fuelDiscrepancy[index].discrepancy_price = this.form.fuelDiscrepancy[index].limitPrice;
+                    this.form.fuelDiscrepancy[index].discrepancy_volume = this.form.fuelDiscrepancy[index].discrepancy_price / this.form.fuelDiscrepancy[index].price;
+                }
+                else{
+                    this.form.fuelDiscrepancy[index].discrepancy_volume = this.form.fuelDiscrepancy[index].discrepancy_price / this.form.fuelDiscrepancy[index].price;
+                }
+            },
         },
         computed: {
             countTotal(){
@@ -435,12 +448,22 @@
                 });
                 return total;
             },
-            countFuelDiscrepancy(){
+            countFuelDiscrepancyPrice(){
                 let that = this;
                 let total = 0;
                 $.each(this.form.fuelDiscrepancy, function(i,val){
-                    total+=Number(val?.nominal);
+                    total+=Number(val?.discrepancy_price);
                 });
+                this.form.price = total;
+                return total;
+            },
+            countFuelDiscrepancyVolume(){
+                let that = this;
+                let total = 0;
+                $.each(this.form.fuelDiscrepancy, function(i,val){
+                    total+=Number(val?.discrepancy_volume);
+                });
+                this.form.volume = total;
                 return total;
             },
             total(){
@@ -458,5 +481,9 @@
     }
     .table-pomdes table tr td,.table-pomdes table tr th{
         padding:10px !important;
+    }
+    .table-ketidaksesuaian table tr td{
+        border-bottom:1px solid lightgray;
+        padding:10px;
     }
 </style>
