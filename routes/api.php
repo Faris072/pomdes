@@ -107,6 +107,7 @@ Route::group(['middleware' => 'auth:api'],function(){
         });
         Route::group(['prefix' => 'discrepancy'], function(){
             Route::get('select-discrepancy-type', 'App\Http\Controllers\API\DiscrepancyController@select_discrepancy_type');
+            Route::post('/', 'App\Http\Controllers\API\DiscrepancyController@create');
         });
         Route::put('finish/{id}', 'App\Http\Controllers\Api\TransactionController@finish');
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
