@@ -96,7 +96,7 @@
                                         <h5>{{ detail?.data?.deskripsi || '-' }}</h5>
                                     </div>
                                 </div>
-                                <div class="row my-3">
+                                <div class="row my-3" v-if="detail.data.files?.length">
                                     <div class="col-md-4">
                                         <h5 class="text-muted">File Pendukung</h5>
                                     </div>
@@ -120,13 +120,37 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row my-3">
+                                <div class="row my-3" v-if="detail.data.invoice?.invoice_pomdes_files?.length">
                                     <div class="col-md-4">
                                         <h5 class="text-muted">Lampiran File Tagihan</h5>
                                     </div>
                                     <div class="col-md-8">
                                         <div class="row mb-5">
                                             <div class="col-md-6 my-3" v-for="(context, index) in detail.data.invoice?.invoice_pomdes_files">
+                                                <div class="card card-file">
+                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                            <div class="icon-file">
+                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                            </div>
+                                                            <div class="info-file">
+                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row my-3" v-if="detail.data.discrepancy?.discrepancy_files?.length">
+                                    <div class="col-md-4">
+                                        <h5 class="text-muted">Lampiran File Ketidaksesuaian</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="row mb-5">
+                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.discrepancy?.discrepancy_files">
                                                 <div class="card card-file">
                                                     <a :href="`${context?.link}?token=${token}`" :download="context?.name">
                                                         <div class="card-body p-2 d-flex align-items-center">
@@ -207,6 +231,50 @@
                                                 </div>
                                                 <br>
                                                 <h5><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts) }}</b></h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Accordion-->
+                                <br><br>
+                                <!--begin::Accordion-->
+                                <div class="accordion" id="accordion-ketidaksesuaian">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="kt_accordion_1_header_1">
+                                            <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-ketidaksesuaian-content" aria-expanded="true" aria-controls="accordion-ketidaksesuaian">Ketidaksesuaian BBM</button>
+                                        </h2>
+                                        <div id="accordion-ketidaksesuaian-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-ketidaksesuaian">
+                                            <div class="accordion-body">
+                                                <div class="table-pomdes" style="overflow:auto;">
+                                                    <table class="table table-bordered" style="border:1px solid black;">
+                                                        <thead style="background-color:#F5F8FA !important;">
+                                                            <tr>
+                                                                <th class="text-center"><b>No</b></th>
+                                                                <th><b>Nama Biaya Tambahan</b></th>
+                                                                <th><b>Tipe</b></th>
+                                                                <th><b>Volume</b></th>
+                                                                <th><b>Nominal</b></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(context, index) in detail?.data?.discrepancy?.fuel_discrepancies" v-if="detail?.data?.discrepancy?.fuel_discrepancies?.length">
+                                                                <td class="text-center">{{ index+1 }}</td>
+                                                                <td>{{ context?.fuel_transaction?.fuel?.name }}</td>
+                                                                <td>{{ context?.discrepancy_type?.name }}</td>
+                                                                <td>{{ $rupiahFormat(context?.discrepancy_volume) }}</td>
+                                                                <td>{{ $rupiahFormat(context?.discrepancy_price) }}</td>
+                                                            </tr>
+                                                            <tr v-else>
+                                                                <td colspan="3">Tidak ada biaya tambahan</td>
+                                                            </tr>
+                                                        </tbody>
+                                                        <tr>
+                                                            <td colspan="3"><b>Total</b></td>
+                                                            <td><b>{{ $rupiahFormat(detail?.data?.discrepancy?.volume) }} Liter</b></td>
+                                                            <td><b>Rp{{ $rupiahFormat(detail?.data?.discrepancy?.price) }}</b></td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -476,6 +544,7 @@
                             fuel: data?.fuel_transactions,
                             files: data?.submission_files,
                             invoice: data?.invoice_pomdes,
+                            discrepancy: data?.discrepancy,
                         };
                     })
                     .catch(err => {

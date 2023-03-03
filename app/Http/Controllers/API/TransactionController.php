@@ -109,9 +109,10 @@ class TransactionController extends Controller
                 'hindrance.hindrance_files',
                 'log_approveds',
                 'discrepancy',
-                'discrepancy.fuel_discrepancies.discrepancy_files',
+                'discrepancy.discrepancy_files',
                 'discrepancy.fuel_discrepancies.discrepancy_type',
                 'discrepancy.fuel_discrepancies.fuel_transaction',
+                'discrepancy.fuel_discrepancies.discrepancy_type',
             ]);
 
             if(auth()->user()->role_id == 1){}
@@ -215,6 +216,8 @@ class TransactionController extends Controller
                 'fuel_transactions.fuel.supplier',
                 'hindrance.hindrance_files',
                 'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
+                'discrepancy.fuel_discrepancies.fuel_transaction.fuel',
+                'discrepancy.fuel_discrepancies.discrepancy_type',
             ])->find($id);
 
             if($transactions->submission_files){
@@ -238,6 +241,12 @@ class TransactionController extends Controller
             if($transactions->hindrance && $transactions->hindrance->hindrance_files){
                 foreach($transactions->hindrance->hindrance_files as $file){
                     $file->link = route('render-hindrance-files',$file->id);
+                }
+            }
+
+            if($transactions->discrepancy && $transactions->discrepancy->discrepancy_files){
+                foreach($transactions->discrepancy->discrepancy_files as $file){
+                    $file->link = route('render-discrepancy-files',$file->id);
                 }
             }
 

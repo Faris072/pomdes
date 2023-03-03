@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('discrepancy_id')->constrained('discrepancy')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('fuel_transaction_id')->constrained('fuel_transaction')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('discrepancy_type_id')->constrained('discrepancy_type')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->float('discrepancy_volume');
-            $table->bigInteger('discrepancy_price');
+            $table->double('discrepancy_volume');
+            $table->double('discrepancy_price');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -16,10 +16,9 @@ return new class extends Migration
         Schema::create('discrepancy', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaction_id')->constrained('transaction')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('report_name');
-            $table->string('report_description');
-            $table->bigInteger('price');
-            $table->bigInteger('volume');
+            $table->string('description');
+            $table->double('price');
+            $table->double('volume');
             $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();

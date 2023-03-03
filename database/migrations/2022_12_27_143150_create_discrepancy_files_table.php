@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('discrepancy_files', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('fuel_discrepancy_id')->constrained('fuel_discrepancy')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('discrepancy_id')->constrained('discrepancy')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->integer('size');
             $table->string('extension');

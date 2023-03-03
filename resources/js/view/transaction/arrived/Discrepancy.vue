@@ -5,7 +5,7 @@
                 <div id="kt_content_container" class="container-xxl">
                     <div class="d-flex justify-content-end">
                         <div class="card-header border-0 pt-5 align-items-center" style="justify-content:flex-end;">
-                            <button class="btn btn-secondary" @click="$router.push({name: 't-tagihan'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
+                            <button class="btn btn-secondary" @click="$router.push({name: 't-sampai'})"><i class="bi bi-arrow-left fa-lg"></i> Kembali</button>
                         </div>
                     </div>
                     <br>
@@ -112,9 +112,6 @@
                                             <h2 class="text-warning">Form Ketidaksesuaian</h2>
                                             <br><br>
                                             <div class="form-ketidaksesuaian">
-                                                <label for="name"><h5>Nama Laporan Ketidaksesuaian</h5></label>
-                                                <input v-model="form.name" type="text" id="name" class="form-control" placeholder="Masukkan nama laporan ketidaksesuaian">
-                                                <br>
                                                 <label for="descripion"><h5>Deskripsi</h5></label>
                                                 <textarea v-model="form.description" id="description" rows="5" class="form-control" placeholder="Masukkan deskripsi laporan ketidaksesuaian"></textarea>
                                             </div>
@@ -228,7 +225,6 @@ import { toDisplayString } from 'vue';
                     bbm: []
                 },
                 form: {
-                    name: '',
                     description: '',
                     price: '',
                     volume: '',
@@ -343,7 +339,6 @@ import { toDisplayString } from 'vue';
             },
             resetForm(){
                 this.form = {
-                    name: '',
                     description: '',
                     price: '',
                     volume: '',
@@ -354,9 +349,8 @@ import { toDisplayString } from 'vue';
             },
             simpan(){
                 let that = this;
-                console.log(this.form);
                 let data = {
-                    name: this.form.name,
+                    transaction_id: this.$route.params.id,
                     description: this.form.description,
                     price: this.form.price,
                     volume: this.form.volume,
@@ -374,17 +368,37 @@ import { toDisplayString } from 'vue';
                     }
                 });
 
+                this.$pageLoadingShow();
+                this.$axios().post(`transaction/discrepancy`, data)
+                    .then(res => {
+                        if(this.dropzoneFile.files.length > 0){
+                            this.uploadFile(res?.data?.data?.id);
+                        }
+                        else{
+                            this.$pageLoadingHide();
+                            Swal.fire('Berhasil','Laporan ketidaksesuaian berhasil disimpan', 'success').then(() => {
+                                this.$router.push({name: 't-sampai'});
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        this.$pageLoadingHide();
+                        this.$axiosHandleError(err);
+                    })
+                    .then(() => {
+
+                    });
             },
             uploadFile(id){
                 let that = this;
                 this.dropzoneFile.on('processing', function(){
-                    this.options.url = urlApi+`transaction/invoice-pomdes/file/${id}`;
+                    this.options.url = urlApi+`transaction/discrepancy/upload-file/${id}`;
                 });
                 this.dropzoneFile.processQueue();
                 this.dropzoneFile.on('success', function(){
                     that.$pageLoadingHide();
-                    Swal.fire('Berhasil', 'Penerbitan tagihan transaksi dan file berhasil disimpan.','success').then(()=>{
-                        that.$router.push({name: 't-tagihan'});
+                    Swal.fire('Berhasil', 'Ketidaksesuaian transaksi dan file berhasil disimpan.','success').then(()=>{
+                        that.$router.push({name: 't-sampai'});
                     });
                 });
             },
@@ -408,7 +422,7 @@ import { toDisplayString } from 'vue';
                     });
             },
             calculateDiscrepancyPrice(index, e){
-                if(this.form.fuelDiscrepancy[index].discrepancy_volume > this.form.fuelDiscrepancy[index].limitVolume && e.keyCode != 8){
+                if(Number(this.form.fuelDiscrepancy[index].discrepancy_volume) > Number(this.form.fuelDiscrepancy[index].limitVolume) && e.keyCode != 8){
                     toastr.warning('Volume tidak boleh melebihi volume yang telah dipesan.');
                     this.form.fuelDiscrepancy[index].discrepancy_volume = this.form.fuelDiscrepancy[index].limitVolume;
                     this.form.fuelDiscrepancy[index].discrepancy_price = this.form.fuelDiscrepancy[index].price * this.form.fuelDiscrepancy[index].discrepancy_volume;
@@ -418,7 +432,7 @@ import { toDisplayString } from 'vue';
                 }
             },
             calculateDiscrepancyVolume(index, e){
-                if(this.form.fuelDiscrepancy[index].discrepancy_price > this.form.fuelDiscrepancy[index].limitPrice && e.keyCode != 8){
+                if(Number(this.form.fuelDiscrepancy[index].discrepancy_price) > Number(this.form.fuelDiscrepancy[index].limitPrice) && e.keyCode != 8){
                     toastr.warning('Volume tidak boleh melebihi volume yang telah dipesan.');
                     this.form.fuelDiscrepancy[index].discrepancy_price = this.form.fuelDiscrepancy[index].limitPrice;
                     this.form.fuelDiscrepancy[index].discrepancy_volume = this.form.fuelDiscrepancy[index].discrepancy_price / this.form.fuelDiscrepancy[index].price;

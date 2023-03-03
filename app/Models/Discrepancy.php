@@ -20,4 +20,8 @@ class Discrepancy extends Model
     public function transaction(){
         return $this->belongsTo(Transaction::class, 'transaction_id','id');
     }
+
+    public function discrepancy_files(){
+        return $this->hasMany(DiscrepancyFiles::class, 'discrepancy_id','id');
+    }
 }
