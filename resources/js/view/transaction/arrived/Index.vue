@@ -36,7 +36,8 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)" v-if="context?.status_id == 10 || context?.status_id == 11"><i class="bi bi-check2-circle fa-lg me-2"></i> Konfirmasi Sampai</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="approve(context?.id)" v-if="context?.status_id == 10"><i class="bi bi-check2-circle fa-lg me-2"></i> Konfirmasi Sampai</a>
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="confirm(context?.id)" v-if="context?.status_id == 11"><i class="bi bi-check2-circle fa-lg me-2"></i> Konfirmasi Ketidaksesuaian</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                     <a class="dropdown-item" href="#" style="padding:10px;" @click="$router.push({path: `sampai/ketidaksesuaian/${context?.id}`})" v-if="context?.status?.id == 10"><i class="bi bi-clipboard2-x fa-lg"></i> Laporkan Ketidaksesuaian</a>
                                                 </div>
@@ -144,30 +145,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row my-3" v-if="detail.data.discrepancy?.discrepancy_files?.length">
-                                    <div class="col-md-4">
-                                        <h5 class="text-muted">Lampiran File Ketidaksesuaian</h5>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="row mb-5">
-                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.discrepancy?.discrepancy_files">
-                                                <div class="card card-file">
-                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
-                                                        <div class="card-body p-2 d-flex align-items-center">
-                                                            <div class="icon-file">
-                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
-                                                            </div>
-                                                            <div class="info-file">
-                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
-                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 <br>
                                 <!--begin::Accordion-->
                                 <div class="accordion" id="accordion-pengajuan">
@@ -245,6 +222,46 @@
                                         </h2>
                                         <div id="accordion-ketidaksesuaian-content" class="accordion-collapse collapse show" aria-labelledby="kt_accordion_1_header_1" data-bs-parent="#accordion-ketidaksesuaian">
                                             <div class="accordion-body">
+                                                <div class="row my-3">
+                                                    <div class="col-md-4">
+                                                        <h5 class="text-muted">Deskripsi Ketidaksesuaian</h5>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <h5>{{ detail?.data?.discrepancy?.description || '-' }}</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row my-3">
+                                                    <div class="col-md-4">
+                                                        <h5 class="text-muted">Tanggal Pelaporan</h5>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <h5>{{ $moment(detail?.data?.discrepancy?.created_at).format('DD-MM-YYYY') || '-' }}</h5>
+                                                    </div>
+                                                </div>
+                                                <div class="row my-3" v-if="detail.data.discrepancy?.discrepancy_files?.length">
+                                                    <div class="col-md-4">
+                                                        <h5 class="text-muted">Lampiran File Ketidaksesuaian</h5>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="row mb-5">
+                                                            <div class="col-md-6 my-3" v-for="(context, index) in detail.data.discrepancy?.discrepancy_files">
+                                                                <div class="card card-file">
+                                                                    <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                                        <div class="card-body p-2 d-flex align-items-center">
+                                                                            <div class="icon-file">
+                                                                                <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                                            </div>
+                                                                            <div class="info-file">
+                                                                                <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                                <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div class="table-pomdes" style="overflow:auto;">
                                                     <table class="table table-bordered" style="border:1px solid black;">
                                                         <thead style="background-color:#F5F8FA !important;">
@@ -558,6 +575,32 @@
                 Swal.fire({
                     title: `Konfirmasi sampai untuk transaksi yang dipilih?`,
                     html: `Transaksi akan di set sebagai selesai dan tidak dapat dikembalikan lagi.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Set Selesai',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#41FF1C'
+                }).then(result => {
+                    if(result.isConfirmed){
+                    this.$pageLoadingShow();
+                    this.$axios().put(`transaction/finish/${id}`)
+                        .then(res => {
+                            Swal.fire('Berhasil', 'Transaksi berhasil di set selesai','success');
+                            this.getDataTable();
+                        })
+                        .catch(err =>{
+                            this.$axiosHandleError(err);
+                        })
+                        .then(()=>{
+                            this.$pageLoadingHide();
+                        });
+                    }
+                });
+            },
+            confirm(id){
+                Swal.fire({
+                    title: `Konfirmasi ketidaksesuaian transaksi yang dipilih?`,
+                    html: `Transaksi akan di set sebagai selesai dan laporan ketidaksesuaian akan disetujui.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, Set Selesai',

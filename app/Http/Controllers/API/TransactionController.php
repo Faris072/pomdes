@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\DiscrepancyBefore;
+use App\Models\Discrepancy;
 use App\Models\Reject;
 use App\Http\Controllers\API\FuelTransactionController;
 use App\Models\LogApproved;
@@ -76,6 +78,29 @@ class TransactionController extends Controller
 
             if(!$query){
                 return $this->getResponse([],'Data gagal disimpan',500);
+            }
+
+            $discrepancy = Discrepancy::with(['transaction'])->where('is_active', true)->whereHas('transaction', function($q) use ($request){
+                $q->where('user_id',$request->user_id);
+            })->first();
+
+            if($discrepancy){
+                $discrepancyBefore = DiscrepancyBefore::create([
+                    'transaction_id' => $query->id,
+                    'discrepancy_id' => $discrepancy->id
+                ]);
+
+                if(!$discrepancyBefore){
+                    $query->delete();
+                    return $this->getResponse([],'Transaksi discrepancy sebelumnya gagal dibuat',500);
+                }
+
+                $updateDiscrepancy = $discrepancy->update(['is_active', false]);
+                if(!$updateDiscrepancy){
+                    $query->delete();
+                    $discrepancyBefore->delete();
+                    return $this->getResponse([],'Transaksi update discrepancy sebelumnya gagal dibuat',500);
+                }
             }
 
             $fuelTransaction = (new FuelTransactionController)->store($request, $query);
@@ -716,6 +741,7 @@ class TransactionController extends Controller
         }
     }
 
+    // set ke menunggu konfirmasi sampai
     public function set_arrived($id){
         try{
             if(auth()->user()->role_id == 1 ||auth()->user()->role_id == 4){}
@@ -741,6 +767,36 @@ class TransactionController extends Controller
             $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Set BBM Sampai');
 
             return $this->getResponse(Transaction::with(['hindrance.hindrance_files'])->find($id),'Transaksi berhasil dikirimkan.');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
+    public function confirm_discrepancy($id){
+        try{
+            if(auth()->user()->status_id == 1 || auth()->user()->status_id == 2){}
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['status','discrepancy.fuel_discrepancy'])->find($id);
+            if(!$transaction){
+                return $this->getResponse([],'Transaksi tidak ditemukan',404);
+            }
+
+            if($transaction->status_id != 11){
+                return $this->getResponse([],'Akses ditolak, Status tidak sesuai.',403);
+            }
+
+            $edit = $transaction->update(['status_id'=>12]);
+            if(!$edit){
+                return $this->getResponse([],'Konfirmasi gagal',500);
+            }
+
+            $this->store_log_approved($id, auth()->user()->id, $transaction->status_id, 'Konfirmasi laporan ketidaksesuaian');
+
+            return $this->getResponse(Transaction::with(['status','discrepancy.fuel_discrepancy'])->find($id),'Konfirmasi ketidaksesuaian berhasil');
         }
         catch(\Exception $e){
             return $this->getResponse([],$e->getMessage(),500);

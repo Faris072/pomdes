@@ -860,6 +860,7 @@ import Edit from '../pengajuan/Edit.vue';
                     this.hindrance.files.on('processing', function(){
                         this.options.url = urlApi+`transaction/hindrance/${that.hindrance.id}`;
                     });
+
                     this.$pageLoadingShow();
                     this.hindrance.files.processQueue();
                     this.hindrance.files.on('success', function(){
@@ -875,7 +876,7 @@ import Edit from '../pengajuan/Edit.vue';
                         description: this.hindrance.description
                     };
                     this.$pageLoadingShow();
-                    this.$axios().post(`transaction/hindrance/${this.form.id}`, data)
+                    this.$axios().post(`transaction/hindrance/${this.hindrance.id}`, data)
                         .then(res => {
                             $('.modal').modal('hide');
                             Swal.fire('Berhasil', 'Data kendala berhasil dikirimkan.','success').then(()=>{

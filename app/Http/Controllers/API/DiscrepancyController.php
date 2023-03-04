@@ -132,6 +132,11 @@ class DiscrepancyController extends Controller
                 }
             }
 
+            $updateStatus = $transaction->update(['status_id' => 11]);
+            if(!$updateStatus){
+                return $this->getResponse([],'Status gagal diubah',500);
+            }
+
             return $this->getResponse(Discrepancy::with(['fuel_discrepancies','discrepancy_files'])->find($discrepancy->id), 'Laporan ketidaksesuaian berhasil dikirimkan', 200);
 
         }

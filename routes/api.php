@@ -112,6 +112,7 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::post('/', 'App\Http\Controllers\API\DiscrepancyController@create');
         });
         Route::put('finish/{id}', 'App\Http\Controllers\Api\TransactionController@finish');
+        Route::put('confirm-discrepancy/{id}', 'App\Http\Controllers\Api\TransactionController@confirm_discrepancy');
         Route::put('publish-billing/{id}', 'App\Http\Controllers\Api\TransactionController@publish_billing');
         Route::put('approve-payment/{id}', 'App\Http\Controllers\Api\TransactionController@approve_payment');
         Route::get('data-table/{steps}','App\Http\Controllers\API\TransactionController@get');

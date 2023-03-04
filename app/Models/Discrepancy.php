@@ -24,4 +24,8 @@ class Discrepancy extends Model
     public function discrepancy_files(){
         return $this->hasMany(DiscrepancyFiles::class, 'discrepancy_id','id');
     }
+
+    public function discrepancy_before(){
+        return $this->hasOne(DiscrepancyBefore::class,'discrepancy_id','id');
+    }
 }

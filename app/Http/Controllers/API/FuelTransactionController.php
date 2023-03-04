@@ -34,7 +34,7 @@ class FuelTransactionController extends Controller
         }
     }
 
-    public function update($request, $id){
+    public function update($request, $query, $id){
         try{
             FuelTransaction::where('transaction_id', $id)->delete();
 
