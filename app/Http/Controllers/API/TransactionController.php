@@ -80,8 +80,16 @@ class TransactionController extends Controller
                 return $this->getResponse([],'Data gagal disimpan',500);
             }
 
-            $discrepancy = Discrepancy::with(['transaction'])->where('is_active', true)->whereHas('transaction', function($q) use ($request){
-                $q->where('user_id',$request->user_id);
+            $user_id = 0;
+            if(auth()->user()->role_id == 1){
+                $user_id = $request->user_id;
+            }
+            else{
+                $user_id = auth()->user()->id;
+            }
+
+            $discrepancy = Discrepancy::with(['transaction'])->where('is_active', true)->whereHas('transaction', function($q) use ($user_id){
+                $q->where('user_id',$user_id);
             })->first();
 
             if($discrepancy){

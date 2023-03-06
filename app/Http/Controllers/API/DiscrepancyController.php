@@ -14,6 +14,35 @@ use Illuminate\Support\Facades\Storage;
 
 class DiscrepancyController extends Controller
 {
+    public function check_discrepancy(Request $request){
+        try{
+            if(auth()->user()->role_id == 1){
+                $user_id = $request->user_id;
+            }
+            else if(auth()->user()->role_id == 3){
+                $user_id = auth()->user()->id;
+            }
+            else{
+                return $this->getResponse([],'Akses ditolak',403);
+            }
+
+            $transaction = Transaction::with(['fuel_transactions.fuel.supplier','discrepancy.fuel_discrepancies.fuel_transaction.fuel','discrepancy.discrepancy_files','discrepancy.fuel_discrepancies.discrepancy_type'])->where('user_id', $user_id)->whereHas('discrepancy', function($q){
+                $q->where('is_active',true);
+            })->first();
+
+            if($transaction->discrepancy && $transaction->discrepancy->discrepancy_files){
+                foreach($transaction->discrepancy->discrepancy_files as $df){
+                    $df->link = route('render-discrepancy-files', $df->id);
+                }
+            }
+
+            return $this->getResponse($transaction,'Data berhasil ditampilkan');
+        }
+        catch(\Exception $e){
+            return $this->getResponse([],$e->getMessage(),500);
+        }
+    }
+
     public function select_discrepancy_type(Request $request){
         try{
             $discrepancyType = DiscrepancyType::with([]);

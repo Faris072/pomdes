@@ -106,6 +106,7 @@ Route::group(['middleware' => 'auth:api'],function(){
             Route::post('/{id}', 'App\Http\Controllers\API\HindranceController@save');
         });
         Route::group(['prefix' => 'discrepancy'], function(){
+            Route::get('check-discrepancy', 'App\Http\Controllers\API\DiscrepancyController@check_discrepancy');
             Route::get('select-discrepancy-type', 'App\Http\Controllers\API\DiscrepancyController@select_discrepancy_type');
             Route::post('/upload-file/{id}', 'App\Http\Controllers\API\DiscrepancyController@upload_file');
             Route::get('/render-file/{id}', 'App\Http\Controllers\API\DiscrepancyController@render_file')->name('render-discrepancy-files');
