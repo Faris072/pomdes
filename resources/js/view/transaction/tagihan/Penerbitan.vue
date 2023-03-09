@@ -146,12 +146,20 @@
                                                 </div>
                                             </div>
                                             <br>
+                                            <div class="row" v-if="informasi?.discrepancyBefore?.discrepancy?.price">
+                                                <div class="col-md-3">
+                                                    <h5 class="text-gray-700">Ketidaksesuaian Transaksi Sebelumnya</h5>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <h4>Rp{{ $rupiahFormat(Number(this?.informasi?.discrepancyBefore?.discrepancy?.price)) }}</h4>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-md-3">
                                                     <h5 class="text-gray-700">Total Biaya Transaksi</h5>
                                                 </div>
                                                 <div class="col-md-9">
-                                                    <h4>Rp{{ $rupiahFormat(total) }}</h4>
+                                                    <h4 class="text-primary">Rp{{ $rupiahFormat(total) }}</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -284,13 +292,13 @@
                 this.$axios().get(`transaction/${this.$route.params.id}`)
                     .then(res => {
                         let data = res?.data?.data;
-                        console.log(data);
                         this.informasi = {
                             namaPemesan: data?.user,
                             nama: data?.name,
                             tanggal: data?.created_at,
                             deskripsi: data?.description,
-                            supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-'
+                            supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-',
+                            discrepancyBefore: data?.discrepancy_before
                         };
 
                         this.files = data?.invoice_pomdes?.invoice_pomdes_files;
@@ -440,6 +448,9 @@
             },
             total(){
                 let total = this.countHargaBbm + this.countAdditionalCosts;
+                if(Number(this?.informasi?.discrepancyBefore?.discrepancy?.price)){
+                    total = total + Number(this?.informasi?.discrepancyBefore?.discrepancy?.price || 0);
+                }
                 this.form.total = total;
                 return total;
             },

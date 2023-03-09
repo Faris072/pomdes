@@ -112,8 +112,8 @@
                                             </tbody>
                                             <tr>
                                                 <td colspan="3"><b>Total</b></td>
-                                                <td><b>{{ $rupiahFormat(countVolumeDiscrepancy) }} Liter</b></td>
-                                                <td><b>Rp{{ $rupiahFormat(countPriceDiscrepancy) }}</b></td>
+                                                <td><b>{{ $rupiahFormat(discrepancyBefore?.discrepancy?.volume) }} Liter</b></td>
+                                                <td><b>Rp{{ $rupiahFormat(discrepancyBefore?.discrepancy?.price) }}</b></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -371,6 +371,7 @@
                 });
             },
             checkDiscrepancy(){
+                let that = this;
                 if(!this?.form?.user?.id){
                     this.discrepancyBefore = false;
                     return false;
@@ -380,13 +381,15 @@
                     .then(res => {
                         let data = res?.data?.data;
                         this.discrepancyBefore = data;
-                        console.log(this.discrepancyBefore);
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
                     })
                     .then(() => {
                         this.loading = false;
+                        setTimeout(function(){
+                            that.initDropzone();
+                        },200);
                     });
             },
             getFuel(search, limit){
@@ -536,22 +539,11 @@
                 $.each(this.form.fuels, function(i,val){
                     total+=Number(val?.price);
                 });
-                return total;
-            },
-            countVolumeDiscrepancy(){
-                let that = this;
-                let total = 0;
-                $.each(this.discrepancyBefore?.discrepancy?.fuel_discrepancies, function(i, val){
-                    total += Number(val?.discrepancy_volume);
-                });
-                return total;
-            },
-            countPriceDiscrepancy(){
-                let that = this;
-                let total = 0;
-                $.each(this.discrepancyBefore?.discrepancy?.fuel_discrepancies, function(i, val){
-                    total += Number(val?.discrepancy_price);
-                });
+
+                if(this?.discrepancyBefore?.discrepancy?.price){
+                    total = total + Number(this?.discrepancyBefore?.discrepancy?.price || 0);
+                }
+
                 return total;
             }
         }

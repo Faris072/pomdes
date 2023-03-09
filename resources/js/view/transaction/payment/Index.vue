@@ -203,7 +203,8 @@
                                                     </table>
                                                 </div>
                                                 <br>
-                                                <h5><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts) }}</b></h5>
+                                                <h5 v-if="detail?.data?.discrepancyBefore?.discrepancy?.price"><b>Ketidaksesuaian Transaksi Sebelumnya: Rp{{ $rupiahFormat(Number(detail?.data?.discrepancyBefore?.discrepancy?.price)) }}</b></h5>
+                                                <h5 class="text-primary"><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts + Number(detail?.data?.discrepancyBefore?.discrepancy?.price || 0)) }}</b></h5>
                                             </div>
                                         </div>
                                     </div>
@@ -251,7 +252,8 @@
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice:[]
+                        invoice:[],
+                        discrepancyBefore: ''
                     }
                 },
                 tableConfig: {
@@ -417,7 +419,8 @@
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice: []
+                        invoice: [],
+                        discrepancyBefore: ''
                     }
                 }
             },
@@ -473,6 +476,7 @@
                             fuel: data?.fuel_transactions,
                             files: data?.submission_files,
                             invoice: data?.invoice_pomdes,
+                            discrepancyBefore: data?.discrepancy_before
                         };
                     })
                     .catch(err => {

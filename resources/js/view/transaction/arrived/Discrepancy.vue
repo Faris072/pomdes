@@ -95,6 +95,9 @@
                                                                             </tr>
                                                                         </table>
                                                                     </div>
+                                                                    <br>
+                                                                    <!-- <h5 v-if="informasi?.discrepancyBefore?.discrepancy?.price"><b>Ketidaksesuaian Transaksi Sebelumnya: Rp{{ $rupiahFormat(Number(informasi?.discrepancyBefore?.discrepancy?.price)) }}</b></h5>
+                                                                    <h5 class="text-primary"><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts + Number(informasi?.discrepancyBefore?.discrepancy?.price || 0)) }}</b></h5> -->
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -222,7 +225,8 @@ import { toDisplayString } from 'vue';
                     nama: '',
                     tanggal: '',
                     deskripsi: '',
-                    bbm: []
+                    bbm: [],
+                    discrepancyBefore: ''
                 },
                 form: {
                     description: '',
@@ -302,7 +306,8 @@ import { toDisplayString } from 'vue';
                             nama: data?.name,
                             tanggal: data?.created_at,
                             deskripsi: data?.description,
-                            supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-'
+                            supplier: data?.fuel_transactions ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-',
+                            discrepancyBefore: data?.discrepancy_before
                         };
 
                         this.informasi.bbm = [];
@@ -310,7 +315,7 @@ import { toDisplayString } from 'vue';
                             that.informasi.bbm.push({
                                 jenis: val?.fuel?.name,
                                 volume: val?.volume,
-                                harga: val?.price
+                                harga: val?.price,
                             });
                         });
 
@@ -344,7 +349,7 @@ import { toDisplayString } from 'vue';
                     volume: '',
                     fuelDiscrepancy: [
                         {isDiscrepancy: false, name:'', fuel_transaction_id: '', discrepancy_type_id: '', discrepancy_volume: '', discrepancy_price: '', volume: '', price: '', limitVolume: '', limitPrice:''},
-                    ]
+                    ],
                 }
             },
             simpan(){
@@ -352,8 +357,8 @@ import { toDisplayString } from 'vue';
                 let data = {
                     transaction_id: this.$route.params.id,
                     description: this.form.description,
-                    price: this.form.price,
-                    volume: this.form.volume,
+                    // price: this.form.price,
+                    // volume: this.form.volume,
                     fuel_discrepancy: [],
                 };
 
@@ -466,7 +471,12 @@ import { toDisplayString } from 'vue';
                 let that = this;
                 let total = 0;
                 $.each(this.form.fuelDiscrepancy, function(i,val){
-                    total+=Number(val?.discrepancy_price);
+                    if(val?.discrepancy_type_id?.id == 1){
+                        total+=Number(val?.discrepancy_price);
+                    }
+                    else{
+                        total-=Number(val?.discrepancy_price);
+                    }
                 });
                 this.form.price = total;
                 return total;
@@ -475,7 +485,12 @@ import { toDisplayString } from 'vue';
                 let that = this;
                 let total = 0;
                 $.each(this.form.fuelDiscrepancy, function(i,val){
-                    total+=Number(val?.discrepancy_volume);
+                    if(val?.discrepancy_type_id?.id == 1){
+                        total+=Number(val?.discrepancy_volume);
+                    }
+                    else{
+                        total-=Number(val?.discrepancy_volume);
+                    }
                 });
                 this.form.volume = total;
                 return total;

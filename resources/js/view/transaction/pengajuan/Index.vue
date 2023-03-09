@@ -155,10 +155,26 @@
                                                         </tbody>
                                                         <tr>
                                                             <td colspan="2"><b>Total</b></td>
-                                                            <td><b>{{ countVolumeBbm }} Liter</b></td>
-                                                            <td><b>Rp{{ countPriceBbm }}</b></td>
+                                                            <td><b>{{ $rupiahFormat(countVolumeBbm) }} Liter</b></td>
+                                                            <td><b>Rp{{ $rupiahFormat(countPriceBbm) }}</b></td>
                                                         </tr>
                                                     </table>
+                                                    <div class="row" v-if="detail?.data?.discrepancyBefore?.discrepancy?.price">
+                                                        <div class="col-md-6">
+                                                            <h5>Biaya ketidaksesuaian transaksi sebelumnya:</h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h5>Rp{{ detail?.data?.discrepancyBefore?.discrepancy?.price }}</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>Total Biaya: </h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h5 class="text-primary">Rp{{ $rupiahFormat(countPriceBbm+Number(detail?.data?.discrepancyBefore?.discrepancy?.price || 0)) }}</h5>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -192,7 +208,7 @@
                     <div class="modal-body" style="overflow-x:auto;">
                         <div class="form">
                             <label for="alasan-penolakan"><h5>Alasan Penolakan</h5></label>
-                            <textarea id="alasan-penolakan" rows="5" class="form-control" placeholder="Cth: Stok supplier telah habis" v-model="reject.data.description"></textarea>
+                            <textarea id="alasan-penolakan" rows="5" class="form-control" placeholder="Cth: Ada kendala internal" v-model="reject.data.description"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -268,7 +284,8 @@
                         deskripsi:'',
                         supplier: '',
                         fuel:[],
-                        files:[]
+                        files:[],
+                        discrepancyBefore: '',
                     }
                 },
                 tableConfig: {
@@ -531,14 +548,14 @@
                 this.$axios().get(`transaction/${id}`)
                     .then(res => {
                         let data = res?.data?.data;
-                        console.log(data);
                         this.detail.data = {
                             user: data?.user?.username,
                             nama: data?.name,
                             deskripsi:data?.description,
                             supplier: data?.fuel_transactions?.length ? data?.fuel_transactions[0]?.fuel?.supplier?.username : '-',
                             fuel: data?.fuel_transactions,
-                            files: data?.submission_files
+                            files: data?.submission_files,
+                            discrepancyBefore: data?.discrepancy_before
                         };
                     })
                     .catch(err => {
@@ -652,7 +669,7 @@
                 $.each(this?.detail?.data?.fuel, function(i,val){
                     price += Number(val?.price);
                 });
-                return this.$rupiahFormat(price);
+                return price;
             },
             countVolumeBbm(){
                 let that = this;
@@ -660,7 +677,7 @@
                 $.each(this?.detail?.data?.fuel, function(i,val){
                     volume += Number(val?.volume);
                 });
-                return this.$rupiahFormat(volume);
+                return volume;
             },
         }
     }

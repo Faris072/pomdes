@@ -30,7 +30,7 @@ class DiscrepancyController extends Controller
                 $q->where('is_active',true);
             })->first();
 
-            if($transaction->discrepancy && $transaction->discrepancy->discrepancy_files){
+            if($transaction && $transaction->discrepancy && $transaction->discrepancy->discrepancy_files){
                 foreach($transaction->discrepancy->discrepancy_files as $df){
                     $df->link = route('render-discrepancy-files', $df->id);
                 }
@@ -85,8 +85,6 @@ class DiscrepancyController extends Controller
             $attributes = [
                 'transaction_id' => 'Transaksi',
                 'description' => 'Deskripsi',
-                'price' => 'Total harga',
-                'volume' => 'Total volume',
                 'fuel_discrepancy.*.fuel_transaction_id' => 'Id transaksi BBM',
                 'fuel_discrepancy.*.discrepancy_type_id' => 'Tipe ketidaksesuaian',
                 'fuel_discrepancy.*.discrepancy_volume' => 'Volume ketidaksesuaian',
@@ -102,8 +100,6 @@ class DiscrepancyController extends Controller
             $validatedData = Validator::make($request->all(),[
                 'transaction_id' => 'required|unique:discrepancy,transaction_id',
                 'description' => '',
-                'price' => 'required|numeric',
-                'volume' => 'required|numeric',
                 'fuel_discrepancy.*.fuel_transaction_id' => 'required|numeric',
                 'fuel_discrepancy.*.discrepancy_type_id' => 'required|numeric',
                 'fuel_discrepancy.*.discrepancy_volume' => 'required|numeric',
@@ -119,24 +115,25 @@ class DiscrepancyController extends Controller
 
             if($request->fuel_discrepancy){
                 foreach($request->fuel_discrepancy as $fd){
-                    $totalPrice += (int) $fd['discrepancy_price'];
-                    $totalVolume += (int) $fd['discrepancy_volume'];
+                    if($fd['discrepancy_type_id'] == 1){
+                        $totalPrice += (int) $fd['discrepancy_price'];
+                        $totalVolume += (int) $fd['discrepancy_volume'];
+                    }
+                    else{
+                        $totalPrice -= (int) $fd['discrepancy_price'];
+                        $totalVolume -= (int) $fd['discrepancy_volume'];
+                    }
                 }
             }
             else{
-                return $this->getResponse([],'BBM yang tidak sesuai harus dipilih salah satu',422);
-            }
-
-            if((int) $request->price == $totalPrice ||(int) $request->volume == $totalVolume ){}
-            else{
-                return $this->getResponse([],'Total BBM tidak sesuai',403);
+                return $this->getResponse([],'BBM yang tidak sesuai harus dipilih salah satu atau lebih',422);
             }
 
             $discrepancy = Discrepancy::create([
                 'transaction_id' => $request->transaction_id,
                 'description' => $request->description,
-                'price' => $request->price,
-                'volume' => $request->volume,
+                'price' => $totalPrice,
+                'volume' => $totalVolume,
                 'is_active' => true
             ]);
             if(!$discrepancy){

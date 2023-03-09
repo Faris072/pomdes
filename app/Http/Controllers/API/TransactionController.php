@@ -103,7 +103,7 @@ class TransactionController extends Controller
                     return $this->getResponse([],'Transaksi discrepancy sebelumnya gagal dibuat',500);
                 }
 
-                $updateDiscrepancy = $discrepancy->update(['is_active', false]);
+                $updateDiscrepancy = $discrepancy->update(['is_active' => false]);
                 if(!$updateDiscrepancy){
                     $query->delete();
                     $discrepancyBefore->delete();
@@ -251,6 +251,9 @@ class TransactionController extends Controller
                 'discrepancy.fuel_discrepancies.fuel_transaction.transaction',
                 'discrepancy.fuel_discrepancies.fuel_transaction.fuel',
                 'discrepancy.fuel_discrepancies.discrepancy_type',
+                'discrepancy_before.discrepancy.fuel_discrepancies.discrepancy_type',
+                'discrepancy_before.discrepancy.fuel_discrepancies.fuel_transaction.fuel',
+                'discrepancy_before.transaction.fuel_transactions.fuel.supplier',
             ])->find($id);
 
             if($transactions->submission_files){
@@ -311,12 +314,8 @@ class TransactionController extends Controller
                 $request['user_id'] = auth()->user()->id;
             }
 
-            $request->status_id = 1;
-            $request['status_id'] = 1;
-
             $attributes = [
                 'user_id' => 'Id user',
-                'status_id' => 'Id status',
                 'name' => 'Nama transaksi',
                 'description' => 'Deskripsi',
                 'fuels.*.fuel_id' => 'Id fuel',
@@ -331,7 +330,6 @@ class TransactionController extends Controller
             ];
 
             $validatedData = Validator::make($request->all(),[
-                'status_id' => 'required|numeric',
                 'user_id' => 'required|numeric',
                 'name' => 'required',
                 'description' => 'required|min:5',
@@ -346,12 +344,6 @@ class TransactionController extends Controller
 
             $user = User::find($request->user_id);
 
-            $status = Status::find($request->status_id);
-
-            if(!$status){
-                return $this->getResponse([],'Status tidak ditemukan',404);
-            }
-
             if(!$user){
                 return $this->getResponse([],'User tidak ditemukan',404);
             }
@@ -362,7 +354,7 @@ class TransactionController extends Controller
                 }
             }
 
-            $query = $transaction->update($request->all());
+            $query = $transaction->update($request->only(['user_id','name','description','fuels']));
 
             if(!$query){
                 return $this->getResponse([],'Transaksi gagal diubah',500);

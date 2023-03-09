@@ -24,7 +24,7 @@
                                 <div class="wrap-form">
                                     <div class="form my-5" v-if="$store.state.auth.role_id == 1">
                                         <label for="user"><h5>User</h5></label>
-                                        <app-select2 id="user" v-model="form.user" :options="selectList.user.list" :loading="selectList.user.loading" @get-options="getUser" placeholder="Pilih pomdes" :multiple="false" />
+                                        <app-select2 id="user" v-model="form.user" :options="selectList.user.list" :loading="selectList.user.loading" @get-options="getUser" placeholder="Pilih pomdes" @change-options="checkDiscrepancy()" :multiple="false" />
                                     </div>
                                     <div class="form my-5">
                                         <label for="name"><h5>Nama Transaksi</h5></label>
@@ -33,6 +33,91 @@
                                     <div class="form my-5">
                                         <label for="name"><h5>Deskripsi</h5></label>
                                         <textarea v-model="form.description" class="form-control" rows="5" placeholder="Masukkan deskripsi transaksi"></textarea>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="card" style="border:1px solid gold;" v-if="this.discrepancyBefore">
+                                    <div class="card-body">
+                                        <h3>Informasi Ketidaksesuaian BBM</h3>
+                                        <span class="text-muted">Berikut adalah informasi ketidaksesuaian BBM pada transaksi sebelumnya.
+                                            Informasi ini akan mempengaruhi total pembayaran pada transaksi ini.
+                                            Jika mitra mempunyai transaksi ketidaksesuaian BBM pada transaksi sebelumnya yang bertipe <b>kurang</b>, maka biaya total transaksi akan dipotong dengan total ketidaksesuaian transaksi pada transaksi sebelumnya (dikurangi).
+                                            Sebaliknya, jika ketidaksesuaian bertipe <b>tambah</b>, maka total biaya transaksi ini akan ditambah dengan total ketidaksesuaian transaksi sebelumnya.
+                                        </span>
+                                        <br><br>
+                                        <div class="row my-4">
+                                            <div class="col-md-4"><h5>Nama transaksi sebelumnya</h5></div>
+                                            <div class="col-md-8 d-flex">
+                                                <h5 class="me-3">:</h5>
+                                                <h5 class="text-gray-700">{{ this?.discrepancyBefore?.transaction?.name }}</h5>
+                                            </div>
+                                        </div>
+                                        <div class="row my-4">
+                                            <div class="col-md-4"><h5>Supplier</h5></div>
+                                            <div class="col-md-8 d-flex">
+                                                <h5 class="me-3">:</h5>
+                                                <h5 class="text-gray-700">{{ this?.discrepancyBefore?.transaction?.fuel_transactions[0]?.fuel?.supplier?.username }}</h5>
+                                            </div>
+                                        </div>
+                                        <div class="row my-4">
+                                            <div class="col-md-4"><h5>Deskripsi ketidaksesuaian</h5></div>
+                                            <div class="col-md-8 d-flex">
+                                                <h5 class="me-3">:</h5>
+                                                <h5 class="text-gray-700">{{ this?.discrepancyBefore?.discrepancy?.description }}</h5>
+                                            </div>
+                                        </div>
+                                        <div class="row my-4" v-if="discrepancyBefore?.discrepancy?.discrepancy_files?.length">
+                                            <div class="col-md-4"><h5>Bukti ketidaksesuaian</h5></div>
+                                            <div class="col-md-8 d-flex">
+                                                <h5 class="me-3">:</h5>
+                                                <div class="row" style="width:100%;">
+                                                    <div class="col-md-5 my-3" v-for="(context, index) in discrepancyBefore?.discrepancy?.discrepancy_files">
+                                                        <div class="card card-file">
+                                                            <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                                <div class="card-body p-2 d-flex align-items-center">
+                                                                    <div class="icon-file">
+                                                                        <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                                    </div>
+                                                                    <div class="info-file">
+                                                                        <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                                        <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br><br>
+                                        <div class="table-ketidaksesuaian" style="overflow:auto;">
+                                            <center><h5>Rincian Ketidaksesuaian</h5></center>
+                                            <table class="table table-bordered" style="border:1px solid black;">
+                                                <thead style="background-color:#F5F8FA !important;">
+                                                    <tr>
+                                                        <th class="text-center"><b>No</b></th>
+                                                        <th><b>Jenis BBM</b></th>
+                                                        <th><b>Tipe Ketidaksesuaian</b></th>
+                                                        <th><b>Volume BBM (Liter)</b></th>
+                                                        <th><b>Harga BBM (Rp)</b></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(context, index) in this.discrepancyBefore?.discrepancy?.fuel_discrepancies">
+                                                        <td class="text-center">{{ index+1 }}</td>
+                                                        <td>{{ context?.fuel_transaction?.fuel?.name }}</td>
+                                                        <td>{{ context?.discrepancy_type?.name }}</td>
+                                                        <td>{{ $rupiahFormat(context?.discrepancy_volume) }} Liter</td>
+                                                        <td>Rp{{ $rupiahFormat(context?.discrepancy_price) }}</td>
+                                                    </tr>
+                                                </tbody>
+                                                <tr>
+                                                    <td colspan="3"><b>Total</b></td>
+                                                    <td><b>{{ $rupiahFormat(discrepancyBefore?.discrepancy?.volume) }} Liter</b></td>
+                                                    <td><b>Rp{{ $rupiahFormat(discrepancyBefore?.discrepancy?.price) }}</b></td>
+                                                </tr>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                                 <br>
@@ -218,6 +303,7 @@
                 token: localStorage.getItem('pomdes_token'),
                 loading: false,
                 dropzoneFile: '',
+                discrepancyBefore: false,
                 selectList: {
                     fuel: {
                         loading: false,
@@ -316,6 +402,8 @@
                         this.form.name = data?.name;
                         this.form.hiddenName = data?.name;
                         this.form.description = data?.description;
+                        this.discrepancyBefore = data?.discrepancy_before;
+                        console.log(this.discrepancyBefore);
                         this.files = data?.submission_files;
                         if(data?.fuel_transactions?.length > 0){
                             this.form.fuels = []
@@ -328,7 +416,6 @@
                                 price: Number(val?.price).toFixed(2),
                             });
                         });
-                        console.log(this.form.fuels)
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
@@ -337,6 +424,7 @@
                         this.loading = false;
                         setTimeout(function(){
                             that.initDropzone();
+                            that.checkDiscrepancy();
                         },500);
                     });
             },
@@ -513,6 +601,11 @@
                 $.each(this.form.fuels, function(i,val){
                     total+=Number(val?.price);
                 });
+
+                if(this?.discrepancyBefore?.discrepancy?.price){
+                    total = total + Number(this?.discrepancyBefore?.discrepancy?.price || 0);
+                }
+
                 return total;
             }
         }
@@ -524,6 +617,12 @@
         border:1px solid black !important;
     }
     .table-pomdes table tr td,.table-pomdes table tr th{
+        padding:10px !important;
+    }
+    .table-ketidaksesuaian table thead,.table-ketidaksesuaian table tbody,.table-ketidaksesuaian table tr td,.table-ketidaksesuaian table tr th{
+        border:1px solid black !important;
+    }
+    .table-ketidaksesuaian table tr td,.table-ketidaksesuaian table tr th{
         padding:10px !important;
     }
     .card-file{

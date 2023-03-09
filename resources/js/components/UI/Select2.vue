@@ -4,8 +4,8 @@
             <div class="select-single" v-if="!multiple">
                 <input type="text" :value="modelValue?.html ? modelValue?.html : modelValue?.text" :placeholder="placeholder" class="form-select" @click="$emit('get-options', searchValue, limit)" data-bs-toggle="dropdown" :disabled="disabled" readonly>
                 <button class="btn-clear" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
-                <ul class="dropdown-menu" style="width:100%;">
-                    <li class="p-4">
+                <ul class="dropdown-menu" style="width:100%; max-height:50vh; overflow-y:auto;">
+                    <li class="p-4" v-if="showSearch">
                         <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
                     </li>
                     <template v-if="loading">
@@ -44,8 +44,8 @@
                 <div class="wrap-btn-clear-multiple d-flex">
                     <button class="my-auto" v-if="showClear" @click="clear()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <ul class="dropdown-menu" style="width:100%;">
-                    <li class="p-4">
+                <ul class="dropdown-menu" style="width:100%; max-height:50vh; overflow-y:auto;">
+                    <li class="p-4" v-if="showSearch">
                         <input type="search" v-model="searchValue" @input="search()" class="form-control p-2" placeholder="Search">
                     </li>
                     <template v-if="loading">
@@ -91,7 +91,7 @@
                 type: String,
                 default: 'Loading...'
             },
-            serverSide: {
+            serverside: {
                 type: Boolean,
                 default: false
             },
@@ -118,6 +118,10 @@
             emptyLabel: {
                 type: String,
                 default: 'Tidak ada data'
+            },
+            showSearch: {
+                type: Boolean,
+                default: true
             }
         },
         data(){

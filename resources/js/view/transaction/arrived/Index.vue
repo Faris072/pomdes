@@ -207,7 +207,8 @@
                                                     </table>
                                                 </div>
                                                 <br>
-                                                <h5><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts) }}</b></h5>
+                                                <h5><b>Ketidaksesuaian Transaksi Sebelumnya: Rp{{ $rupiahFormat(Number(detail?.data?.discrepancyBefore?.discrepancy?.price)) }}</b></h5>
+                                                <h5 class="text-primary"><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts + Number(detail?.data?.discrepancyBefore?.discrepancy?.price || 0)) }}</b></h5>
                                             </div>
                                         </div>
                                     </div>
@@ -215,7 +216,7 @@
                                 <!--end::Accordion-->
                                 <br><br>
                                 <!--begin::Accordion-->
-                                <div class="accordion" id="accordion-ketidaksesuaian">
+                                <div class="accordion" id="accordion-ketidaksesuaian" v-if="detail?.data?.discrepancy">
                                     <div class="accordion-item">
                                         <h2 class="accordion-header" id="kt_accordion_1_header_1">
                                             <button class="accordion-button fs-4 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-ketidaksesuaian-content" aria-expanded="true" aria-controls="accordion-ketidaksesuaian">Ketidaksesuaian BBM</button>
@@ -339,7 +340,8 @@
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice:[]
+                        invoice:[],
+                        discrepancyBefore: ''
                     }
                 },
                 tableConfig: {
@@ -505,7 +507,8 @@
                         supplier: '',
                         fuel:[],
                         files:[],
-                        invoice: []
+                        invoice: [],
+                        discrepancyBefore: ''
                     }
                 }
             },
@@ -562,6 +565,7 @@
                             files: data?.submission_files,
                             invoice: data?.invoice_pomdes,
                             discrepancy: data?.discrepancy,
+                            discrepancyBefore: data?.discrepancy_before
                         };
                     })
                     .catch(err => {

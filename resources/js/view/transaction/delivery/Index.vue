@@ -36,18 +36,18 @@
                                             <td valign="middle" class="text-center">
                                                 <button class="btn btn-secondary dropdown-toggle btn-sm m-auto" type="button" data-bs-toggle="dropdown">Aksi</button>
                                                 <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                     <template v-if="context?.status_id == 7">
-                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="sendDelivery(context?.id)"><i class="bi bi-truck fa-lg"></i> Kirim BBM</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="modalBukti(context?.id)"><i class="bi bi-camera fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Bukti Pengiriman</a>
                                                     </template>
                                                     <template v-if="context?.status_id == 8">
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="setArrived(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Set Telah Sampai</a>
-                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="showDetail(context?.id)"><i class="bi bi-info-lg fa-lg me-2"></i> Detail</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="sendHindrance(context?.id)"><i class="bi bi-send-exclamation fa-lg"></i> Kirim Laporan Kendala</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="modalKendala(context?.id)"><i class="bi bi-exclamation-triangle fa-lg"></i> {{ context?.delivery ? 'Edit' : '' }} Laporan Kendala</a>
                                                     </template>
                                                     <template v-if="context?.status_id == 9">
+                                                        <a class="dropdown-item" href="#" style="padding:10px;" @click="infoKendala(context?.id)"><i class="bi bi-exclamation-triangle fa-lg"></i> Informasi Kendala</a>
                                                         <a class="dropdown-item" href="#" style="padding:10px;" @click="setArrived(context?.id)"><i class="bi bi-check2-circle fa-lg me-2"></i> Set Telah Sampai</a>
                                                     </template>
                                                 </div>
@@ -257,7 +257,8 @@
                                                     </table>
                                                 </div>
                                                 <br>
-                                                <h5><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts) }}</b></h5>
+                                                <h5 v-if="detail?.data?.discrepancyBefore?.discrepancy?.price"><b>Ketidaksesuaian Transaksi Sebelumnya: Rp{{ $rupiahFormat(Number(detail?.data?.discrepancyBefore?.discrepancy?.price)) }}</b></h5>
+                                                <h5 class="text-primary"><b>Total Biaya: Rp{{ $rupiahFormat(countPriceBbm + countAdditionalCosts + Number(detail?.data?.discrepancyBefore?.discrepancy?.price || 0)) }}</b></h5>
                                             </div>
                                         </div>
                                     </div>
@@ -407,6 +408,73 @@
             </div>
         </div>
 
+        <div class="modal fade" tabindex="-1" id="modal-info-kendala">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="m-auto" style="width:100%;">
+                            <center>
+                                <h3 class="modal-title">Form Kendala Pengiriman</h3>
+                                <span class="text-muted">Isi form berikut jika ada kendala saat pengiriman.</span>
+                            </center>
+                        </div>
+                        <!--begin::Close-->
+                        <button type="button" class="btn-close m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <!--end::Close-->
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="loading d-flex justify-content-center align-items-center" style="height:100%;" v-if="hindrance.loading">
+                            <app-loader></app-loader>
+                        </div>
+                        <div class="wrap-form" v-else>
+                            <div class="form">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5 class="text-gray-700">Terakhir diubah</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>: {{ $moment(hindrance?.updatedAt).format('DD-MM-YYYY (H:m:s)') }}</h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5 class="text-gray-700">Deskripsi</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>: {{ hindrance?.description }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <br><br>
+                            <div class="show-files" v-if="hindrance.showFiles?.length">
+                                <h5>File Terlampir : </h5>
+                                <div class="row my-3">
+                                    <div class="col-md-6 my-3" v-for="(context, index) in hindrance.showFiles">
+                                        <div class="card card-file">
+                                            <a :href="`${context?.link}?token=${token}`" :download="context?.name">
+                                                <div class="card-body p-2 d-flex align-items-center">
+                                                    <div class="icon-file">
+                                                        <img src="@/assets/images/file_icon.png" style="width:50px;">
+                                                    </div>
+                                                    <div class="info-file">
+                                                        <h6 class="text-primary">{{ context?.name || '-' }}</h6>
+                                                        <span class="text-muted">{{ $formatBytes(context?.size) }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -436,7 +504,8 @@ import Edit from '../pengajuan/Edit.vue';
                         fuel:[],
                         files:[],
                         invoice:[],
-                        delivery: []
+                        delivery: [],
+                        discrepancyBefore: ''
                     }
                 },
                 tableConfig: {
@@ -621,7 +690,8 @@ import Edit from '../pengajuan/Edit.vue';
                     estimationDate: null,
                     description: '',
                     showFiles: [],
-                    files: this.form.files
+                    files: this.form.files,
+                    discrepancyBefore: ''
                 }
             },
             simpan(){
@@ -716,8 +786,8 @@ import Edit from '../pengajuan/Edit.vue';
                             files: data?.submission_files,
                             invoice: data?.invoice_pomdes,
                             delivery: data?.delivery,
+                            discrepancyBefore: data?.discrepancy_before
                         };
-                        console.log(this.detail.data);
                     })
                     .catch(err => {
                         this.$axiosHandleError(err);
@@ -827,6 +897,13 @@ import Edit from '../pengajuan/Edit.vue';
                 this.editKendala();
                 $('#modal-kendala').modal('show');
             },
+            infoKendala(id){
+                this.hindrance.loading = true;
+                this.resetModalKendala();
+                this.hindrance.id = id;
+                this.editKendala();
+                $('#modal-info-kendala').modal('show');
+            },
             editKendala(){
                 let that = this;
                 this.hindrance.loading = true;
@@ -838,6 +915,7 @@ import Edit from '../pengajuan/Edit.vue';
                             return true;
                         }
 
+                        this.hindrance.updatedAt = data?.updated_at;
                         this.hindrance.description = data?.description;
                         this.hindrance.showFiles = data?.hindrance_files;
                     })
